@@ -109,7 +109,8 @@ namespace StructuralDesignKitLibrary.Materials
             RhoMean = MaterialTimberBaubuche.fmzk[Grade];
             RhoK = MaterialTimberBaubuche.fmzk[Grade];
 
-            Density = RhoMean;
+            //according to design guide, density for load calculation 850Kg/m³
+            Density = 850;
             E = E0mean;
             G = G0mean;
 
@@ -241,8 +242,8 @@ namespace StructuralDesignKitLibrary.Materials
         public static readonly Dictionary<string, double> rhoMean = new Dictionary<string, double>
         {
             //Baubuche
-            {"GL75h_Cl1", 850},
-            {"GL75h_Cl2", 850},
+            {"GL75h_Cl1", 800},
+            {"GL75h_Cl2", 800},
 
 
         };
@@ -256,5 +257,34 @@ namespace StructuralDesignKitLibrary.Materials
 
         };
         #endregion
+
+
+        /// <summary>
+        /// Update the material properties based on the size modification factor in the 
+        /// ETA-14/0354 of 20.09.2021 and in Manual for design and structural calculation in accordance with Eurocode 5 - 3rd revised edition
+        /// from Hans Joachim Blass, Johannes Streib
+        /// </summary>
+        /// <param name="b">beam width</param>
+        /// <param name="h">beam height - represents the Z axis of the beam, where lamellas are stacked</param>
+        public void UpdateBaubucheProperties(int b, int h)
+        {
+            //Update bending strength flatwise (Y axis):
+            Fmyk *= Math.Pow(600 / h, 0.1);
+
+            //Update bending strength edgewise (Z axis) according to design guide P.11:
+            if (b > 300)Fmzk *= Math.Pow(300 / h, 0.12);
+            if (b > 1200) throw new Exception("Baubuche Block gluing is limited to 1200mm according to ETA-14/0354");
+
+            //Update tension strength:
+            Ft0k*= Math.Pow(600 / Math.Max(h, b), 0.1);
+
+            //Update compression parallel to the grain strength:
+            var kc = Math.Min(1.18, 0.0009 * h + 0.892);
+            if (h > 120) Fc0k *= kc;
+
+            //Update shear strength:
+            var kvh = Math.Pow(600 / h, 0.13);
+            Fvk *= kvh;
+        }
     }
 }
