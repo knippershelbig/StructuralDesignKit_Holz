@@ -71,16 +71,16 @@ namespace StructuralDesignKitLibrary.Materials
             Ft0k = MaterialTimberBaubuche.ft0k[Grade];
             Ft90k = MaterialTimberBaubuche.ft90k[Grade];
             Fc0k = MaterialTimberBaubuche.fc0k[Grade];
-            Fc90k = MaterialTimberBaubuche.fmzk[Grade];
-            Fvk = MaterialTimberBaubuche.fmzk[Grade];
-            Frk = MaterialTimberBaubuche.fmzk[Grade];
-            E0mean = MaterialTimberBaubuche.fmzk[Grade];
-            E90mean = MaterialTimberBaubuche.fmzk[Grade];
-            G0mean = MaterialTimberBaubuche.fmzk[Grade];
-            E0_005 = MaterialTimberBaubuche.fmzk[Grade];
-            G0_005 = MaterialTimberBaubuche.fmzk[Grade];
-            RhoMean = MaterialTimberBaubuche.fmzk[Grade];
-            RhoK = MaterialTimberBaubuche.fmzk[Grade];
+            Fc90k = MaterialTimberBaubuche.fc90k[Grade];
+            Fvk = MaterialTimberBaubuche.fvk[Grade];
+            Frk = MaterialTimberBaubuche.frk[Grade];
+            E0mean = MaterialTimberBaubuche.e0mean[Grade];
+            E90mean = MaterialTimberBaubuche.e90mean[Grade];
+            G0mean = MaterialTimberBaubuche.gmean[Grade];
+            E0_005 = MaterialTimberBaubuche.e0_005[Grade];
+            G0_005 = MaterialTimberBaubuche.g0_005[Grade];
+            RhoMean = MaterialTimberBaubuche.rhoMean[Grade];
+            RhoK = MaterialTimberBaubuche.rhoK[Grade];
 
             Density = RhoMean;
             E = E0mean;
@@ -98,16 +98,16 @@ namespace StructuralDesignKitLibrary.Materials
             Ft0k = MaterialTimberBaubuche.ft0k[Grade];
             Ft90k = MaterialTimberBaubuche.ft90k[Grade];
             Fc0k = MaterialTimberBaubuche.fc0k[Grade];
-            Fc90k = MaterialTimberBaubuche.fmzk[Grade];
-            Fvk = MaterialTimberBaubuche.fmzk[Grade];
-            Frk = MaterialTimberBaubuche.fmzk[Grade];
-            E0mean = MaterialTimberBaubuche.fmzk[Grade];
-            E90mean = MaterialTimberBaubuche.fmzk[Grade];
-            G0mean = MaterialTimberBaubuche.fmzk[Grade];
-            E0_005 = MaterialTimberBaubuche.fmzk[Grade];
-            G0_005 = MaterialTimberBaubuche.fmzk[Grade];
-            RhoMean = MaterialTimberBaubuche.fmzk[Grade];
-            RhoK = MaterialTimberBaubuche.fmzk[Grade];
+            Fc90k = MaterialTimberBaubuche.fc90k[Grade];
+            Fvk = MaterialTimberBaubuche.fvk[Grade];
+            Frk = MaterialTimberBaubuche.frk[Grade];
+            E0mean = MaterialTimberBaubuche.e0mean[Grade];
+            E90mean = MaterialTimberBaubuche.e90mean[Grade];
+            G0mean = MaterialTimberBaubuche.gmean[Grade];
+            E0_005 = MaterialTimberBaubuche.e0_005[Grade];
+            G0_005 = MaterialTimberBaubuche.g0_005[Grade];
+            RhoMean = MaterialTimberBaubuche.rhoMean[Grade];
+            RhoK = MaterialTimberBaubuche.rhoK[Grade];
 
             //according to design guide, density for load calculation 850Kg/m³
             Density = 850;

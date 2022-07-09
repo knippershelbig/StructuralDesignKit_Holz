@@ -73,16 +73,16 @@ namespace StructuralDesignKitLibrary.Materials
             Ft0k = MaterialTimberHardwood.ft0k[Grade];
             Ft90k = MaterialTimberHardwood.ft90k[Grade];
             Fc0k = MaterialTimberHardwood.fc0k[Grade];
-            Fc90k = MaterialTimberHardwood.fmzk[Grade];
-            Fvk = MaterialTimberHardwood.fmzk[Grade];
-            Frk = MaterialTimberHardwood.fmzk[Grade];
-            E0mean = MaterialTimberHardwood.fmzk[Grade];
-            E90mean = MaterialTimberHardwood.fmzk[Grade];
-            G0mean = MaterialTimberHardwood.fmzk[Grade];
-            E0_005 = MaterialTimberHardwood.fmzk[Grade];
-            G0_005 = MaterialTimberHardwood.fmzk[Grade];
-            RhoMean = MaterialTimberHardwood.fmzk[Grade];
-            RhoK = MaterialTimberHardwood.fmzk[Grade];
+            Fc90k = MaterialTimberHardwood.fc90k[Grade];
+            Fvk = MaterialTimberHardwood.fvk[Grade];
+            Frk = MaterialTimberHardwood.frk[Grade];
+            E0mean = MaterialTimberHardwood.e0mean[Grade];
+            E90mean = MaterialTimberHardwood.e90mean[Grade];
+            G0mean = MaterialTimberHardwood.gmean[Grade];
+            E0_005 = MaterialTimberHardwood.e0_005[Grade];
+            G0_005 = MaterialTimberHardwood.g0_005[Grade];
+            RhoMean = MaterialTimberHardwood.rhoMean[Grade];
+            RhoK = MaterialTimberHardwood.rhoK[Grade];
 
             Density = RhoMean;
             E = E0mean;
@@ -93,23 +93,23 @@ namespace StructuralDesignKitLibrary.Materials
         public MaterialTimberHardwood(Grades name)
         {
             Grade = name.ToString();
-            
+
 
             Fmyk = MaterialTimberHardwood.fmyk[Grade];
             Fmzk = MaterialTimberHardwood.fmzk[Grade];
             Ft0k = MaterialTimberHardwood.ft0k[Grade];
             Ft90k = MaterialTimberHardwood.ft90k[Grade];
             Fc0k = MaterialTimberHardwood.fc0k[Grade];
-            Fc90k = MaterialTimberHardwood.fmzk[Grade];
-            Fvk = MaterialTimberHardwood.fmzk[Grade];
-            Frk = MaterialTimberHardwood.fmzk[Grade];
-            E0mean = MaterialTimberHardwood.fmzk[Grade];
-            E90mean = MaterialTimberHardwood.fmzk[Grade];
-            G0mean = MaterialTimberHardwood.fmzk[Grade];
-            E0_005 = MaterialTimberHardwood.fmzk[Grade];
-            G0_005 = MaterialTimberHardwood.fmzk[Grade];
-            RhoMean = MaterialTimberHardwood.fmzk[Grade];
-            RhoK = MaterialTimberHardwood.fmzk[Grade];
+            Fc90k = MaterialTimberHardwood.fc90k[Grade];
+            Fvk = MaterialTimberHardwood.fvk[Grade];
+            Frk = MaterialTimberHardwood.frk[Grade];
+            E0mean = MaterialTimberHardwood.e0mean[Grade];
+            E90mean = MaterialTimberHardwood.e90mean[Grade];
+            G0mean = MaterialTimberHardwood.gmean[Grade];
+            E0_005 = MaterialTimberHardwood.e0_005[Grade];
+            G0_005 = MaterialTimberHardwood.g0_005[Grade];
+            RhoMean = MaterialTimberHardwood.rhoMean[Grade];
+            RhoK = MaterialTimberHardwood.rhoK[Grade];
 
             Density = RhoMean;
             E = E0mean;

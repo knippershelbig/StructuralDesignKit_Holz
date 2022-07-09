@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StructuralDesignKitLibrary.Materials;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -293,12 +294,12 @@ namespace StructuralDesignKitLibrary.EC5
                     kl = 1;
                     break;
                 case TimberType.LVL:
-                    //Value according to EN 1995-1-1:2004 - Eq (3.3) and Kerto Product Certificate No EUFI29-20000676-C/EN §6.5
+                    //Value according to EN 1995-1-1:2004 - Eq (3.4) and Kerto Product Certificate No EUFI29-20000676-C/EN §6.5
                     kl = Math.Min(Math.Pow(3000 / Length, 0.06), 1.1);
                     break;
                 case TimberType.Baubuche:
-                    //Value according to EN 1995-1-1:2004 - Eq (3.3) and Baubuche Design Assistance Guide P.11
-                    kl = Math.Min(Math.Pow(3000 / Length, (0.12/2)), 1.1);
+                    //Value according to EN 1995-1-1:2004 - Eq (3.4) and Baubuche Design Assistance Guide P.11
+                    kl = Math.Min(Math.Pow(3000 / Length, (0.12 / 2)), 1.1);
                     break;
             }
             return kl;
@@ -306,6 +307,49 @@ namespace StructuralDesignKitLibrary.EC5
 
         #endregion
 
+
+        #region Kcr
+        /// <summary>
+        /// Computes the Crack factor for shear resistance Kcr 
+        /// </summary>
+        /// <param name="material">Material object</param>
+        /// <returns>Kcr value</returns>
+        [Description("Computes the Crack factor for shear resistance Kcr ")]
+        public static double Kcr(IMaterial material)
+        {
+            double kcr = 1;
+
+            IMaterialTimber timber;
+            if (material is IMaterialTimber)
+            {
+                timber = (IMaterialTimber)material;
+                switch (timber.Type)
+                {
+                    case EC5_Utilities.TimberType.Softwood:
+                        //DIN EN 1995-1 NA-DE: Annotation to 6.1.7(2) for Softwood
+                        kcr = 2.0 / timber.Fvk;
+                        break;
+                    case EC5_Utilities.TimberType.Hardwood:
+                        kcr = 0.67;
+                        break;
+                    case EC5_Utilities.TimberType.Glulam:
+                        //DIN EN 1995-1 NA-DE: Annotation to 6.1.7(2) for Glulam
+                        kcr = 2.5 / timber.Fvk;
+                        break;
+                    case EC5_Utilities.TimberType.LVL:
+                        kcr = 1;
+                        break;
+                    case EC5_Utilities.TimberType.Baubuche:
+                        kcr = 1;
+                        break;
+                }
+            }
+
+            return kcr;
+        }
     }
+    #endregion
+
 }
+
 
