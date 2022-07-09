@@ -45,6 +45,7 @@
     <Compile Include="Class1.cs" />
     <Compile Include="CrossSections\CrossSectionRectangular.cs" />
     <Compile Include="CrossSections\Interfaces\iCrossSection.cs" />
+    <Compile Include="EC5\EC5_Factors.cs" />
     <Compile Include="EC5\EC5_Utilities.cs" />
     <Compile Include="Materials\MaterialTimberHardwood.cs" />
     <Compile Include="Materials\MaterialTimberGlulam.cs" />

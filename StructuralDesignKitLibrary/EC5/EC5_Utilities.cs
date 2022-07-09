@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StructuralDesignKitLibrary.EC5
 {
-    public class EC5_Utilities
+    public static class EC5_Utilities
     {
 
        public enum TimberType
@@ -16,7 +16,25 @@ namespace StructuralDesignKitLibrary.EC5
             Glulam,
             LVL,
             Baubuche,
-
         }
+
+        public enum ServiceClass
+        {
+            SC1,
+            SC2,
+            SC3
+        }
+
+        public enum LoadDuration
+        {
+            Permanent, 
+            LongTerm, 
+            MediumTerm, 
+            ShortTerm, 
+            Instantaneous,
+            ShortTerm_Instantaneous,
+        }
+
+
     }
 }

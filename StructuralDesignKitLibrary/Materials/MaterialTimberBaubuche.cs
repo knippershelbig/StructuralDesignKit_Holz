@@ -260,12 +260,13 @@ namespace StructuralDesignKitLibrary.Materials
 
 
         /// <summary>
-        /// Update the material properties based on the size modification factor in the 
+        /// Update the material properties based on the size modification factors in the 
         /// ETA-14/0354 of 20.09.2021 and in Manual for design and structural calculation in accordance with Eurocode 5 - 3rd revised edition
         /// from Hans Joachim Blass, Johannes Streib
         /// </summary>
         /// <param name="b">beam width</param>
         /// <param name="h">beam height - represents the Z axis of the beam, where lamellas are stacked</param>
+        [Description("Update the material properties based on the size modification factor")]
         public void UpdateBaubucheProperties(int b, int h)
         {
             //Update bending strength flatwise (Y axis):
