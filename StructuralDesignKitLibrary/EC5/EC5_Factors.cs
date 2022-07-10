@@ -1,4 +1,6 @@
-﻿using StructuralDesignKitLibrary.Materials;
+﻿using StructuralDesignKitLibrary.CrossSections;
+using StructuralDesignKitLibrary.CrossSections.Interfaces;
+using StructuralDesignKitLibrary.Materials;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -109,6 +111,7 @@ namespace StructuralDesignKitLibrary.EC5
         }
         #endregion
 
+
         #region Ym
         // Ym represents the material's safety factor
         // Values according to DIN EN 1995-1-1 
@@ -141,6 +144,7 @@ namespace StructuralDesignKitLibrary.EC5
         }
 
         #endregion
+
 
         #region Kdef
         // Kdef is the Deformation factor to take into account the long time creep behaviour depending on the service class and the timber type
@@ -192,6 +196,7 @@ namespace StructuralDesignKitLibrary.EC5
             return kdef;
         }
         #endregion
+
 
         #region Kh
         // Size factor
@@ -271,14 +276,16 @@ namespace StructuralDesignKitLibrary.EC5
 
         #endregion
 
+
         #region Kl
 
         /// <summary>
-        /// The size factor considers the inhomogeneities and other deviations from an ideal orthotropic material
+        /// Size factor for LVL (or Baubuche) members submited to tensile force - according to EN 1995-1-1:2004 - Eq (3.4) + Kerto Product Certificate + Baubuche Design Assistance Guide
         /// </summary>
         /// <param name="timberType"></param>
         /// <param name="Length">Beam in tension total length</param>
         /// <returns></returns>
+        [Description("Size factor for LVL (or Baubuche) members submited to tensile force - according to EN 1995-1-1:2004 - Eq (3.4) + Kerto Product Certificate + Baubuche Design Assistance Guide")]
         public static double Kl(TimberType timberType, double Length)
         {
             double kl = 1;
@@ -310,11 +317,11 @@ namespace StructuralDesignKitLibrary.EC5
 
         #region Kcr
         /// <summary>
-        /// Computes the Crack factor for shear resistance Kcr 
+        /// Computes the Crack factor for shear resistance Kcr - According to DIN EN 1995-1 NA  §6.1.7(2)
         /// </summary>
         /// <param name="material">Material object</param>
         /// <returns>Kcr value</returns>
-        [Description("Computes the Crack factor for shear resistance Kcr ")]
+        [Description("Computes the Crack factor for shear resistance Kcr - According to DIN EN 1995-1 NA  §6.1.7(2)")]
         public static double Kcr(IMaterial material)
         {
             double kcr = 1;
@@ -347,9 +354,179 @@ namespace StructuralDesignKitLibrary.EC5
 
             return kcr;
         }
-    }
-    #endregion
 
+        #endregion
+
+
+        #region KShape
+        /// <summary>
+        /// Factor depending on the shape of the cross-section (and Material for Baubuche) for Torsion check - According to EN 1995-1 Eq(6.15)
+        /// </summary>
+        /// <param name="crossSection">Cross Section Object</param>
+        /// <param name="material">Material Object</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        [Description("Factor depending on the shape of the cross-section (and Material for Baubuche) for Torsion check - According to EN 1995-1 Eq(6.15)")]
+        public static double KShape(ICrossSection crossSection, IMaterial material)
+        {
+
+            double Kshape = 0;
+
+            if (crossSection is CrossSectionRectangular)
+            {
+                CrossSectionRectangular rectCS = (CrossSectionRectangular)crossSection;
+
+                if (material is MaterialTimberBaubuche)
+                {
+                    //according to Baubuche design guide §4.1.8 Torsion and Eq (6.15)
+                    Kshape = Math.Min(1 + 0.05 * rectCS.H / rectCS.B, 1.3);
+                }
+                else Kshape = Math.Min(1 + 0.15 * rectCS.H / rectCS.B, 2);
+            }
+            else throw new Exception("Currently only Rectangular Cross sections are covered for torsion check");
+
+            return Kshape;
+        }
+
+        #endregion
+
+
+        #region Km
+        /// <summary>
+        /// Factor considering re-distribution of bending stresses in a cross-section - According to EN 1995-1 §6.1.6(2)
+        /// </summary>
+        /// <param name="crossSection">Cross Section Object</param>
+        /// <param name="material">Material Object</param>
+        /// <returns>Returns the Km value</returns>
+        [Description("Factor considering re-distribution of bending stresses in a cross-section - According to EN 1995-1 §6.1.6(2)")]
+        public static double Km(ICrossSection crossSection, IMaterial material)
+        {
+            //km -> Factor considering re-distribution of bending stresses in a cross-section
+            double km = 1;
+
+            if (crossSection is CrossSectionRectangular)
+            {
+                IMaterialTimber timber;
+                if (material is IMaterialTimber)
+                {
+                    timber = (IMaterialTimber)material;
+
+                    if (timber.Type == EC5_Utilities.TimberType.Softwood ||
+                        timber.Type == EC5_Utilities.TimberType.Hardwood ||
+                        timber.Type == EC5_Utilities.TimberType.Glulam ||
+                        timber.Type == EC5_Utilities.TimberType.LVL ||
+                        timber.Type == EC5_Utilities.TimberType.Baubuche)
+                    {
+                        km = 0.7;
+                    }
+                }
+            }
+
+            return km;
+        }
+        #endregion
+
+
+        #region Kc
+
+        /// <summary>
+        /// Conmputes and returns the buckling instability factors kcy and kcz as a list of doubles - According to EN 1995-1 Eq(6.27) + Eq(6.28)
+        /// </summary>
+        /// <param name="crossSection">Cross section object</param>
+        /// <param name="material">Material object</param>
+        /// <param name="Leff_Y">Buckling length along Y in mm</param>
+        /// <param name="Leff_Z">Buckling Length along Z in mm</param>
+        /// <returns>Returns the buckling instability factors kcy and kcz as a list of doubles </double></returns>
+        /// <exception cref="Exception"></exception>
+        [Description("Conmputes and returns the buckling instability factors kcy and kcz as a list of doubles - According to EN 1995-1 Eq(6.27) + Eq(6.28)")]
+        public static List<double> Kc(ICrossSection crossSection, IMaterial material, double Leff_Y, double Leff_Z)
+        {
+
+            if (!(crossSection is CrossSectionRectangular)) throw new Exception("The buckling Factor Kc is currently only implemented for rectangular cross section");
+            CrossSectionRectangular RectCS = (CrossSectionRectangular)crossSection;
+            if (!(material is IMaterialTimber)) throw new Exception("The buckling Factor Kc is currently only implemented for IMaterialTimber");
+            IMaterialTimber timber = (IMaterialTimber)material;
+
+
+            double iy = RectCS.H / Math.Sqrt(12);
+            double iz = RectCS.B / Math.Sqrt(12);
+
+            double lambdaY = Leff_Y / iy;
+            double lambdaZ = Leff_Z / iz;
+
+            double lambdaRelY = lambdaY / Math.PI * Math.Sqrt(timber.Fc0k / timber.E0_005);
+            double lambdaRelZ = lambdaZ / Math.PI * Math.Sqrt(timber.Fc0k / timber.E0_005);
+
+
+            double Bc = 0;
+            switch (timber.Type)
+            {
+                case TimberType.Softwood:
+                    Bc = 0.2;
+                    break;
+                case TimberType.Hardwood:
+                    Bc = 0.2;
+                    break;
+                case TimberType.Glulam:
+                    Bc = 0.1;
+                    break;
+                case TimberType.LVL:
+                    Bc = 0.1;
+                    break;
+                case TimberType.Baubuche:
+                    Bc = 0.1;
+                    break;
+            }
+
+
+            double Ky = 0.5 * (1 + Bc * (lambdaRelY - 0.3) + Math.Pow(lambdaRelY, 2));
+            double Kz = 0.5 * (1 + Bc * (lambdaRelZ - 0.3) + Math.Pow(lambdaRelZ, 2));
+
+            double Kcy = 1 / (Ky + Math.Sqrt(Math.Pow(Ky, 2) - Math.Pow(lambdaRelY, 2)));
+            double Kcz = 1 / (Kz + Math.Sqrt(Math.Pow(Kz, 2) - Math.Pow(lambdaRelZ, 2)));
+
+
+            return new List<double>() { Kcy, Kcz };
+        }
+
+        #endregion
+
+
+        #region Kcrit
+        /// <summary>
+        /// factor which takes into account the reduced bending strength due to lateral buckling according to EN 1995-1 Eq(6.34)
+        /// </summary>
+        /// <param name="material">Material object</param>
+        /// <param name="crossSection">Cross section object</param>
+        /// <param name="Leff">Lateral buckling effective length in mm</param>
+        /// <returns>return the Kcrit factor</returns>
+        /// <exception cref="Exception"></exception>
+        public static double Kcrit(IMaterial material, ICrossSection crossSection, double Leff)
+        {
+            if (!(material is IMaterialTimber)) throw new Exception("Kcrit can only be calculated fot timber material");
+            var timber = (IMaterialTimber)material;
+
+            double kcrit = 1;
+
+            double SigmaCrit = 0;
+
+            //According to DIN EN 1995-1 NA §6.3.3(2), for Glulam, characteristic elastic properties can be increased by a factor 1.4
+            if (timber.Type == TimberType.Glulam) SigmaCrit = Math.PI * Math.Sqrt(timber.E0_005 * 1.4 * crossSection.MomentOfInertia_Z * timber.G0_005 * 1.4 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
+            else SigmaCrit = Math.PI * Math.Sqrt(timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
+            
+            double lambdaRel_m = Math.Sqrt(timber.Fmyk / SigmaCrit);
+
+
+            if (lambdaRel_m <= 0.75) kcrit = 1;
+            else if (lambdaRel_m <= 1.4) kcrit = 1.56 - 0.75 * lambdaRel_m;
+            else kcrit = 1 / Math.Pow(lambdaRel_m, 2);
+
+            return kcrit;
+        }
+
+        #endregion
+
+    }
 }
 
 

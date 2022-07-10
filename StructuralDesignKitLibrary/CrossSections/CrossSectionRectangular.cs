@@ -53,9 +53,14 @@ namespace StructuralDesignKitLibrary.CrossSections
         {
             B = b;
             H = h;
-            Material = material;
             this.ComputeCrossSectionProperties();
-            
+            if (material is MaterialTimberBaubuche)
+            {
+                MaterialTimberBaubuche baubuche = (MaterialTimberBaubuche)material;
+                baubuche.UpdateBaubucheProperties(b, h);
+                Material = baubuche;
+            }
+            else Material = material;
         }
 
 
@@ -83,11 +88,10 @@ namespace StructuralDesignKitLibrary.CrossSections
             SectionModulus_Z = H * Math.Pow(B, 2) / 6;
 
             //Torsion
-            double c = (1.0 / 3.0) * (1 - (0.63 / (H / B)) + (0.052 / Math.Pow((H / B), 5)));
-            TorsionalInertia= c * H * Math.Pow(B, 3);
+            double c1 = (1.0 / 3.0) * (1 - (0.63 / (H / (double)B)) + (0.052 / Math.Pow((H / (double)B), 5)));
+            TorsionalInertia= c1 * H * Math.Pow(B, 3);
 
-            double c1 = (1.0 / 3.0) * (1 - (0.63 / (H / B)) + (0.052 / Math.Pow((H / B), 5)));
-            double c2 = 1 - (0.65 / (1 + Math.Pow((H / B), 3)));
+            double c2 = 1 - (0.65 / (1 + Math.Pow((H / (double)B), 3)));
             TorsionalModulus = (c1 / c2) * H * Math.Pow(B, 2);
 
         }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StructuralDesignKitLibrary.Materials
 {
-    internal interface IMaterialTimber:IMaterial    
+    public interface IMaterialTimber:IMaterial    
     {
 
         /// <summary>
