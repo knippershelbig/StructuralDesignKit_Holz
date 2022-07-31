@@ -59,7 +59,7 @@ namespace StructuralDesignKitLibrary.Materials
         public MaterialTimberBaubuche(string name)
         {
 
-            if (Enum.GetNames(typeof(MaterialTimberBaubuche.Grade_Baubuche)).Contains(name))
+            if (Enum.GetNames(typeof(MaterialTimberBaubuche.Grades)).Contains(name))
             {
                 Grade = name;
             }
@@ -88,7 +88,7 @@ namespace StructuralDesignKitLibrary.Materials
 
         }
 
-        public MaterialTimberBaubuche(Grade_Baubuche name)
+        public MaterialTimberBaubuche(Grades name)
         {
             Grade = name.ToString();
 
@@ -122,7 +122,7 @@ namespace StructuralDesignKitLibrary.Materials
         public static TimberType type = TimberType.Baubuche;
 
         //Material properties of Baubuche GL75h according to ETA-14/0354 of 11.07.2018
-        public enum Grade_Baubuche
+        public enum Grades
         {
             GL75h_Cl1,
             GL75h_Cl2,

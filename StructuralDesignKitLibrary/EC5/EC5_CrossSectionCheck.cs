@@ -170,8 +170,6 @@ namespace StructuralDesignKitLibrary.EC5
         }
 
 
-
-
         /// <summary>
         /// Bending and tension EN 1995-1 §6.2.3 - Eq(6.17) + Eq(6.18)
         /// </summary>
@@ -217,7 +215,8 @@ namespace StructuralDesignKitLibrary.EC5
 
             return 1.0;// BendingAndTension(SigMyd, SigMzd, Sig0_t_d, crossSection, material, Kmod, Ym, khy, khz, Kh_Tension, Kl);
         }
-        //Bending and compression
+
+
         /// <summary>
         /// Combined Bending and Compression EN 1995-1 §6.2.4 - Eq(6.19) + Eq(6.20)
         /// </summary>
@@ -251,7 +250,6 @@ namespace StructuralDesignKitLibrary.EC5
             return Math.Max(eq_6_19, eq_6_20);
         }
 
-        //Instabilities
 
         /// <summary>
         /// Bending and Buckling EN 1995-1 §6.2.4 - Eq(6.23) + Eq(6.24)
