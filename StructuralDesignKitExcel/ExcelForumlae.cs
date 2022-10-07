@@ -10,6 +10,7 @@ using StructuralDesignKitLibrary.CrossSections;
 using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.Materials;
 using Microsoft.Office.Interop.Excel;
+using System.ComponentModel;
 
 namespace StructuralDesignKitExcel
 {
@@ -91,8 +92,60 @@ namespace StructuralDesignKitExcel
 
     }
 
-    public static class myfunction
+    public static class ExcelFormulae
     {
+
+
+
+        #region Eurocode 5 factors
+
+
+
+
+
+        //Kmod
+
+
+
+        //Ym
+        //Kdef
+        //Kl_LVL
+        //Kcr
+        //KShape
+        //Km
+        //Kc
+        //Kcrit
+        //Kc90
+        //KmAlpha
+        //Kr
+        //Kl
+        //Kvol
+        //Kdis
+
+
+        //Kp
+        [ExcelFunction(Description = "Factor for the verification of tension perpendicular to the grain at apex - EN 1995-1 §6.4.3 eq (6.56)",
+        Name = "SDK.Factors.Kp",
+        IsHidden = false,
+        Category = "SDK.EC5_Factors")]
+        public static double FactorKp([ExcelArgument(Description = "Beam height at apex in [mm]")] double heightApex, [ExcelArgument(Description = "cutting angle at apex in degree")] double angleApex,
+            [ExcelArgument(Description = "beam internal radius in [mm]")] double internalRadius)
+        {
+
+            return EC5_Factors.Kp(heightApex, angleApex, internalRadius);
+
+        }
+
+
+
+
+        #endregion
+
+
+
+
+
+
         [ExcelFunction("Returns the answer")]
         public static object MyFunction([ExcelArgument("The unimportant input")] object input)
         {
@@ -158,7 +211,7 @@ namespace StructuralDesignKitExcel
         Category = "SDK.EC5_CrossSection")]
         public static string CrossSectionTag([ExcelArgument(Description = "width")] double b, [ExcelArgument(Description = "height")] double h, string material)
         {
-            return ExcelHelpers.CreateRectCrossSectionTag(b,h,ExcelHelpers.GetTimberMaterial(material));
+            return ExcelHelpers.CreateRectCrossSectionTag(b, h, ExcelHelpers.GetTimberMaterial(material));
 
         }
 

@@ -61,17 +61,27 @@ namespace StructuralDesignKit
                 EC5_CrossSectionCheck.BendingAndTension(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N), cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1, Kh_Tension(mat.Type, cs1.B)),
                 EC5_CrossSectionCheck.BendingAndCompression(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N), cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1),
                 EC5_CrossSectionCheck.BendingAndBuckling(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N), leffy, leffz, cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1),
-                EC5_CrossSectionCheck.LateralTorsionalBuckling(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N),leffy,leffz,ltb_Eff,cs1,mat,kmod,ym, Kh_Bending(mat.Type, cs1.H), 1)));
+                EC5_CrossSectionCheck.LateralTorsionalBuckling(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N), leffy, leffz, ltb_Eff, cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1)));
 
 
-                double angle = 10;
-                Console.WriteLine("Compression at an angle {0}: {1:0.00}", angle,
-                    EC5_CrossSectionCheck.CompressionAtAnAngleToGrain(2, angle, cs1.Material, kmod, ym,1.5));
+            double angle = 10;
+            Console.WriteLine("Compression at an angle {0}: {1:0.00}", angle,
+                EC5_CrossSectionCheck.CompressionAtAnAngleToGrain(2, angle, cs1.Material, kmod, ym, 1.5));
 
 
-            Console.WriteLine(EC5_Factors.Kp(320,25,25000));
+            Console.WriteLine(EC5_Factors.Kp(320, 25, 25000));
 
 
+
+
+
+            DescriptionAttribute attribute = (DescriptionAttribute)typeof(EC5_Factors).GetMethod("Kdis").GetCustomAttributes(false)[0];
+            
+            //var description = (DescriptionAttribute)attribute;
+            //var text = description.Description;
+
+
+ 
 
             Console.ReadLine();
         }

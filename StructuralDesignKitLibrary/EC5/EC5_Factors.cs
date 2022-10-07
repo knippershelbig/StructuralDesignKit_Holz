@@ -681,6 +681,7 @@ namespace StructuralDesignKitLibrary.EC5
         }
         #endregion
 
+            
         #region Kdis
         /// <summary>
         /// Factor taking into consideration the influence of stress distribution - EN 1995-1 §6.4.3 eq (6.52)
@@ -694,7 +695,6 @@ namespace StructuralDesignKitLibrary.EC5
             else return 1.7;                //for pitched cambered beams
         }
         #endregion
-
 
 
         #region Kp
