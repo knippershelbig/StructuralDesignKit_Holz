@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using ExcelDna.Integration;
 using ExcelDna.Registration;
+using Excel = Microsoft.Office.Interop.Excel;
 using StructuralDesignKitLibrary.CrossSections;
 using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.Materials;
-
+using Microsoft.Office.Interop.Excel;
 
 namespace StructuralDesignKitExcel
 {
@@ -76,6 +77,7 @@ namespace StructuralDesignKitExcel
             {
 
             }
+
         }
 
 
@@ -122,10 +124,12 @@ namespace StructuralDesignKitExcel
         //}
 
 
+
+
         [ExcelFunction(Description = "Find a material based on a string",
-       Name = "SDK.Material.GetMaterial",
-       IsHidden = false,
-       Category = "SDK.EC5_Materials")]
+           Name = "SDK.Material.GetMaterial",
+           IsHidden = false,
+           Category = "SDK.EC5_Materials")]
         public static string Material(string material)
         {
             IMaterialTimber mat = ExcelHelpers.GetTimberMaterial(material);
@@ -133,16 +137,33 @@ namespace StructuralDesignKitExcel
 
         }
 
+
+
+
         [ExcelFunction(Description = "TestFunction",
-Name = "SDK.Material.Test",
-IsHidden = false,
-Category = "SDK.EC5_Materials")]
+        Name = "SDK.Material.Test",
+        IsHidden = false,
+        Category = "SDK.EC5_Materials")]
         public static string CrossSection(string CrossSectionTag)
         {
             CrossSectionRectangular CS = ExcelHelpers.CreateCrossSection(CrossSectionTag);
-            return String.Format("{0}x{1}mm",CS.B.ToString(), CS.H.ToString());
+            return String.Format("{0}x{1}mm", CS.B.ToString(), CS.H.ToString());
 
         }
+
+
+        [ExcelFunction(Description = "Creates a SDK cross section tag",
+        Name = "SDK.Material.CrossSectionTag",
+        IsHidden = false,
+        Category = "SDK.EC5_CrossSection")]
+        public static string CrossSectionTag([ExcelArgument(Description = "width")] double b, [ExcelArgument(Description = "height")] double h, string material)
+        {
+            return ExcelHelpers.CreateRectCrossSectionTag(b,h,ExcelHelpers.GetTimberMaterial(material));
+
+        }
+
+
+
 
 
 
@@ -167,6 +188,9 @@ Category = "SDK.EC5_Materials")]
         //Expose drop down Material type (baubuche, ...)
 
         //define material type based on names Find material type 
+
+        //Add optimisation (Cross section / material for given check)
+
 
     }
 

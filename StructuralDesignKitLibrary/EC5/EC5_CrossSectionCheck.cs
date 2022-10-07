@@ -1,6 +1,7 @@
 ﻿using StructuralDesignKitLibrary.CrossSections;
 using StructuralDesignKitLibrary.CrossSections.Interfaces;
 using StructuralDesignKitLibrary.Materials;
+using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,18 +23,18 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="Kmod">modification factor</param>
         /// <param name="Ym">Material Safety factor</param>
         /// <param name="Kh">Size Factor for Cross section</param>
-        /// <param name="Kl">Mofification factor for member Length</param>
+        /// <param name="Kl_LVL">Mofification factor for member Length</param>
         /// <returns>Design ratio for Tension parallel to the grain according to EN 1995-1 §6.1.2 - Eq(6.1)</returns>
         [Description("Tension parallel to the grain §6.1.2")]
-        public static double TensionParallelToGrain(double Sig0_t_d, IMaterial material, double Kmod, double Ym, double Kh = 1, double Kl = 1)
+        public static double TensionParallelToGrain(double Sig0_t_d, IMaterial material, double Kmod, double Ym, double Kh = 1, double Kl_LVL = 1)
         {
             if (!(material is IMaterialTimber)) throw new Exception("This method is currently only implemented for timber materials");
             var timber = (IMaterialTimber)material;
             double ft0_k = timber.Ft0k;
 
-            if(timber.Type != EC5_Utilities.TimberType.LVL && timber.Type != EC5_Utilities.TimberType.Baubuche) Kl = 1;
+            if(timber.Type != EC5_Utilities.TimberType.LVL && timber.Type != EC5_Utilities.TimberType.Baubuche) Kl_LVL = 1;
 
-                return Sig0_t_d / (Kh * Kl * ft0_k * Kmod / Ym);
+                return Sig0_t_d / (Kh * Kl_LVL * ft0_k * Kmod / Ym);
         }
 
 
@@ -53,6 +54,28 @@ namespace StructuralDesignKitLibrary.EC5
             double fc0_k = timber.Fc0k;
 
             return Sig0_c_d / (fc0_k * Kmod / Ym);
+        }
+
+
+        /// <summary>
+        /// Compression stresses at an angle to the grain 
+        /// </summary>
+        /// <param name="SigAlpha_c_d">Design compressive stress</param>
+        /// <param name="angleToGrain">Tress angle to the grain in Degree</param>
+        /// <param name="material"></param>
+        /// <param name="Kmod">modification factor</param>
+        /// <param name="Ym">Material Safety factor</param>
+        /// <param name="kc90">factor taking into account the effect of stresses perpendicular to the grain</param>
+        /// <returns></returns>
+        [Description("Compression stresses at an angle to the grain EN 1995-1 §6.2.2 - Eq(6.16)")]
+        public static double CompressionAtAnAngleToGrain(double SigAlpha_c_d, double angleToGrain, IMaterial material, double Kmod, double Ym, double kc90 =1)
+        {
+            var timber = CheckMaterialTimber(material);
+            double angleRad = angleToGrain * Math.PI / 180;
+            double fc0_d = timber.Fc0k * Kmod/Ym;
+            double fc90_d = timber.Fc90k*Kmod/Ym;
+
+            return SigAlpha_c_d / ( fc0_d / ((fc0_d / (kc90 * fc90_d)) * Math.Pow(Math.Sin(angleRad), 2) + Math.Pow(Math.Cos(angleRad), 2)));
         }
 
 
@@ -187,7 +210,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         [Description("Bending and tension EN 1995-1 +NA §6.2.3 Eq(6.17) + Eq(6.18)")]
-        public static double BendingAndTension(double SigMyd, double SigMzd, double Sig0_t_d, ICrossSection crossSection, IMaterial material, double Kmod, double Ym, double khy = 1, double khz = 1, double Kh_Tension = 1, double Kl = 1)
+        public static double BendingAndTension(double SigMyd, double SigMzd, double Sig0_t_d, ICrossSection crossSection, IMaterial material, double Kmod, double Ym, double khy = 1, double khz = 1, double Kh_Tension = 1, double Kl_LVL = 1)
         {
             if (!(material is IMaterialTimber)) throw new Exception("This method is currently only implemented for timber materials");
             var timber = (IMaterialTimber)material;
@@ -198,23 +221,16 @@ namespace StructuralDesignKitLibrary.EC5
 
             double km = EC5_Factors.Km(crossSection, material);
 
-            if (timber.Type != EC5_Utilities.TimberType.LVL && timber.Type != EC5_Utilities.TimberType.Baubuche) Kl = 1;
+            if (timber.Type != EC5_Utilities.TimberType.LVL && timber.Type != EC5_Utilities.TimberType.Baubuche) Kl_LVL = 1;
 
-            double tensionRatio = Sig0_t_d / (Kh_Tension * Kl * ft0_k * Kmod / Ym);
+            double tensionRatio = Sig0_t_d / (Kh_Tension * Kl_LVL * ft0_k * Kmod / Ym);
             double eq_6_17 = tensionRatio + SigMyd / (fmy_k * khy * Kmod / Ym) + km * SigMzd / (fmz_k * khz * Kmod / Ym);
             double eq_6_18 = tensionRatio + km * SigMyd / (fmy_k * khy * Kmod / Ym) + SigMzd / (fmz_k * khz * Kmod / Ym);
 
             return Math.Max(eq_6_17, eq_6_18);
         }
 
-        public static double BendingAndTension(List<double> forces, ICrossSection crossSection, IMaterial material, double Kmod, double Ym, double khy = 1, double khz = 1, double Kh_Tension = 1, double Kl = 1)
-        {
-            double SigMyd = crossSection.ComputeStressBendingY(forces[0]);
-            double SigMzd = crossSection.ComputeStressBendingZ(forces[1]);
-            double Sig0_t_d = crossSection.ComputeStressBendingZ(forces[2]);
-
-            return 1.0;// BendingAndTension(SigMyd, SigMzd, Sig0_t_d, crossSection, material, Kmod, Ym, khy, khz, Kh_Tension, Kl);
-        }
+        
 
 
         /// <summary>
@@ -334,5 +350,8 @@ namespace StructuralDesignKitLibrary.EC5
 
             return results[0];
         }
+
+
+
     }
 }

@@ -89,10 +89,23 @@ namespace StructuralDesignKitExcel
 
                 throw;
             }
-
-
-
             return new CrossSectionRectangular(b, h, material);
+        }
+
+
+
+
+
+        public static string CreateRectCrossSectionTag(double b, double h, IMaterialTimber material)
+        {
+
+            //CS_R_100x200_GL24h
+            return String.Format("CS_R_{0}_{1}_{2}",
+                b,
+                h,
+                material.Grade);
+           
+
         }
     }
 }

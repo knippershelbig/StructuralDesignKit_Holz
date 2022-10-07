@@ -1,6 +1,7 @@
 ﻿using StructuralDesignKitLibrary.CrossSections;
 using StructuralDesignKitLibrary.CrossSections.Interfaces;
 using StructuralDesignKitLibrary.Materials;
+using StructuralDesignKitLibrary.EC5;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -277,7 +278,7 @@ namespace StructuralDesignKitLibrary.EC5
         #endregion
 
 
-        #region Kl
+        #region Kl_LVL
 
         /// <summary>
         /// Size factor for LVL (or Baubuche) members submited to tensile force - according to EN 1995-1-1:2004 - Eq (3.4) + Kerto Product Certificate + Baubuche Design Assistance Guide
@@ -286,7 +287,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="Length">Beam in tension total length</param>
         /// <returns></returns>
         [Description("Size factor for LVL (or Baubuche) members submited to tensile force - according to EN 1995-1-1:2004 - Eq (3.4) + Kerto Product Certificate + Baubuche Design Assistance Guide")]
-        public static double Kl(TimberType timberType, double Length)
+        public static double Kl_LVL(TimberType timberType, double Length)
         {
             double kl = 1;
             switch (timberType)
@@ -513,7 +514,7 @@ namespace StructuralDesignKitLibrary.EC5
             //According to DIN EN 1995-1 NA §6.3.3(2), for Glulam, characteristic elastic properties can be increased by a factor 1.4
             if (timber.Type == TimberType.Glulam) SigmaCrit = Math.PI * Math.Sqrt(timber.E0_005 * 1.4 * crossSection.MomentOfInertia_Z * timber.G0_005 * 1.4 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
             else SigmaCrit = Math.PI * Math.Sqrt(timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
-            
+
             double lambdaRel_m = Math.Sqrt(timber.Fmyk / SigmaCrit);
 
 
@@ -525,6 +526,204 @@ namespace StructuralDesignKitLibrary.EC5
         }
 
         #endregion
+
+
+        #region Kc90
+        /// <summary>
+        /// kc,90 takes into consideration the type of effect, the splitting risk and the extent of the deformation
+        /// </summary>
+        /// <param name="material">Material object</param>
+        /// <param name="supportType">0 for continuous support; 1 for ponctual contact according to EN 1995-1 §6.1.5</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        [Description("kc,90 takes into consideration the type of effect, the splitting risk and the extent of the deformation")]
+        public static double Kc90(IMaterial material, int supportType)
+        {
+            double kc90 = 1;
+            var timber = CheckMaterialTimber(material);
+            switch (timber.Type)
+            {
+                case TimberType.Softwood:
+                    if (supportType == 0) kc90 = 1.25;
+                    else kc90 = 1.5;
+                    break;
+
+                case TimberType.Hardwood:
+                    if (supportType == 0) kc90 = 1.25;
+                    else kc90 = 1.5;
+                    break;
+
+                case TimberType.Glulam:
+                    if (supportType == 0) kc90 = 1.5;
+                    else kc90 = 1.75;
+                    break;
+
+                case TimberType.LVL:
+                    //To implement according to product i.e: CERTIFICATE NO. EUFI29-20000676-C/EN for Kerto
+                    kc90 = 1;
+                    break;
+
+                case TimberType.Baubuche:
+                    kc90 = 1;
+                    break;
+
+                default:
+                    kc90 = 1;
+                    break;
+            }
+
+            return kc90;
+
+        }
+
+        #endregion
+
+
+        #region Km_Alpha
+        /// <summary>
+        /// Km,α is a reduction factor taking into account the increased stress due to tapper edges. The factor differs for edges in tension or compression
+        /// depending on the bending orientation - EN 1995-1 §6.4.2 eq (6.39)
+        /// </summary>
+        /// <param name="material">Material object</param>
+        /// <param name="AngleInDegree">ange in degree</param>
+        /// <returns></returns>
+        [Description("Km,α is a reduction factor taking into account the increased stress due to tapper edges")]
+        public static double Km_Alpha_Tension(IMaterial material, double AngleInDegree)
+        {
+            double angleRadian = AngleInDegree * Math.PI / 180;
+            var timber = CheckMaterialTimber(material);
+
+            return 1 / (Math.Sqrt(1 + Math.Pow(timber.Fmyk / (0.75 * timber.Fvk) * Math.Tan(angleRadian), 2) + Math.Pow(timber.Fmyk / timber.Ft90k * Math.Pow(Math.Tan(angleRadian), 2), 2)));
+        }
+
+        /// <summary>
+        /// Km,α is a reduction factor taking into account the increased stress due to tapper edges. The factor differs for edges in tension or compression
+        /// depending on the bending orientation - EN 1995-1 §6.4.2 eq (6.40)
+        /// </summary>
+        /// <param name="material">Material object</param>
+        /// <param name="AngleInDegree">ange in degree</param>
+        /// <returns></returns>
+        [Description("Km,α is a reduction factor taking into account the increased stress due to tapper edges")]
+        public static double Km_Alpha_Compression(IMaterial material, double AngleInDegree)
+        {
+            double angleRadian = AngleInDegree * Math.PI / 180;
+            var timber = CheckMaterialTimber(material);
+
+            return 1 / (Math.Sqrt(1 + Math.Pow(timber.Fmyk / (1.5 * timber.Fvk) * Math.Tan(angleRadian), 2) + Math.Pow(timber.Fmyk / timber.Fc90k * Math.Pow(Math.Tan(angleRadian), 2), 2)));
+        }
+
+        #endregion
+
+
+        #region Kr
+        /// <summary>
+        /// Factor taking into consideration the stresses generated prior to bonding due to the bending of individual lamellae for curved beams with small radii of curvature - EN 1995-1 §6.4.3 eq (6.49)
+        /// </summary>
+        /// <param name="internalRadius">internal beam radius in [mm]</param>
+        /// <param name="lamellaThickness">glulam lamellae thickness in [mm]</param>
+        /// <returns></returns>
+        [Description("Factor taking into consideration the stresses generated prior to bonding due to the bending of individual lamellae for curved beams with small radii of curvature")]
+        public static double Kr(double internalRadius, double lamellaThickness)
+        {
+            double kr = 1;
+            if (internalRadius / lamellaThickness < 240) kr = 0.76 + 0.001 * internalRadius / lamellaThickness;
+            return kr;
+        }
+
+        #endregion
+
+
+        #region Kl
+        /// <summary>
+        /// Kl is a bending amplification factor taking into account the beam curvature,cut angle and height in the apex area - EN 1995-1 §6.4.3 eq (6.43)
+        /// </summary>
+        /// <param name="heightApex">Beam height at apex in [mm]</param>
+        /// <param name="angleApex">cut angle at apex in degree</param>
+        /// <param name="internalRadius">beam internal radius in [mm]</param>
+        /// <returns></returns>
+        [Description("Kl is a bending stress amplification factor taking into account the beam curvature,cut angle and height in the apex area")]
+        public static double Kl(double heightApex, double angleApex, double internalRadius)
+        {
+            double angleRad = angleApex * Math.PI / 180;
+            double r = internalRadius + heightApex / 2;
+            double h_ap = heightApex;
+            double k1 = 1 + 1.4 * angleRad + 5.4 * Math.Pow(Math.Tan(angleRad), 2);
+            double k2 = 0.35 - 8 * Math.Tan(angleRad);
+            double k3 = 0.6 + 8.3 * Math.Tan(angleRad) - 7.8 * Math.Pow(Math.Tan(angleRad), 2);
+            double k4 = 6 * Math.Pow(Math.Tan(angleRad), 2);
+
+            return k1 + k2 * (h_ap / r) + k3 * Math.Pow(h_ap / r, 2) + k4 * Math.Pow(h_ap / r, 3);
+        }
+
+
+        #endregion
+
+
+        #region Kvol
+        /// <summary>
+        /// Volume factor taking into consideration the influence of volume on tensile strength perpendicular to the grain - EN 1995-1 §6.4.3 eq (6.51)
+        /// </summary>
+        /// <param name="material">Material Object</param>
+        /// <param name="Vstressed">stressed volume of the apex zone in [m³]</param>
+        /// <param name="Vtot">Total beam volume in [m³]</param>
+        /// <returns></returns>
+        [Description("Volume factor taking into consideration the influence of volume on tensile strength perpendicular to the grain - EN 1995-1 §6.4.3 eq (6.51)")]
+        public static double Kvol(IMaterial material, double Vstressed, double Vtot)
+        {
+            var timber = CheckMaterialTimber(material);
+            double kvol = 1;
+            if (timber.Type != TimberType.Hardwood || timber.Type != TimberType.Softwood)
+            {
+                kvol = Math.Pow(0.01 / Vstressed, 0.2);
+            }
+            if (Vstressed > 2 / 3 * Vtot) throw new Exception("Stressed volumes should not exceed 2/3 of total volume according to EN 1995-1 §6.4.3 (6)");
+            return kvol;
+        }
+        #endregion
+
+        #region Kdis
+        /// <summary>
+        /// Factor taking into consideration the influence of stress distribution - EN 1995-1 §6.4.3 eq (6.52)
+        /// </summary>
+        /// <param name="beamType">0->double tapered and curved beams | 1-> for pitched cambered beams </param>
+        /// <returns></returns>
+        [Description("Factor taking into consideration the influence of stress distribution - EN 1995-1 §6.4.3 eq (6.52)")]
+        public static double Kdis(int beamType)
+        {
+            if (beamType == 0) return 1.4;  //for double tapered and curved beams
+            else return 1.7;                //for pitched cambered beams
+        }
+        #endregion
+
+
+
+        #region Kp
+        /// <summary>
+        /// Factor for the verification of tension perpendicular to the grain at apex - EN 1995-1 §6.4.3 eq (6.56)
+        /// </summary>
+        /// <param name="heightApex">Beam height at apex in [mm]</param>
+        /// <param name="angleApex">cut angle at apex in degree</param>
+        /// <param name="internalRadius">beam internal radius in [mm]</param>
+        /// <returns></returns>
+        [Description("Factor for the verification of tension perpendicular to the grain at apex - EN 1995-1 §6.4.3 eq (6.56)")]
+        public static double Kp(double heightApex, double angleApex, double internalRadius)
+        {
+            double angleRad = angleApex* Math.PI / 180;
+            double r = internalRadius + heightApex / 2;
+            double h_ap = heightApex;
+
+            double k5 = 0.2 * Math.Tan(angleRad);
+            double k6 = 0.25 - 1.5 * Math.Tan(angleRad) + 2.6 * Math.Pow(Math.Tan(angleRad), 2);
+            double k7 = 2.1 * Math.Tan(angleRad) - 4 * Math.Pow(Math.Tan(angleRad), 2);
+
+            return k5 + k6 * (h_ap / r) + k7 * Math.Pow(h_ap / r, 2);
+        }
+
+
+        #endregion
+
+
+
 
     }
 }

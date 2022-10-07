@@ -29,7 +29,7 @@ namespace StructuralDesignKit
             double kmod = Kmod(mat.Type, ServiceClass.SC1, LoadDuration.Permanent);
             double ym = Ym(mat.Type);
 
-            double N = 0;
+            double N = -150;
             double Vy = 0;
             double Vz = 0;
             double Mx = 0;
@@ -58,15 +58,20 @@ namespace StructuralDesignKit
                 EC5_CrossSectionCheck.Bending(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1),
                 EC5_CrossSectionCheck.Shear(cs1.ComputeShearY(Vy), cs1.ComputeShearZ(Vz), mat, kmod, ym),
                 EC5_CrossSectionCheck.Torsion(cs1.ComputeTorsion(Mx), cs1.ComputeShearY(Vy), cs1.ComputeShearZ(Vz), cs1, mat, kmod, ym),
-                EC5_CrossSectionCheck.BendingAndTension(loads, cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1, Kh_Tension(mat.Type, cs1.B)),
+                EC5_CrossSectionCheck.BendingAndTension(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N), cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1, Kh_Tension(mat.Type, cs1.B)),
                 EC5_CrossSectionCheck.BendingAndCompression(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N), cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1),
                 EC5_CrossSectionCheck.BendingAndBuckling(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N), leffy, leffz, cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1),
                 EC5_CrossSectionCheck.LateralTorsionalBuckling(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N),leffy,leffz,ltb_Eff,cs1,mat,kmod,ym, Kh_Bending(mat.Type, cs1.H), 1)));
 
 
-            //cs1.ComputeShearY(10).ToString(),
-            //cs1.ComputeShearZ(10).ToString(),
-            //cs1.ComputeTorsion(10).ToString()));
+                double angle = 10;
+                Console.WriteLine("Compression at an angle {0}: {1:0.00}", angle,
+                    EC5_CrossSectionCheck.CompressionAtAnAngleToGrain(2, angle, cs1.Material, kmod, ym,1.5));
+
+
+            Console.WriteLine(EC5_Factors.Kp(320,25,25000));
+
+
 
             Console.ReadLine();
         }

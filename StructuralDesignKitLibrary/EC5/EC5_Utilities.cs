@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StructuralDesignKitLibrary.Materials;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,26 @@ namespace StructuralDesignKitLibrary.EC5
             Instantaneous,
             ShortTerm_Instantaneous,
         }
+
+
+
+
+
+
+        #region helper functions
+        /// <summary>
+        /// Control function to ensure that IMaterialTimber interface is passsed as argument
+        /// </summary>
+        /// <param name="material">material object to test</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        internal static IMaterialTimber CheckMaterialTimber(IMaterial material)
+        {
+            if (!(material is IMaterialTimber)) throw new Exception("This method is currently only implemented for timber materials");
+            return (IMaterialTimber)material;
+        }
+
+        #endregion
 
 
     }
