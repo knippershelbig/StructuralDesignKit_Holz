@@ -10,7 +10,7 @@ using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 namespace StructuralDesignKitLibrary.Materials
 {
     [Description("Structural timber classs for Softwood according to EN 1995 and EN 338:2016")]
-    public class MaterialTimberSoftwood : IMaterial, IMaterialTimber
+    public class MaterialTimberSoftwood: IMaterial, IMaterialTimber
     {
 
         #region Object properties

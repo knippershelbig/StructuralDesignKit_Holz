@@ -42,7 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="CrossSections\CrossSectionRectangular.cs" />
     <Compile Include="CrossSections\Interfaces\ICrossSection.cs" />
     <Compile Include="EC5\EC5_ConnectionCheck.cs" />
@@ -53,6 +52,7 @@
     <Compile Include="Materials\MaterialTimberGlulam.cs" />
     <Compile Include="Materials\MaterialTimberBaubuche.cs" />
     <Compile Include="Materials\MaterialTimberSoftwood.cs" />
+    <Compile Include="Materials\MaterialTimberGeneric.cs" />
     <Compile Include="Materials\Interfaces\IMaterial.cs" />
     <Compile Include="Materials\Interfaces\IMaterialTimber.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

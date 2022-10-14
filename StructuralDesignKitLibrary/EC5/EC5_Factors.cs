@@ -160,20 +160,7 @@ namespace StructuralDesignKitLibrary.EC5
         public static double Kdef(TimberType timberType, ServiceClass serviceClass)
         {
             double kdef = 0;
-            int SC = 0;
-
-            switch (serviceClass)
-            {
-                case ServiceClass.SC1:
-                    SC = 0;
-                    break;
-                case ServiceClass.SC2:
-                    SC = 1;
-                    break;
-                case ServiceClass.SC3:
-                    SC = 2;
-                    break;
-            }
+            int SC = (int)serviceClass;
 
             switch (timberType)
             {
@@ -486,6 +473,8 @@ namespace StructuralDesignKitLibrary.EC5
             double Kcy = 1 / (Ky + Math.Sqrt(Math.Pow(Ky, 2) - Math.Pow(lambdaRelY, 2)));
             double Kcz = 1 / (Kz + Math.Sqrt(Math.Pow(Kz, 2) - Math.Pow(lambdaRelZ, 2)));
 
+            Kcy = Math.Min(Kcy, 1);
+            Kcz = Math.Min(Kcz, 1);
 
             return new List<double>() { Kcy, Kcz };
         }
@@ -676,7 +665,7 @@ namespace StructuralDesignKitLibrary.EC5
             {
                 kvol = Math.Pow(0.01 / Vstressed, 0.2);
             }
-            if (Vstressed > 2 / 3 * Vtot) throw new Exception("Stressed volumes should not exceed 2/3 of total volume according to EN 1995-1 §6.4.3 (6)");
+            if (Vstressed > (2.0 / 3.0) * Vtot) throw new Exception("Stressed volumes should not exceed 2/3 of total volume according to EN 1995-1 §6.4.3 (6)");
             return kvol;
         }
         #endregion

@@ -23,7 +23,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="Kmod">modification factor</param>
         /// <param name="Ym">Material Safety factor</param>
         /// <param name="Kh">Size Factor for Cross section</param>
-        /// <param name="Kl_LVL">Mofification factor for member Length</param>
+        /// <param name="Kl_LVL">Mofification factor for LVL member length</param>
         /// <returns>Design ratio for Tension parallel to the grain according to EN 1995-1 §6.1.2 - Eq(6.1)</returns>
         [Description("Tension parallel to the grain §6.1.2")]
         public static double TensionParallelToGrain(double Sig0_t_d, IMaterial material, double Kmod, double Ym, double Kh = 1, double Kl_LVL = 1)
@@ -61,7 +61,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// Compression stresses at an angle to the grain 
         /// </summary>
         /// <param name="SigAlpha_c_d">Design compressive stress</param>
-        /// <param name="angleToGrain">Tress angle to the grain in Degree</param>
+        /// <param name="angleToGrain">stress angle to the grain in Degree</param>
         /// <param name="material"></param>
         /// <param name="Kmod">modification factor</param>
         /// <param name="Ym">Material Safety factor</param>
@@ -84,7 +84,6 @@ namespace StructuralDesignKitLibrary.EC5
         /// </summary>
         /// <param name="SigMyd">Design bending stress in cross section Y axis</param>
         /// <param name="SigMzd">Design bending stress in cross section Z axis</param>
-        /// <param name="material">Material Object</param>
         /// <param name="crossSection">Cross section Object to check</param>
         /// <param name="material">Material Object to check</param>
         /// <param name="Kmod">modification factor</param>
@@ -206,7 +205,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="khy">Size Factor for Cross section in Y axis</param>
         /// <param name="khz">Size Factor for Cross section in Y axis</param>
         /// <param name="Kh_Tension">Size Factor for Cross section in tension</param>
-        /// <param name="Kl">Mofification factor for member Length</param>
+        /// <param name="Kl_LVL">Mofification factor for member Length</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         [Description("Bending and tension EN 1995-1 +NA §6.2.3 Eq(6.17) + Eq(6.18)")]
@@ -247,7 +246,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="khz">Size Factor for Cross section in Y axis</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        [Description("Combined Bending and Compression EN 1995-1 §6.2.4 - Eq(6.19) + Eq(6.20")]
+        [Description("Combined Bending and Compression EN 1995-1 §6.2.4 - Eq(6.19) + Eq(6.20)")]
         public static double BendingAndCompression(double SigMyd, double SigMzd, double Sig0_c_d, ICrossSection crossSection, IMaterial material, double Kmod, double Ym, double khy = 1, double khz = 1)
         {
             if (!(material is IMaterialTimber)) throw new Exception("This method is currently only implemented for timber materials");

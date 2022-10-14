@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace StructuralDesignKitExcel
 {
-    public class ExcelHelpers
+    public static class ExcelHelpers
     {
 
         /// <summary>
@@ -68,9 +68,13 @@ namespace StructuralDesignKitExcel
 
             int b = 0;
             int h = 0;
-            
-            if (CS.Length != 4) throw new Exception(error);
 
+            if (CS.Length != 4)
+            {
+                if (CS[3] != "GL75h") throw new Exception(error);
+                else CS[3] += "_" + CS[4];
+            }
+        
             if (CS[0] != "CS") throw new Exception(error);
             if (CS[1] != "R") throw new Exception("Currently only Rectangular cross-sections are supported");
             var bxh = CS[2].Split('x');
@@ -101,7 +105,7 @@ namespace StructuralDesignKitExcel
         {
 
             //CS_R_100x200_GL24h
-            return String.Format("CS_R_{0}_{1}_{2}",
+            return String.Format("CS_R_{0}x{1}_{2}",
                 b,
                 h,
                 material.Grade);
