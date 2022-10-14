@@ -52,6 +52,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\StructuralDesignKitExcel\StructuralDesignKitExcel.csproj">
+      <Project>{2f7d1ead-bd33-46bd-9c0c-49f22f99d71e}</Project>
+      <Name>StructuralDesignKitExcel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StructuralDesignKitLibrary\StructuralDesignKitLibrary.csproj">
       <Project>{dec4f3b3-18a2-4e3a-a4a8-5780c138e785}</Project>
       <Name>StructuralDesignKitLibrary</Name>

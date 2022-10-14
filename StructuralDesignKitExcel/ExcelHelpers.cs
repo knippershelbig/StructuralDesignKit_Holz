@@ -59,7 +59,7 @@ namespace StructuralDesignKitExcel
             }
         }
 
-        public static CrossSectionRectangular CreateCrossSection (string crossSectionTag)
+        public static CrossSectionRectangular CreateRectangularCrossSection(string crossSectionTag)
         {
             string error = "The cross section tag does not respect the defined syntax (i.e: CS_R_100x200_GL24h)";
             //CS_R_100x200_GL24h
@@ -74,7 +74,7 @@ namespace StructuralDesignKitExcel
                 if (CS[3] != "GL75h") throw new Exception(error);
                 else CS[3] += "_" + CS[4];
             }
-        
+
             if (CS[0] != "CS") throw new Exception(error);
             if (CS[1] != "R") throw new Exception("Currently only Rectangular cross-sections are supported");
             var bxh = CS[2].Split('x');
@@ -99,9 +99,7 @@ namespace StructuralDesignKitExcel
 
 
 
-
-
-        public static string CreateRectCrossSectionTag(double b, double h, IMaterialTimber material)
+        public static string CreateRectangularCrossSection(double b, double h, IMaterialTimber material)
         {
 
             //CS_R_100x200_GL24h
@@ -109,10 +107,34 @@ namespace StructuralDesignKitExcel
                 b,
                 h,
                 material.Grade);
-           
+
 
         }
 
-    
+        public static List<string> AllMaterialAsList()
+        {
+            List<string> allTimber = new List<string>();
+            allTimber.AddRange(ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.Materials.MaterialTimberSoftwood.Grades>());
+            allTimber.AddRange(ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.Materials.MaterialTimberHardwood.Grades>());
+            allTimber.AddRange(ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.Materials.MaterialTimberGlulam.Grades>());
+            allTimber.AddRange(ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.Materials.MaterialTimberBaubuche.Grades>());
+
+            return allTimber;
+        }
+
+
+
+        public static List<string> GetStringValuesFromEnum<T>()
+        {
+            List<string> valuesString = new List<string>();
+
+            var values = Enum.GetValues(typeof(T)).Cast<T>();
+            foreach (var val in values)
+            {
+                valuesString.Add(val.ToString());
+            }
+            return valuesString;
+        }
+
     }
 }

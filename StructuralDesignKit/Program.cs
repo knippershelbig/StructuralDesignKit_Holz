@@ -10,6 +10,9 @@ using StructuralDesignKitLibrary.EC5;
 using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using static StructuralDesignKitLibrary.EC5.EC5_Factors;
 using StructuralDesignKitLibrary.CrossSections.Interfaces;
+using System.IO;
+using System.Xml;
+
 
 namespace StructuralDesignKit
 {
@@ -72,16 +75,32 @@ namespace StructuralDesignKit
             Console.WriteLine(EC5_Factors.Kp(320, 25, 25000));
 
 
-
-
-
             DescriptionAttribute attribute = (DescriptionAttribute)typeof(EC5_Factors).GetMethod("Kdis").GetCustomAttributes(false)[0];
-            
-            //var description = (DescriptionAttribute)attribute;
-            //var text = description.Description;
+
+            var methods = typeof(StructuralDesignKitExcel.ExcelFormulae).GetMethods();
+
+            var test = methods[0].CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value;
+
+            foreach (var method in methods)
+            {
+                if (method.CustomAttributes.ToList().Count >= 1)
+                {
+                    if (method.CustomAttributes.ToList()[0].NamedArguments.Count >= 3)
+                    {
+
+                        Console.WriteLine(method.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString());
+                        if (method.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == "SDK.EC5_Factors")
+                        {
+                            Console.WriteLine("True");
+                        }
+                    }
+                }
+            }
+            //var FactorMethods = methods.Where(p => (string)p.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == "SDK.EC5_Factors").ToList();
+            //Console.WriteLine(methods[0].Name);
 
 
- 
+
 
             Console.ReadLine();
         }

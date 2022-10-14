@@ -61,7 +61,7 @@
     <Compile Include="ExcelForumlae.cs" />
     <Compile Include="ExcelHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ribbon.cs" />
+    <Compile Include="ExcelRibbon.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="customUI.xsd">
