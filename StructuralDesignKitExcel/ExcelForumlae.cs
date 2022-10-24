@@ -94,7 +94,7 @@ namespace StructuralDesignKitExcel
              Name = "SDK.Factors.Kdef",
              IsHidden = false,
              Category = "SDK.EC5_Factors")]
-        public static double KDef([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "Service class (SC1,SC2 or SC3)")] string serviceClass)
+        public static double Kdef([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "Service class (SC1,SC2 or SC3)")] string serviceClass)
         {
             var mat = ExcelHelpers.GetTimberMaterial(TimberGrade).Type;
             var SC = EC5_Utilities.GetServiceClass(serviceClass);

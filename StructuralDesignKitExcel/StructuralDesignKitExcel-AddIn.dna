@@ -10,14 +10,13 @@
         <tabs>
           <tab id='SDK' label='SDK Timber'>
             <group id='EC5_Factors' label='EC5 Factors'>
-				<dynamicMenu id="dynamicFactors" label="Cross Section factors" getContent="GetMenuContent" tag="SDK.EC5_Factors"/>
-				<menu id ="FactorTables" label="Tables">
-					<button id ="kmodTable" label ="kmod Table" onAction="KmodTable"/>
-					<button id ="kdefTable" label ="kdef Table" onAction="KdefTable"/>
-					<button id ="YmTable" label ="Ym Table" onAction="YmTable"/>
-				</menu>
+				<dynamicMenu id="dynamicFactors" label="Cross Section factors" getContent="GetMenuContent" tag="SDK.EC5_Factors" size="large"/>
+					<button id ="kmodButton" label ="kmod" onAction="OnButtonPressedKmod"/>
+					<button id ="kdefButton" label ="kdef" onAction="OnButtonPressedKdef"/>
+					<button id ="YmButton" label ="Ym" onAction="OnButtonPressedYm"/>
             </group>
 			  <group id="EC5_Checks" label ="Cross section checks">
+				  <button id ="CrossSectionCheckButton" label="CS Check" onAction="OnButtonPressedCSCheck" size="large"/>
 				  <dynamicMenu id="dynamicCS_Checks" label="Eurocode checks" getContent="GetMenuContent" tag="SDK.EC5_CrossSection_Checks"/>
 				  <dynamicMenu id="dynamicCS_Stresses" label="Compute stresses" getContent="GetMenuContent" tag="SDK.CrossSection_StressCompute"/>
 			  </group>
@@ -25,12 +24,12 @@
 				  <dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities"/>
 			  </group>
 		  <group id="EC5_Material" label="Material">
-			  <menu id ="MaterialList" label ="Material Lists">
-				  <button id="Softwood" label ="Softwood" tag ="Softwood" onAction="MaterialList"/>
-				  <button id="Hardwood" label ="Hardwood" tag ="Hardwood" onAction="MaterialList"/>
-				  <button id="Glulam" label ="Glulam" tag ="Glulam" onAction="MaterialList"/>
-				  <button id="Baubuche" label ="Baubuche" tag ="Baubuche" onAction="MaterialList"/>
-				  <button id="All" label ="All Timber Type" tag ="All" onAction="MaterialList"/>
+			  <button id="All" label ="All Timber Type" tag ="All" onAction="MaterialList" size ="large"/>
+			  <menu id ="MaterialListButton" label ="Material Lists">
+				  <button id="SoftwoodButton" label ="Softwood" tag ="Softwood" onAction="MaterialList"/>
+				  <button id="HardwoodButton" label ="Hardwood" tag ="Hardwood" onAction="MaterialList"/>
+				  <button id="GlulamButton" label ="Glulam" tag ="Glulam" onAction="MaterialList"/>
+				  <button id="BaubucheButton" label ="Baubuche" tag ="Baubuche" onAction="MaterialList"/>
 			  </menu>
 		  </group>
           </tab>
