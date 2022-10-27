@@ -13,6 +13,8 @@ using Microsoft.Office.Interop.Excel;
 using System.ComponentModel;
 using System.Windows;
 using System.Runtime.InteropServices;
+using System.Runtime.ConstrainedExecution;
+using System.Diagnostics.Eventing.Reader;
 
 namespace StructuralDesignKitExcel
 {
@@ -48,7 +50,7 @@ namespace StructuralDesignKitExcel
 
     }
 
-    public static class ExcelFormulae 
+    public static class ExcelFormulae
     {
 
 
@@ -124,7 +126,7 @@ namespace StructuralDesignKitExcel
              Name = "SDK.Factors.Kh_Tension",
              IsHidden = false,
              Category = "SDK.EC5_Factors")]
-        public static double KhTension([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "Bending height in [mm]")] double height)
+        public static double KhTension([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "beam height in [mm]")] double height)
         {
             var mat = ExcelHelpers.GetTimberMaterial(TimberGrade).Type;
             return EC5_Factors.Kh_Tension(mat, height);
@@ -562,10 +564,10 @@ namespace StructuralDesignKitExcel
 
 
         //-------------------------------------------
-        //Bending EN 1995-1 §6.1.4 - Eq(6.11) + Eq(6.12)
+        //Bending EN 1995-1 §6.1.6 - Eq(6.11) + Eq(6.12)
         //-------------------------------------------
-        [ExcelFunction(Description = "Bending EN 1995-1 §6.1.4 - Eq(6.11) + Eq(6.12)",
-            Name = "SDK.CrossSectionChecks.Bending_6.1.4",
+        [ExcelFunction(Description = "Bending EN 1995-1 §6.1.6 - Eq(6.11) + Eq(6.12)",
+            Name = "SDK.CrossSectionChecks.Bending_6.1.6",
             IsHidden = false,
             Category = "SDK.EC5_CrossSection_Checks")]
         public static double CS_Check_Bending(
@@ -601,7 +603,7 @@ namespace StructuralDesignKitExcel
             return EC5_CrossSectionCheck.Shear(TauYd, TauZd, mat, Kmod, Ym);
         }
 
-        
+
         //-------------------------------------------
         //Torsion DIN EN 1995-1 +NA §6.1.8 - Eq(6.15) + Eq(NA.55)
         //-------------------------------------------
@@ -622,7 +624,7 @@ namespace StructuralDesignKitExcel
             return EC5_CrossSectionCheck.Torsion(TauTorsion, TauYd, TauZd, CS, mat, Kmod, Ym);
         }
 
-        
+
         //-------------------------------------------
         //Bending and tension EN 1995-1 +NA §6.2.3 Eq(6.17) + Eq(6.18)
         //-------------------------------------------
@@ -647,7 +649,7 @@ namespace StructuralDesignKitExcel
             return EC5_CrossSectionCheck.BendingAndTension(SigMyd, SigMzd, Sig0_t_d, CS, mat, Kmod, Ym, khy, khz, Kh_Tension, Kl_LVL);
         }
 
-        
+
         //-------------------------------------------
         //Combined Bending and Compression EN 1995-1 §6.2.4 - Eq(6.19) + Eq(6.20)
         //-------------------------------------------
@@ -670,12 +672,12 @@ namespace StructuralDesignKitExcel
             return EC5_CrossSectionCheck.BendingAndCompression(SigMyd, SigMzd, Sig0_c_d, CS, mat, Kmod, Ym, khy, khz); ;
         }
 
-        
+
         //-------------------------------------------
-        //Bending and Buckling EN 1995-1 §6.2.4 - Eq(6.23) + Eq(6.24)
+        //Bending and Buckling EN 1995-1 §6.3.2 - Eq(6.23) + Eq(6.24)
         //-------------------------------------------
-        [ExcelFunction(Description = "Bending and Buckling EN 1995-1 §6.2.4 - Eq(6.23) + Eq(6.24)",
-             Name = "SDK.CrossSectionChecks.BendingAndBuckling_6.2.4",
+        [ExcelFunction(Description = "Bending and Buckling EN 1995-1 §6.3.2 - Eq(6.23) + Eq(6.24)",
+             Name = "SDK.CrossSectionChecks.BendingAndBuckling_6.3.2",
              IsHidden = false,
              Category = "SDK.EC5_CrossSection_Checks")]
         public static double CS_Check_BendingAndBuckling(
@@ -720,6 +722,50 @@ namespace StructuralDesignKitExcel
             var mat = CS.Material;
             return EC5_CrossSectionCheck.LateralTorsionalBuckling(SigMyd, SigMzd, Sig0_c_d, Leff_Y, Leff_Z, Leff_LTB, CS, mat, Kmod, Ym, khy, khz);
         }
+
+        #endregion
+
+
+
+        #region Material
+        //-------------------------------------------
+        //Material Property
+        //-------------------------------------------
+        [ExcelFunction(Description = "Retrieve the material property, given a cross section and the property name",
+         Name = "SDK.Material.Property",
+         IsHidden = false,
+         Category = "SDK.EC5_Material")]
+        public static double MaterialProperty([ExcelArgument(Description = "Cross Section")] string CrossSection, [ExcelArgument(Description = "Property name")] string propertyName)
+        {
+            try
+            {
+                var CS = ExcelHelpers.CreateRectangularCrossSection(CrossSection);
+                double returnValue = 0;
+
+                //Get Timber properties
+                var properties = typeof(StructuralDesignKitLibrary.Materials.IMaterialTimber).GetProperties().ToList();
+                //return car.GetType().GetProperty(propertyName).GetValue(car, null);
+                if (properties.Where(p => p.Name == propertyName).ToList().Count > 0) //The property given exists
+                {
+                    if (propertyName != "Type")
+                    {
+                        var timberMat = CS.Material as StructuralDesignKitLibrary.Materials.IMaterialTimber;
+                        returnValue = (double)timberMat.GetType().GetProperty(propertyName).GetValue(timberMat);
+                    }
+
+                }
+                else throw new Exception("Material property unknow");
+
+                return returnValue;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+         
+        }
+
+
 
         #endregion
 

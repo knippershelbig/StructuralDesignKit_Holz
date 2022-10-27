@@ -24,13 +24,14 @@
 				  <dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities"/>
 			  </group>
 		  <group id="EC5_Material" label="Material">
-			  <button id="All" label ="All Timber Type" tag ="All" onAction="MaterialList" size ="large"/>
+			  <button id="AllMaterial" label ="All Timber Type" tag ="All" onAction="MaterialList" size ="large"/>
 			  <menu id ="MaterialListButton" label ="Material Lists">
 				  <button id="SoftwoodButton" label ="Softwood" tag ="Softwood" onAction="MaterialList"/>
 				  <button id="HardwoodButton" label ="Hardwood" tag ="Hardwood" onAction="MaterialList"/>
 				  <button id="GlulamButton" label ="Glulam" tag ="Glulam" onAction="MaterialList"/>
 				  <button id="BaubucheButton" label ="Baubuche" tag ="Baubuche" onAction="MaterialList"/>
 			  </menu>
+			  <button id="MaterialProperty" label="properties"/>
 		  </group>
           </tab>
         </tabs>

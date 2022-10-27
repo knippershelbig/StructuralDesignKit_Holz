@@ -270,14 +270,14 @@ namespace StructuralDesignKitLibrary.Materials
         public void UpdateBaubucheProperties(int b, int h)
         {
             //Update bending strength flatwise (Y axis):
-            Fmyk *= Math.Pow((600 / (double)h), 0.1); ;
+            Fmyk = Math.Min(Fmyk*Math.Pow((600 / (double)h), 0.1),91.7);
 
             //Update bending strength edgewise (Z axis) according to design guide P.11:
             if (b > 300)Fmzk *= Math.Pow(300 / (double)h, 0.12);
             if (b > 1200) throw new Exception("Baubuche Block gluing is limited to 1200mm according to ETA-14/0354");
 
             //Update tension strength:
-            Ft0k*= Math.Pow(600 / Math.Max((double)h, (double)b), 0.1);
+            Ft0k= Math.Min(Ft0k*Math.Pow(600 / Math.Max((double)h, (double)b), 0.1),73);
 
             //Update compression parallel to the grain strength:
             var kc = Math.Min(1.18, 0.0009 * (double)h + 0.892);
@@ -285,7 +285,7 @@ namespace StructuralDesignKitLibrary.Materials
 
             //Update shear strength:
             var kvh = Math.Pow(600 / (double)h, 0.13);
-            Fvk *= kvh;
+            Fvk = Math.Min(Fvk*kvh,5.8);
         }
     }
 }

@@ -91,7 +91,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="khy">Size Factor for Cross section in Y axis</param>
         /// <param name="khz">Size Factor for Cross section in Y axis</param>
         /// <returns>Design ratio for Bending according to EN 1995-1 §6.1.6 - Eq(6.11) + Eq(6.12) - Only the most onerous result of the two equations is returned</returns>
-        [Description("Bending EN 1995-1 §6.1.4 - Eq(6.11) + Eq(6.12)")]
+        [Description("Bending EN 1995-1 §6.1.6 - Eq(6.11) + Eq(6.12)")]
         public static double Bending(double SigMyd, double SigMzd, ICrossSection crossSection, IMaterial material, double Kmod, double Ym, double khy = 1, double khz = 1)
         {
             if (!(material is IMaterialTimber)) throw new Exception("This method is currently only implemented for timber materials");
@@ -282,7 +282,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="khz">Size Factor for Cross section in Y axis</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        [Description("Bending and Buckling EN 1995-1 §6.2.4 - Eq(6.23) + Eq(6.24)")]
+        [Description("Bending and Buckling EN 1995-1 §6.3.2 - Eq(6.23) + Eq(6.24)")]
         public static double BendingAndBuckling(double SigMyd, double SigMzd, double Sig0_c_d, double Leff_Y, double Leff_Z, ICrossSection crossSection, IMaterial material, double Kmod, double Ym, double khy = 1, double khz = 1)
         {
 

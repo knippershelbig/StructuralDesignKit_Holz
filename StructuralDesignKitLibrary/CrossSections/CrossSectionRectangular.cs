@@ -99,32 +99,32 @@ namespace StructuralDesignKitLibrary.CrossSections
         #region Compute Stresses
         public double ComputeStressBendingY(double BendingMomentY)
         {
-            return BendingMomentY * 1e6 / SectionModulus_Y;
+            return Math.Abs(BendingMomentY) * 1e6 / SectionModulus_Y;
         }
 
         public double ComputeStressBendingZ(double BendingMomentZ)
         {
-            return BendingMomentZ * 1e6 / SectionModulus_Z;
+            return Math.Abs(BendingMomentZ) * 1e6 / SectionModulus_Z;
         }
 
         public double ComputeNormalStress(double NormalForce)
         {
-            return NormalForce * 1e3 / Area;
+            return Math.Abs(NormalForce) * 1e3 / Area;
         }
 
         public double ComputeShearY(double ShearForceY)
         {
-            return ShearForceY * 3 / 2 * 1e3 / Area;
+            return Math.Abs(ShearForceY) * 3 / 2 * 1e3 / Area;
         }
 
         public double ComputeShearZ(double ShearForceZ)
         {
-            return ShearForceZ * 3 / 2 * 1e3 / Area;
+            return Math.Abs(ShearForceZ) * 3 / 2 * 1e3 / Area;
         }
 
         public double ComputeTorsion(double TorsionMoment)
         {
-            return TorsionMoment * 1e6 / TorsionalModulus;
+            return Math.Abs(TorsionMoment) * 1e6 / TorsionalModulus;
         }
         #endregion
     }
