@@ -1,13 +1,10 @@
-﻿using StructuralDesignKitLibrary.CrossSections;
-using StructuralDesignKitLibrary.CrossSections.Interfaces;
+﻿using StructuralDesignKitLibrary.CrossSections.Interfaces;
 using StructuralDesignKitLibrary.Materials;
 using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace StructuralDesignKitLibrary.EC5
@@ -230,8 +227,6 @@ namespace StructuralDesignKitLibrary.EC5
         }
 
         
-
-
         /// <summary>
         /// Combined Bending and Compression EN 1995-1 §6.2.4 - Eq(6.19) + Eq(6.20)
         /// </summary>

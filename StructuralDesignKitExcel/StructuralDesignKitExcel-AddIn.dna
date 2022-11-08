@@ -5,18 +5,18 @@
 
 
   <CustomUI>
-    <customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui'>
+    <customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui' loadImage='LoadImage'>
       <ribbon>
         <tabs>
           <tab id='SDK' label='SDK Timber'>
             <group id='EC5_Factors' label='EC5 Factors'>
-				<dynamicMenu id="dynamicFactors" label="Cross Section factors" getContent="GetMenuContent" tag="SDK.EC5_Factors" size="large"/>
+				<dynamicMenu id="dynamicFactors" label="Cross Section factors" getContent="GetMenuContent" tag="SDK.EC5_Factors" size="large" image="Factors"/>
 					<button id ="kmodButton" label ="kmod" onAction="OnButtonPressedKmod"/>
 					<button id ="kdefButton" label ="kdef" onAction="OnButtonPressedKdef"/>
 					<button id ="YmButton" label ="Ym" onAction="OnButtonPressedYm"/>
             </group>
-			  <group id="EC5_Checks" label ="Cross section checks">
-				  <button id ="CrossSectionCheckButton" label="CS Check" onAction="OnButtonPressedCSCheck" size="large"/>
+			  <group id="EC5_Checks" label ="Cross section checks" >
+				  <button id ="CrossSectionCheckButton" label="CS Check" onAction="OnButtonPressedCSCheck" size="large" image="Checks"/>
 				  <dynamicMenu id="dynamicCS_Checks" label="Eurocode checks" getContent="GetMenuContent" tag="SDK.EC5_CrossSection_Checks"/>
 				  <dynamicMenu id="dynamicCS_Stresses" label="Compute stresses" getContent="GetMenuContent" tag="SDK.CrossSection_StressCompute"/>
 			  </group>
@@ -24,14 +24,14 @@
 				  <dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities"/>
 			  </group>
 		  <group id="EC5_Material" label="Material">
-			  <button id="AllMaterial" label ="All Timber Type" tag ="All" onAction="MaterialList" size ="large"/>
+			  <button id="AllMaterial" label ="All Timber Type" tag ="All" onAction="MaterialList" size ="large" image="Timber"/>
 			  <menu id ="MaterialListButton" label ="Material Lists">
 				  <button id="SoftwoodButton" label ="Softwood" tag ="Softwood" onAction="MaterialList"/>
 				  <button id="HardwoodButton" label ="Hardwood" tag ="Hardwood" onAction="MaterialList"/>
 				  <button id="GlulamButton" label ="Glulam" tag ="Glulam" onAction="MaterialList"/>
 				  <button id="BaubucheButton" label ="Baubuche" tag ="Baubuche" onAction="MaterialList"/>
 			  </menu>
-			  <button id="MaterialProperty" label="properties"/>
+			  <button id="MaterialProperty" label="properties" onAction="MaterialProperties"/>
 		  </group>
           </tab>
         </tabs>
@@ -39,7 +39,9 @@
     </customUI>
   </CustomUI>
 
-
+	<Image Name="Checks" Path="icons\Checks.png" Pack="true"/>
+	<Image Name="Factors" Path="icons\Factors.png" Pack="true"/>
+	<Image Name="Timber" Path="icons\Timber.png" Pack="true"/>
   
   
 </DnaLibrary>

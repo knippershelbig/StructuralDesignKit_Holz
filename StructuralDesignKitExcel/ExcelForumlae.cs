@@ -202,7 +202,7 @@ namespace StructuralDesignKitExcel
         //-------------------------------------------
         //Kc
         //-------------------------------------------
-        [ExcelFunction(Description = "Conmputes and returns the buckling instability factors kcy and kcz as a list of doubles - According to EN 1995-1 Eq(6.27) + Eq(6.28)",
+        [ExcelFunction(Description = "Computes and returns the buckling instability factors kcy and kcz as a list of doubles - According to EN 1995-1 Eq(6.27) + Eq(6.28)",
              Name = "SDK.Factors.Kc",
              IsHidden = false,
              Category = "SDK.EC5_Factors")]

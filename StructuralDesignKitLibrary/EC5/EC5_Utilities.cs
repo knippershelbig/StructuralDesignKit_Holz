@@ -38,9 +38,6 @@ namespace StructuralDesignKitLibrary.EC5
 
 
 
-
-
-
         #region helper functions
         /// <summary>
         /// Control function to ensure that IMaterialTimber interface is passsed as argument
