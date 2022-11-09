@@ -42,6 +42,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connections\Connection_Utilities.cs" />
+    <Compile Include="Connections\Fasteners\FasternerBolt.cs" />
+    <Compile Include="Connections\Fasteners\FasternerDowel.cs" />
+    <Compile Include="Connections\Interface\IConnection.cs" />
+    <Compile Include="Connections\Interface\IFastener.cs" />
+    <Compile Include="Connections\Interface\ISteelTimberShear.cs" />
+    <Compile Include="Connections\SteelTimber\SteelSingleInnerPlate.cs" />
     <Compile Include="CrossSections\CrossSectionRectangular.cs" />
     <Compile Include="CrossSections\Interfaces\ICrossSection.cs" />
     <Compile Include="EC5\EC5_ConnectionCheck.cs" />

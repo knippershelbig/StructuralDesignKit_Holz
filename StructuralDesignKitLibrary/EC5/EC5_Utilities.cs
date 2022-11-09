@@ -36,6 +36,15 @@ namespace StructuralDesignKitLibrary.EC5
             ShortTerm_Instantaneous,
         }
 
+        public enum FasternType
+        {
+            Nail,
+            Staple,
+            Screw,
+            Bolt,
+            Dowel
+        }
+
 
 
         #region helper functions

@@ -886,23 +886,9 @@ namespace StructuralDesignKitExcel
 
         //material encryypt and decript
 
-        //Check all at once given a load torsor
-
-        //Create drop down list with materials
-
-        //Create a list of all material properties in excel (kind of deconstruct material) - Function
-
         //Create a material which can be used following the IMaterial Timber Interface
 
-        //Expose drop down Material type (baubuche, ...)
-
-        //Generate functions (+ Buttons in Ribbon) to display factors + table of factors
-
-        //Generate functions with boiling plates for the different checks and full checks - Highlight cell to modify
-
         //Generate material tables
-
-        //Dropdown enum (material type, load duration, service class, ...)
 
         //Add optimisation (Cross section / material for given check)
 

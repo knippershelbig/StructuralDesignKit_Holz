@@ -12,7 +12,8 @@ using static StructuralDesignKitLibrary.EC5.EC5_Factors;
 using StructuralDesignKitLibrary.CrossSections.Interfaces;
 using System.IO;
 using System.Xml;
-
+using StructuralDesignKitLibrary.Connections.Fasteners;
+using StructuralDesignKitLibrary.Connections.SteelTimber;
 
 namespace StructuralDesignKit
 {
@@ -99,7 +100,23 @@ namespace StructuralDesignKit
             //var FactorMethods = methods.Where(p => (string)p.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == "SDK.EC5_Factors").ToList();
             //Console.WriteLine(methods[0].Name);
 
+            Console.WriteLine("\n-------------------------------------------------------------------\n");
+            Console.WriteLine("Fastener checks\n");
 
+            var Dowel = new FasternerDowel(24, 360);
+            var bolt = new FasternerBolt(16, 800);
+            var timber = new MaterialTimberHardwood(MaterialTimberHardwood.Grades.D30);
+            //var timber = new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL24h);
+            double angle1 = 90;
+            var shearCapacity = new SteelSingleInnerPlate(bolt, 6, angle1, timber, 20, true);
+
+            for (int i = 0; i < shearCapacity.Capacities.Count; i++)
+            {
+            Console.WriteLine(String.Format("Failure mode {0} = {1:0}N", shearCapacity.FailureModes[i], shearCapacity.Capacities[i]));
+
+            }
+
+            Console.WriteLine(String.Format("Shear Capacity = {0:0.00}KN (Failure mode {1})",shearCapacity.Capacity/1000,shearCapacity.FailureMode));
 
 
             Console.ReadLine();
