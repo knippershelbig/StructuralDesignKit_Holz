@@ -13,7 +13,8 @@ using StructuralDesignKitLibrary.CrossSections.Interfaces;
 using System.IO;
 using System.Xml;
 using StructuralDesignKitLibrary.Connections.Fasteners;
-using StructuralDesignKitLibrary.Connections.SteelTimber;
+using StructuralDesignKitLibrary.Connections.SteelTimberShear;
+using StructuralDesignKitLibrary.Connections.TimberTimberShear;
 
 namespace StructuralDesignKit
 {
@@ -103,20 +104,26 @@ namespace StructuralDesignKit
             Console.WriteLine("\n-------------------------------------------------------------------\n");
             Console.WriteLine("Fastener checks\n");
 
-            var Dowel = new FasternerDowel(24, 360);
-            var bolt = new FasternerBolt(16, 800);
-            var timber = new MaterialTimberHardwood(MaterialTimberHardwood.Grades.D30);
-            //var timber = new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL24h);
-            double angle1 = 90;
-            var shearCapacity = new SteelSingleInnerPlate(bolt, 6, angle1, timber, 20, true);
+            var Dowel = new FastenerDowel(10, 360);
+            var bolt = new FastenerBolt(20, 800);
+            //var timber = new MaterialTimberHardwood(MaterialTimberHardwood.Grades.D30);
+            var timber = new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL28h);
+            double angle1 = 43;
 
-            for (int i = 0; i < shearCapacity.Capacities.Count; i++)
+            var shearCapacity2 = new SteelSingleInnerPlate(Dowel,6, angle1, timber, 45, false);
+            //var shearCapacity2 = new TimberTimberSingleShear(bolt,timber, 160, 90,timber,175,0,true);
+
+            Dowel.ComputeSpacings(angle1);
+
+            for (int i = 0; i < shearCapacity2.Capacities.Count; i++)
             {
-            Console.WriteLine(String.Format("Failure mode {0} = {1:0}N", shearCapacity.FailureModes[i], shearCapacity.Capacities[i]));
+            Console.WriteLine(String.Format("Failure mode {0} = {1:0}N", shearCapacity2.FailureModes[i], shearCapacity2.Capacities[i]));
 
             }
 
-            Console.WriteLine(String.Format("Shear Capacity = {0:0.00}KN (Failure mode {1})",shearCapacity.Capacity/1000,shearCapacity.FailureMode));
+            Console.WriteLine(String.Format("Shear Capacity = {0:0.00}KN (Failure mode {1})", shearCapacity2.Capacity/1000,shearCapacity2.FailureMode));
+            Console.WriteLine(String.Format("a1={0:0}mm\na2={1:0}mm\na3t={2:0}mm\na3c={3:0}mm\na4t={4:0}mm\na4c={5:0.}mm\n",
+                Dowel.a1min, Dowel.a2min, Dowel.a3tmin, Dowel.a3cmin, Dowel.a4tmin, Dowel.a4cmin));
 
 
             Console.ReadLine();

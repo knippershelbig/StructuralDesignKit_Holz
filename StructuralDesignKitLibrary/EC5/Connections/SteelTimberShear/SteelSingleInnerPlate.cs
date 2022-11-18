@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StructuralDesignKitLibrary.Connections.SteelTimber
+namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
 {
     public class SteelSingleInnerPlate : ISteelTimberShear
     {
@@ -62,11 +62,11 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimber
 
             //Failure mode f
             FailureModes.Add("f");
-            Capacities.Add(Fastener.FhAlphaK * TimberThickness * Fastener.Diameter);
+            Capacities.Add(Fastener.Fhk * TimberThickness * Fastener.Diameter);
 
             //Failure mode g
             FailureModes.Add("g");
-            capacity = Capacities[0] * (Math.Sqrt(2 + 4 * Fastener.MyRk / (Fastener.FhAlphaK * Fastener.Diameter * Math.Pow(TimberThickness, 2))) - 1);
+            capacity = Capacities[0] * (Math.Sqrt(2 + 4 * Fastener.MyRk / (Fastener.Fhk * Fastener.Diameter * Math.Pow(TimberThickness, 2))) - 1);
             if (RopeEffect)
             {
                 Fastener.ComputeWithdrawalStrength(this);
@@ -77,7 +77,7 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimber
 
             //Failure mode h
             FailureModes.Add("h");
-            capacity = 2.3 * Math.Sqrt(Fastener.MyRk * Fastener.FhAlphaK * Fastener.Diameter);
+            capacity = 2.3 * Math.Sqrt(Fastener.MyRk * Fastener.Fhk * Fastener.Diameter);
             if (RopeEffect) capacity += Math.Min(Fastener.MaxJohansenPart * capacity, RopeEffectCapacity);
             Capacities.Add(capacity);
 

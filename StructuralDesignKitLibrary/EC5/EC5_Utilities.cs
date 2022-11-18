@@ -36,13 +36,13 @@ namespace StructuralDesignKitLibrary.EC5
             ShortTerm_Instantaneous,
         }
 
-        public enum FasternType
+        public enum FastenerType
         {
-            Nail,
-            Staple,
-            Screw,
             Bolt,
             Dowel
+            //Nail,
+            //Staple,
+            //Screw,
         }
 
 

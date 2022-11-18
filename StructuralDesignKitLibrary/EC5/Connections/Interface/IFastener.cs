@@ -1,4 +1,5 @@
-﻿using StructuralDesignKitLibrary.Materials;
+﻿using StructuralDesignKitLibrary.EC5.Connections.Interface;
+using StructuralDesignKitLibrary.Materials;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,7 +15,7 @@ namespace StructuralDesignKitLibrary.Connections.Interface
         /// Type of fasterner (Bolt, dowels, screw...)
         /// </summary>
         [Description("Type of fasterner (Bolt, dowels, screw...)")]
-        EC5.EC5_Utilities.FasternType Type { get; }
+        EC5.EC5_Utilities.FastenerType Type { get; }
 
         /// <summary>
         /// Diameter of the fastener in mm
@@ -39,7 +40,7 @@ namespace StructuralDesignKitLibrary.Connections.Interface
         /// Embedment Strength of the fastener in N/mm²
         /// </summary>
         [Description("Embedment Strength of the fastener in N/mm²")]
-        double FhAlphaK { get; set; }
+        double Fhk { get; set; }
 
         /// <summary>
         /// Withdrawal strength of the fastener in N
@@ -53,43 +54,43 @@ namespace StructuralDesignKitLibrary.Connections.Interface
         [Description("Limitation of the Johansen part for the rope effect based on EN 1995-1-1 §8.2.2 (2)")]
         double MaxJohansenPart { get; set; }
 
+
+
         /// <summary>
         /// Minimum spacing parallel to grain in mm
         /// </summary>
         [Description("Minimum spacing parallel to grain in mm")]
-        double a1min { get; }
+        double a1min { get; set; }
 
         /// <summary>
         /// Minimum spacing perpendicular to grain in mm
         /// </summary>
         [Description("Minimum spacing perpendicular to grain in mm")]
-        double a2min { get; }
+        double a2min { get; set; }
 
         /// <summary>
         /// Minimum spacing to loaded end in mm
         /// </summary>
         [Description("Minimum spacing to loaded end in mm")]
-        double a3tmin { get; }
+        double a3tmin { get; set; }
 
         /// <summary>
         /// Minimum spacing to unloaded end in mm
         /// </summary>
         [Description("Minimum spacing to unloaded end in mm")]
-        double a3cmin { get; }
+        double a3cmin { get; set; }
 
         /// <summary>
         /// Minimum spacing to loaded edge in mm
         /// </summary>
         [Description("Minimum spacing to loaded edge in mm")]
-        double a4tmin { get; }
+        double a4tmin { get; set; }
 
         /// <summary> 
         /// Minimum spacing to unloaded edge in mm
         /// </summary>
         [Description("Minimum spacing to unloaded edge in mm")]
-        double a4cmin { get; }
-
-
+        double a4cmin { get; set; }
 
         /// <summary>
         /// Computes the effective number of fasteners
@@ -102,62 +103,18 @@ namespace StructuralDesignKitLibrary.Connections.Interface
 
 
         /// <summary>
-        /// Define the minimum spacing to loaded end in mm
-        /// </summary>
-        /// <param name="angle">angle to grain in Degree</param>
-        /// <returns></returns>
-        [Description("Define the minimum spacing to loaded end in mm")]
-        double DefineA1Min(double angle);
-
-        /// <summary>
-        /// Define the minimum spacing perpendicular to grain in mm
-        /// </summary>
-        /// <param name="angle">angle to grain in Degree</param>
-        /// <returns></returns>
-        [Description("Define the minimum spacing perpendicular to grain in mm")]
-        double DefineA2Min(double angle);
-
-        /// <summary>
-        /// Define the Minimum spacing to loaded end in mm
-        /// </summary>
-        /// <param name="angle">angle to grain in Degree</param>
-        /// <returns></returns>
-        [Description("Define the Minimum spacing to loaded end in mm")]
-        double DefineA3tMin(double angle);
-
-        /// <summary>
-        /// Define the Minimum spacing to unloaded end in mm
-        /// </summary>
-        /// <param name="angle">angle to grain in Degree</param>
-        /// <returns></returns>
-        [Description("Define the Minimum spacing to unloaded end in mm")]
-        double DefineA3cMin(double angle);
-
-        /// <summary>
-        /// Define the Minimum spacing to loaded edge in mm
-        /// </summary>
-        /// <param name="angle">angle to grain in Degree</param>
-        /// <returns></returns>
-        [Description("Define the Minimum spacing to loaded edge in mm")]
-        double DefineA4tMin(double angle);
-
-        /// <summary>
-        /// Define the minimum spacing to unloaded edge in mm
-        /// </summary>
-        /// <returns></returns>
-        [Description("Define the minimum spacing to unloaded edge in mm")]
-        double DefineA4cMin();
-
-
-        /// <summary>
         /// Computes the embedment strength of the fastener
         /// </summary>
         /// <param name="timber">Timber connected with the fastener</param>
-        /// <param name="angle">Load angle toward the timber grain</param>
+        /// <param name="angle">Load angle toward the timber grain in degree</param>
         /// <returns></returns>
         void ComputeEmbedmentStrength(IMaterialTimber timber, double angle);
 
-        void ComputeWithdrawalStrength(ISteelTimberShear ConnectionType);
+        void ComputeWithdrawalStrength(IShearCapacity ConnectionType);
+
+        void ComputeSpacings(double angle);
+
+
 
     }
 }

@@ -1,11 +1,18 @@
-﻿using StructuralDesignKitLibrary.CrossSections;
+﻿using Microsoft.Office.Interop.Excel;
+using StructuralDesignKitLibrary.Connections.Interface;
+using StructuralDesignKitLibrary.CrossSections;
+using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.Materials;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Resources;
+using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace StructuralDesignKitExcel
 {
@@ -97,8 +104,6 @@ namespace StructuralDesignKitExcel
             return new CrossSectionRectangular(b, h, material);
         }
 
-
-
         public static string CreateRectangularCrossSection(double b, double h, IMaterialTimber material)
         {
 
@@ -122,8 +127,6 @@ namespace StructuralDesignKitExcel
             return allTimber;
         }
 
-
-
         public static List<string> GetStringValuesFromEnum<T>()
         {
             List<string> valuesString = new List<string>();
@@ -134,6 +137,57 @@ namespace StructuralDesignKitExcel
                 valuesString.Add(val.ToString());
             }
             return valuesString;
+        }
+
+
+        //Check if a workbook is open - If not, open a blank WB
+        public static void WorkBookOpen(Excel.Application app)
+        {
+            if (app.Workbooks.Count == 0)
+            {
+                app.Workbooks.Add(XlWBATemplate.xlWBATWorksheet);
+                // app.Workbooks[0].Activate();
+            }
+        }
+
+
+        /// <summary>
+        /// Return a IFastener object based on a string, diameter and steel tensile strength
+        /// </summary>
+        /// <param name="fastenerType"></param>
+        /// <param name="diameter"></param>
+        /// <param name="fuk"></param>
+        /// <returns></returns>
+        public static IFastener GetFastener(string fastenerType, double diameter, double fuk)
+        {
+            //Get fasterner types in SDK
+            var fasteners = Assembly.Load("StructuralDesignKitLibrary").GetTypes().Where(p => p.FullName.StartsWith("StructuralDesignKitLibrary.Connections.Fasteners")).ToList();
+
+            //Get the fastener SDK type requested
+            Type type = fasteners.Where(p => p.Name.ToLower().Contains(fastenerType.ToLower())).First();
+
+            //Create an instance from the particular fastener type to compute the properties
+            IFastener fastener = (IFastener)Activator.CreateInstance(type, diameter, fuk);
+
+            return fastener;
+        }
+
+        /// <summary>
+        /// Method to check if a fastener type is available in the SDK based on a string
+        /// </summary>
+        /// <param name="fastenerType"></param>
+        /// <returns></returns>
+        public static bool IsFastener(string fastenerType)
+        {
+            //Get fastener types available in SDK
+            var availableFastenerTypes = Enum.GetNames(typeof(EC5_Utilities.FastenerType)).ToList();
+            List<string> availableFastenerTypesLower = new List<string>();
+            foreach (var item in availableFastenerTypes)
+            {
+                availableFastenerTypesLower.Add(item.ToLower());
+            }
+            if (availableFastenerTypesLower.Contains(fastenerType.ToLower())) return true;
+            else return false;
         }
 
     }

@@ -15,6 +15,10 @@ using System.Windows;
 using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
 using System.Diagnostics.Eventing.Reader;
+using StructuralDesignKitLibrary.Connections.Fasteners;
+using System.Reflection;
+using StructuralDesignKitLibrary.Connections.Interface;
+using System.CodeDom;
 
 namespace StructuralDesignKitExcel
 {
@@ -500,7 +504,7 @@ namespace StructuralDesignKitExcel
         #endregion
 
 
-        #region Eucocode 5 Cross-section checks
+        #region Eurocode 5 Cross-section checks
 
 
         //-------------------------------------------
@@ -726,6 +730,173 @@ namespace StructuralDesignKitExcel
         #endregion
 
 
+        #region Connections
+
+
+        [ExcelFunction(Description = "Characteristic yield moment of the fastener in N.mm",
+            Name = "SDK.EC5.Connections.Myrk",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double Myrk([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
+            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
+            [ExcelArgument(Description = "Tensile strength of the steel the fastener is made of")] double fuk)
+        {
+
+            double myrk = 0;
+
+            if (ExcelHelpers.IsFastener(fastenerType))
+            {
+                myrk = ExcelHelpers.GetFastener(fastenerType, diameter, fuk).MyRk;
+            }
+            else
+            {
+                throw new Exception("The fasterner type is not recognized");
+            }
+            return myrk;
+        }
+
+
+        [ExcelFunction(Description = "Embedment Strength of the fastener in N/mm²",
+            Name = "SDK.EC5.Connections.Fhk",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double Fhk([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
+            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
+            [ExcelArgument(Description = "Tensile strength of the steel the fastener is made of")] double fuk,
+            [ExcelArgument(Description = "Load angle to the timber grain")] double angle,
+            [ExcelArgument(Description = "Timber type")] string timber)
+        {
+
+            IFastener fastener = null;
+            IMaterialTimber timberMaterial = null;
+
+            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, fuk);
+            timberMaterial = ExcelHelpers.GetTimberMaterial(timber);
+            fastener.ComputeEmbedmentStrength(timberMaterial, angle);
+            return fastener.Fhk;
+        }
+
+
+        [ExcelFunction(Description = "Get the percentage of the Johansen Part that the rope effect can contribute to",
+            Name = "SDK.EC5.Connections.MaxJohansenPart",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double MaxJohansenPart([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType)
+        {
+
+            IFastener fastener = null;
+            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, 20, 800);
+            return fastener.MaxJohansenPart;
+        }
+
+
+        [ExcelFunction(Description = "Minimum spacing parallel to grain in mm",
+            Name = "SDK.EC5.Connections.a1Min",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double A1Min([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
+            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
+            [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
+        {
+
+            IFastener fastener = null;
+            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, 800);
+            fastener.ComputeSpacings(angle);
+            return fastener.a1min;
+        }
+
+
+        [ExcelFunction(Description = "Minimum spacing perpendicular to grain in mm",
+            Name = "SDK.EC5.Connections.a2Min",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double A2Min([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
+            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
+            [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
+        {
+            IFastener fastener = null;
+            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, 800);
+            fastener.ComputeSpacings(angle);
+            return fastener.a2min;
+        }
+
+
+        [ExcelFunction(Description = "Minimum spacing to loaded end in mm",
+            Name = "SDK.EC5.Connections.a3tMin",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double A3tMin([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
+            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
+            [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
+        {
+            IFastener fastener = null;
+            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, 800);
+            fastener.ComputeSpacings(angle);
+            return fastener.a3tmin;
+        }
+
+
+        [ExcelFunction(Description = "Minimum spacing to unloaded end in mm",
+            Name = "SDK.EC5.Connections.a3cMin",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double A3cMin([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
+            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
+            [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
+        {
+            IFastener fastener = null;
+            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, 800);
+            fastener.ComputeSpacings(angle);
+            return fastener.a3cmin;
+        }
+
+
+        [ExcelFunction(Description = "Minimum spacing to loaded edge in mm",
+            Name = "SDK.EC5.Connections.a4tMin",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double A4tMin([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
+            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
+            [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
+        {
+            IFastener fastener = null;
+            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, 800);
+            fastener.ComputeSpacings(angle);
+            return fastener.a4tmin;
+        }
+
+
+        [ExcelFunction(Description = "Minimum spacing to unloaded edge in mm",
+            Name = "SDK.EC5.Connections.a4cMin",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double A4cMin([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
+            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
+            [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
+        {
+            IFastener fastener = null;
+            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, 800);
+            fastener.ComputeSpacings(angle);
+            return fastener.a4cmin;
+        }
+
+
+
+
+
+
+        //public double K90 { get; set; }
+
+        //Shear plane timber
+
+        //Shear plane steel
+
+        //public double WithdrawalStrength { get; set; }
+
+        #endregion
+
+
+
 
         #region Material
         //-------------------------------------------
@@ -762,7 +933,7 @@ namespace StructuralDesignKitExcel
             {
                 return -1;
             }
-         
+
         }
 
 
@@ -888,8 +1059,6 @@ namespace StructuralDesignKitExcel
 
         //Create a material which can be used following the IMaterial Timber Interface
 
-        //Generate material tables
-
         //Add optimisation (Cross section / material for given check)
 
         //LTB according to EC3
@@ -900,113 +1069,9 @@ namespace StructuralDesignKitExcel
 
         #region Garbage Collector
 
-        //public static StructuralDesignKitLibrary.Materials.IMaterialTimber mat()
-        //{
-        //    return new MaterialTimberBaubuche()
-        //}
 
 
 
-
-
-        //[ExcelFunction("Returns the answer")]
-        //public static object MyFunction([ExcelArgument("The unimportant input")] object input)
-        //{
-        //    return 42;
-        //}
-
-
-
-
-
-        //[ExcelFunction(Description = "Find a material based on a string",
-        //    Name = "SDK.Material.GetMaterial",
-        //    IsHidden = false,
-        //    Category = "SDK.EC5_Factors")]
-        //public static double buckling()
-        //{
-        //    var Kcs = EC5_Factors.Kc()
-        //}
-
-
-
-
-
-
-        //[ExcelFunction(Description = "TestFunction",
-        //Name = "SDK.Material.Test",
-        //IsHidden = false,
-        //Category = "SDK.EC5_Materials")]
-        //public static string CrossSection(string CrossSectionTag)
-        //{
-        //    CrossSectionRectangular CS = ExcelHelpers.CreateCrossSection(CrossSectionTag);
-        //    return String.Format("{0}x{1}mm", CS.B.ToString(), CS.H.ToString());
-
-        //}
-
-
-
-
-
-
-        //public static class MyFunctions
-        //{
-
-        //    [ExcelFunction(Description = "My first .NET function")]
-        //    public static string SayHello(string name)
-        //    {
-        //        return "Hello " + name;
-        //    }
-
-        //    [ExcelFunction(Description = "Return a SDK Material")]
-        //    public static Object material(string materialName)
-        //    {
-        //        var mat = new MaterialTimberGlulam(materialName);
-        //        var guid = Guid.NewGuid();
-        //        return mat.Ft0k;
-        //    }
-
-        //    [ExcelFunction(Description = "Return a FCK from a material")]
-        //    public static double fc0k(object material)
-        //    {
-        //        var mat = (IMaterialTimber)material;
-        //        return mat.Fc0k;
-        //    }
-
-        //    //        // Get the type corresponding to the class MyClass.
-        //    //Type myType = typeof(MyClass1);
-        //    //// Get the object of the Guid.
-        //    //Guid myGuid = (Guid)myType.GUID;
-        //    //Console.WriteLine("The name of the class is "+myType.ToString());
-        //    //Console.WriteLine("The ClassId of MyClass is "+myType.GUID);	
-
-
-        //    [ExcelFunction("Returns the answer")]
-        //    public static object MyFunction([ExcelArgument("The unimportant input")] object input)
-        //    {
-        //        return 42;
-        //    }
-
-
-        //}
-
-        //public class testclass : XlCall
-        //{
-        //    //test function objects
-        //    [ExcelFunction(Description = "TestFunction returning objects to Excel",
-        //     Name = "SDK.testObject",
-        //     IsHidden = false,
-        //     Category = "SDK.Test")]
-        //    public object TestObject(
-        //         [ExcelArgument(Name = "SourceData", Description = "The range of cells to be transposed.")] object oSource,
-        //         [ExcelArgument(Name = "ByRow", Description = "Optional flag to force transposing vertically insted of the horizontal default.")][Optional] bool bByRow
-        //                                    )
-
-        //    {
-        //        var oCaller = Excel(xlfCaller) as ExcelReference;
-        //        return oCaller.GetValue();
-        //    }
-        //}
 
         #endregion
 

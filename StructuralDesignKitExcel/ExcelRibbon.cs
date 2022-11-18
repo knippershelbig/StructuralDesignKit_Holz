@@ -19,13 +19,16 @@ using StructuralDesignKitLibrary.EC5;
 
 namespace StructuralDesignKitExcel
 {
+
+    /// <summary>
+    /// Methods linked to the ribbon buttons
+    /// </summary>
     [ComVisible(true)] //To make Excel recognize the ribbon
     public class RibbonController : ExcelRibbon
     {
 
         public string GetMenuContent(IRibbonControl control)
         {
-
             string category = control.Tag;
 
             var menuXML = new StringWriter();
@@ -60,6 +63,7 @@ namespace StructuralDesignKitExcel
                     writer.WriteAttributeString("label", method.Name);
                     writer.WriteAttributeString("onAction", "OnButton");
                     writer.WriteAttributeString("tag", method.CustomAttributes.ToList()[0].NamedArguments[0].TypedValue.Value.ToString());
+                    writer.WriteAttributeString("screentip", method.CustomAttributes.ToList()[0].NamedArguments[1].TypedValue.Value.ToString());
                     writer.WriteEndElement();
                 }
 
@@ -72,11 +76,11 @@ namespace StructuralDesignKitExcel
         }
 
 
-
-
         public void OnButton(IRibbonControl control)
         {
             Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
             var cell = xlApp.ActiveCell;
 
             // AppActivate Application.Caption;
@@ -84,15 +88,14 @@ namespace StructuralDesignKitExcel
             xlApp.SendKeys("{F2}");
             cell.Value2 = "=" + control.Tag;
             xlApp.SendKeys("{(}");
-
         }
-
-
 
 
         public void OnButtonPressedKmod(IRibbonControl control)
         {
             var xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
             var baseCell = xlApp.ActiveCell;
             var activeCell = xlApp.ActiveCell;
 
@@ -167,6 +170,8 @@ namespace StructuralDesignKitExcel
         public void OnButtonPressedCSCheck(IRibbonControl control)
         {
             Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
             var baseCell = xlApp.ActiveCell;
             var activeCell = xlApp.ActiveCell;
 
@@ -458,7 +463,7 @@ namespace StructuralDesignKitExcel
             activeCell = baseCell.Offset[0, 7]; activeCell.Value2 = "Material Properties";
 
 
-            MaterialProperties(control, baseCell.Offset[0, 7]);
+            MaterialProperties(control, baseCell.Offset[0, 7], baseCell.Offset[1, 1]);
 
             //------------------------------
             //Global Formating
@@ -491,17 +496,24 @@ namespace StructuralDesignKitExcel
 
         }
 
-
-        public void MaterialProperties(IRibbonControl control, Range cell = null)
+        /// <summary>
+        /// Display all the material properties in a table 
+        /// </summary>
+        /// <param name="control">ribbon control</param>
+        /// <param name="insertCell">cell where to insert the table. If null, book's active cell</param>
+        /// <param name="csCell">first cell to look for the cross section. Format: b, h, Mat on top of each other</param>
+        public void MaterialProperties(IRibbonControl control, Range insertCell = null, Range csCell= null)
         {
             var xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
             var baseCell = xlApp.ActiveCell;
             var activeCell = xlApp.ActiveCell;
 
-            if (cell != null)
+            if (insertCell != null)
             {
-                baseCell = cell;
-                activeCell = cell;
+                baseCell = insertCell;
+                activeCell = insertCell;
             }
 
             var properties = typeof(StructuralDesignKitLibrary.Materials.IMaterialTimber).GetProperties().ToList();
@@ -516,6 +528,15 @@ namespace StructuralDesignKitExcel
             activeCell.Offset[2, 1].Value2 = 200;
             ValidateCellWithList(activeCell.Offset[3, 1], ExcelHelpers.AllMaterialAsList());
             activeCell.Offset[3, 1].Value2 = "GL24h";
+
+            //Replace default values with linked values to a specific cross section:
+            if (csCell!= null)
+            {
+                activeCell.Offset[1, 1].Formula = string.Format("={0}",csCell.Address[false, false]);
+                activeCell.Offset[2, 1].Formula = string.Format("={0}",csCell.Offset[1,0].Address[false, false]);
+                activeCell.Offset[3, 1].Formula = string.Format("={0}",csCell.Offset[2, 0].Address[false, false]);
+            }
+
             activeCell.Offset[4, 1].Formula = string.Format("=SDK.Material.CreateRectangularCrossSection({0},{1},{2})",
                 activeCell.Offset[1, 1].Address[false, false], activeCell.Offset[2, 1].Address[false, false], activeCell.Offset[3, 1].Address[false, false]);
 
@@ -554,46 +575,6 @@ namespace StructuralDesignKitExcel
         }
 
 
-
-        /// <summary>
-        /// Trying to create a button which generates over 4 lines:
-        /// - Validated cell with material list
-        /// - B 
-        /// - H
-        /// - Cross section Tag
-        /// </summary>
-        /// <param name="control"></param>
-        public void CreatesCrossSection(IRibbonControl control)
-        {
-            Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
-            var activeCell = xlApp.ActiveCell;
-            activeCell.Value2 = "Material = ";
-            int row = activeCell.Row;
-            int col = activeCell.Column;
-            var ce = new ExcelReference(row, col);
-
-            Range cell_1 = xlApp.Range[activeCell.Row + 1, activeCell.Column + 1].Cells;
-            cell_1.Value2 = "Test_Approved";
-            //ValidateCellWithMaterials(xlApp.Range[activeCell.Row, activeCell.Column + 1]);
-            //xlApp.Range[activeCell.Row + 1, activeCell.Column].Value2 = "width :";
-            //xlApp.Range[activeCell.Row + 2, activeCell.Column].Value2 = "height :";
-            //xlApp.Range[activeCell.Row + 3, activeCell.Column].Value2 = "CrossSection :";
-            //xlApp.Range[activeCell.Row + 1, activeCell.Column + 1].Value2 = 100;
-            //xlApp.Range[activeCell.Row + 2, activeCell.Column+2].Value2 = 200;
-            //xlApp.Range[activeCell.Row + 3, activeCell.Column+3].Formula = String.Format("=CrossSectionTag({0},{1},{2})",
-            //    xlApp.Range[activeCell.Row + 1, activeCell.Column + 1].Address[false,false],
-            //    xlApp.Range[activeCell.Row + 2, activeCell.Column + 1].Address[false,false],
-            //    xlApp.Range[activeCell.Row + 3, activeCell.Column + 1].Address[false,false]);
-
-
-            //ExcelReference b3 = new ExcelReference(2,1);
-            //b3.SetValue("Hey! It works...");
-            //
-
-
-        }
-
-
         /// <summary>
         /// Create a cell validation with a given list
         /// </summary>
@@ -601,7 +582,7 @@ namespace StructuralDesignKitExcel
         /// <param name="list">List to implement</param>
         private void ValidateCellWithList(Range cell, List<string> list)
         {
-
+            if(cell == null) { throw new Exception("Please open a new workbook first");}
             var flatList = string.Join(",", list.ToArray());
             string initialValue = list[0];
 
