@@ -15,6 +15,7 @@ using System.Xml;
 using System.IO;
 using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using StructuralDesignKitLibrary.EC5;
+using StructuralDesignKitLibrary.CrossSections.Interfaces;
 
 
 namespace StructuralDesignKitExcel
@@ -181,7 +182,7 @@ namespace StructuralDesignKitExcel
             //Define cross section and material
             //----------------------------------
 
-            int blockCSLength = 9;
+            int blockCSLength = 10;
             //Captions
             activeCell.Value2 = "Cross section";
             activeCell = baseCell.Offset[1, 0]; activeCell.Value2 = "b";
@@ -191,6 +192,7 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Service Class";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Buckling Length Ly";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Buckling Length Lz";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Torsional buckling Length Ltb";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Member length in tension (LVL)";
 
 
@@ -205,12 +207,14 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "3";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "1.5";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "3";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "3";
 
 
             //Units - Comments
             activeCell = baseCell.Offset[1, 2]; activeCell.Value2 = "mm";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
             activeCell = activeCell.Offset[4, 0]; activeCell.Value2 = "m";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "m";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "m";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "m";
 
@@ -337,8 +341,8 @@ namespace StructuralDesignKitExcel
             //Define Checks Factors
             //----------------------------------
 
-            int blockFactorStart = 10;
-            int BlockFactorLength = 10;
+            int blockFactorStart = 11;
+            int BlockFactorLength = 11;
 
             //Captions
             activeCell = baseCell.Offset[blockFactorStart, 4]; activeCell.Value2 = "Factors";
@@ -348,6 +352,7 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Khz";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kcy";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kcz";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kcrit";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kcr";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kh_tension";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kl_tension_LVL";
@@ -363,6 +368,7 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kh_Bending({0},{1})", baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[1, 1].Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kc({0},{1}*1000,{2}*1000,0)", baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[6, 1].Address[false, false], baseCell.Offset[7, 1].Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kc({0},{1}*1000,{2}*1000,1)", baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[6, 1].Address[false, false], baseCell.Offset[7, 1].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kcrit({0},{1}*1000)", baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[8, 1].Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kcr({0})", baseCell.Offset[3, 1].Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kh_Tension({0},{1})", baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[2, 1].Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kl_LVL({0},{1}*1000)", baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[8, 1].Address[false, false]);
@@ -382,7 +388,7 @@ namespace StructuralDesignKitExcel
             //----------------------------------
             //Define checks
             //----------------------------------
-            int BlockCheckLength = 9;
+            int BlockCheckLength = 10;
 
             //Captions
             activeCell = baseCell.Offset[0, 4]; activeCell.Value2 = "Eurocodes 5 DIN EN 1995-1 Checks";
@@ -392,6 +398,7 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Bending And Tension_6.2.3 : ";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Bending And Compression_6.2.4 : ";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Bending And Buckling_6.3.2 : ";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Lateral Torsional buckling_6.3.3";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Shear_6.1.7 : ";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Torsion_6.1.8 : ";
 
@@ -425,6 +432,13 @@ namespace StructuralDesignKitExcel
                 baseCell.Offset[6, 1].Address[false, false], baseCell.Offset[7, 1].Address[false, false], baseCell.Offset[4, 1].Address[false, false],
                 baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false],
                 baseCell.Offset[blockFactorStart + 3, 5].Address[false, false], baseCell.Offset[blockFactorStart + 4, 5].Address[false, false]);
+
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.LateralTorsionalBuckling_6.3.3({0},{1},{2},{3}*1000,{4}*1000,{5}*1000,{6},{7},{8},{9},{10})",
+                   baseCell.Offset[blockStressesStart + 6, 1].Address[false, false], baseCell.Offset[blockStressesStart + 7, 1].Address[false, false], baseCell.Offset[blockStressesStart + 2, 1].Address[false, false],
+                baseCell.Offset[6, 1].Address[false, false], baseCell.Offset[7, 1].Address[false, false], baseCell.Offset[8, 1].Address[false, false], baseCell.Offset[4, 1].Address[false, false],
+                baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false],
+                baseCell.Offset[blockFactorStart + 3, 5].Address[false, false], baseCell.Offset[blockFactorStart + 4, 5].Address[false, false]);
+
 
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.Shear_6.1.7({0},{1},{2},{3},{4})",
                 baseCell.Offset[blockStressesStart + 3, 1].Address[false, false], baseCell.Offset[blockStressesStart + 4, 1].Address[false, false], baseCell.Offset[3, 1].Address[false, false],
@@ -502,7 +516,7 @@ namespace StructuralDesignKitExcel
         /// <param name="control">ribbon control</param>
         /// <param name="insertCell">cell where to insert the table. If null, book's active cell</param>
         /// <param name="csCell">first cell to look for the cross section. Format: b, h, Mat on top of each other</param>
-        public void MaterialProperties(IRibbonControl control, Range insertCell = null, Range csCell= null)
+        public void MaterialProperties(IRibbonControl control, Range insertCell = null, Range csCell = null)
         {
             var xlApp = (Excel.Application)ExcelDnaUtil.Application;
             ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
@@ -530,11 +544,11 @@ namespace StructuralDesignKitExcel
             activeCell.Offset[3, 1].Value2 = "GL24h";
 
             //Replace default values with linked values to a specific cross section:
-            if (csCell!= null)
+            if (csCell != null)
             {
-                activeCell.Offset[1, 1].Formula = string.Format("={0}",csCell.Address[false, false]);
-                activeCell.Offset[2, 1].Formula = string.Format("={0}",csCell.Offset[1,0].Address[false, false]);
-                activeCell.Offset[3, 1].Formula = string.Format("={0}",csCell.Offset[2, 0].Address[false, false]);
+                activeCell.Offset[1, 1].Formula = string.Format("={0}", csCell.Address[false, false]);
+                activeCell.Offset[2, 1].Formula = string.Format("={0}", csCell.Offset[1, 0].Address[false, false]);
+                activeCell.Offset[3, 1].Formula = string.Format("={0}", csCell.Offset[2, 0].Address[false, false]);
             }
 
             activeCell.Offset[4, 1].Formula = string.Format("=SDK.Material.CreateRectangularCrossSection({0},{1},{2})",
@@ -561,7 +575,7 @@ namespace StructuralDesignKitExcel
 
             for (int i = 0; i < 3; i++)
             {
-                baseCell.Offset[i +1, 1].Interior.Color = XlRgbColor.rgbLightYellow;
+                baseCell.Offset[i + 1, 1].Interior.Color = XlRgbColor.rgbLightYellow;
             }
 
             var range = xlApp.Range[baseCell, baseCell.Offset[properties.Count + 3, 1]];
@@ -582,7 +596,7 @@ namespace StructuralDesignKitExcel
         /// <param name="list">List to implement</param>
         private void ValidateCellWithList(Range cell, List<string> list)
         {
-            if(cell == null) { throw new Exception("Please open a new workbook first");}
+            if (cell == null) { throw new Exception("Please open a new workbook first"); }
             var flatList = string.Join(",", list.ToArray());
             string initialValue = list[0];
 
