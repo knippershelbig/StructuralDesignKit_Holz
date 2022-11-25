@@ -126,6 +126,8 @@ namespace StructuralDesignKit
                 Dowel.a1min, Dowel.a2min, Dowel.a3tmin, Dowel.a3cmin, Dowel.a4tmin, Dowel.a4cmin));
 
 
+
+
             Console.ReadLine();
         }
     }

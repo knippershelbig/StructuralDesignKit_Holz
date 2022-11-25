@@ -201,7 +201,7 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "400";
             activeCell = activeCell.Offset[1, 0]; ValidateCellWithList(activeCell, ExcelHelpers.AllMaterialAsList());
             activeCell.Value2 = "GL24h";
-            formula = string.Format("=SDK.Material.CreateRectangularCrossSection({0},{1},{2})", activeCell.Offset[-2, 0].Address[false, false], activeCell.Offset[-1, 0].Address[false, false], activeCell.Address[false, false]);
+            formula = string.Format("=SDK.Utilities.CreateRectangularCrossSection({0},{1},{2})", activeCell.Offset[-2, 0].Address[false, false], activeCell.Offset[-1, 0].Address[false, false], activeCell.Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = formula;
             activeCell = activeCell.Offset[1, 0]; ValidateCellWithList(activeCell, ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.EC5.EC5_Utilities.ServiceClass>());
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "3";
@@ -551,7 +551,7 @@ namespace StructuralDesignKitExcel
                 activeCell.Offset[3, 1].Formula = string.Format("={0}", csCell.Offset[2, 0].Address[false, false]);
             }
 
-            activeCell.Offset[4, 1].Formula = string.Format("=SDK.Material.CreateRectangularCrossSection({0},{1},{2})",
+            activeCell.Offset[4, 1].Formula = string.Format("=SDK.Utilities.CreateRectangularCrossSection({0},{1},{2})",
                 activeCell.Offset[1, 1].Address[false, false], activeCell.Offset[2, 1].Address[false, false], activeCell.Offset[3, 1].Address[false, false]);
 
             int count = 0;

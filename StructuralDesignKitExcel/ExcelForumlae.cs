@@ -19,12 +19,11 @@ using StructuralDesignKitLibrary.Connections.Fasteners;
 using System.Reflection;
 using StructuralDesignKitLibrary.Connections.Interface;
 using System.CodeDom;
+using StructuralDesignKitLibrary.Connections.SteelTimberShear;
+using StructuralDesignKitLibrary.Connections.TimberTimberShear;
 
 namespace StructuralDesignKitExcel
 {
-
-
-
 
     public class AddIn : IExcelAddIn
     {
@@ -48,10 +47,6 @@ namespace StructuralDesignKitExcel
         {
             ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
         }
-
-
-
-
     }
 
     public static class ExcelFormulae
@@ -881,8 +876,102 @@ namespace StructuralDesignKitExcel
         }
 
 
+        /*
+         * -------------------------
+         * STEEL TO TIMBER CONNECTIONS
+         * -------------------------
+         */
+        [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to steel connection with inner plate in [N]. The value is for 2 shear planes",
+            Name = "SDK.EC5.Connection.InnerSteelPlate",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double ComputeSteelSingleInnerPLateCapacity(
+            [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
+            [ExcelArgument(Description = "Steel plate thickness in [mm]")] double steelPlateThickness,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle,
+            [ExcelArgument(Description = "Timber material used in the connection")] string material,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane (t1 or t2 according to 8.2.3 (3))")] double timberThickness,
+            [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect)
+        {
+            var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
+            var timber = ExcelHelpers.GetTimberMaterial(material);
+            return new SteelSingleInnerPlate(fastener, steelPlateThickness, angle, timber, timberThickness, ropeEffect).Capacity;
+        }
 
 
+        [ExcelFunction(Description = "Return the shear capacity of a chosen failure mode for a timber to steel connection with inner plate in [N]. The value is for 1 shear plane",
+            Name = "SDK.EC5.Connection.InnerSteelPlateFailureMode",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double ComputeSteelSingleInnerPLateFailureMode(
+            [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
+            [ExcelArgument(Description = "Steel plate thickness in [mm]")] double steelPlateThickness,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle,
+            [ExcelArgument(Description = "Timber material used in the connection")] string material,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane (t1 or t2 according to 8.2.3 (3))")] double timberThickness,
+            [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect,
+            [ExcelArgument(Description = "Failure mode to consider")] string failureMode)
+        {
+            var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
+            var timber = ExcelHelpers.GetTimberMaterial(material);
+            var connection = new SteelSingleInnerPlate(fastener, steelPlateThickness, angle, timber, timberThickness, ropeEffect);
+
+            if (connection.FailureModes.Contains(failureMode)) return connection.Capacities[connection.FailureModes.IndexOf(failureMode)];
+            else return -1.0;
+        }
+
+
+
+        /*
+         * -------------------------
+         * TIMBER TO TIMBER CONNECTIONS
+         * -------------------------
+         */
+        [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to timber connection in [N]. The value is for 1 shear plane",
+            Name = "SDK.EC5.Connection.TimberToTimber",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double ComputeTimberToTimberCapacity(
+            [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
+            [ExcelArgument(Description = "First timber material used in the shear plane")] string timber1,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber1,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle1,
+            [ExcelArgument(Description = "Second timber material used in the shear plane")] string timber2,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber2,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle2,
+            [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect)
+        {
+            var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
+            var Timber1 = ExcelHelpers.GetTimberMaterial(timber1);
+            var Timber2 = ExcelHelpers.GetTimberMaterial(timber2);
+
+            return new TimberTimberSingleShear(fastener,Timber1, ThicknessTimber1,angle1, Timber2, ThicknessTimber2, angle2, ropeEffect).Capacity;
+        }
+
+        [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to timber connection in [N]. The value is for 1 shear plane",
+            Name = "SDK.EC5.Connection.TimberToTimberFailureMode",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections")]
+        public static double ComputeTimberToTimberFailureMode(
+            [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
+            [ExcelArgument(Description = "First timber material used in the shear plane")] string timber1,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber1,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle1,
+            [ExcelArgument(Description = "Second timber material used in the shear plane")] string timber2,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber2,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle2,
+            [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect,
+            [ExcelArgument(Description = "Failure mode to consider")] string failureMode)
+        {
+            var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
+            var Timber1 = ExcelHelpers.GetTimberMaterial(timber1);
+            var Timber2 = ExcelHelpers.GetTimberMaterial(timber2);
+
+            var connection = new TimberTimberSingleShear(fastener, Timber1, ThicknessTimber1, angle1, Timber2, ThicknessTimber2, angle2, ropeEffect);
+
+            if (connection.FailureModes.Contains(failureMode)) return connection.Capacities[connection.FailureModes.IndexOf(failureMode)];
+            else return -1.0;
+        }
 
 
         //public double K90 { get; set; }
@@ -894,8 +983,6 @@ namespace StructuralDesignKitExcel
         //public double WithdrawalStrength { get; set; }
 
         #endregion
-
-
 
 
         #region Material
@@ -939,7 +1026,6 @@ namespace StructuralDesignKitExcel
 
 
         #endregion
-
 
 
         #region Compute Stresses
@@ -1041,10 +1127,9 @@ namespace StructuralDesignKitExcel
         #endregion
 
 
-
         #region utilities
         [ExcelFunction(Description = "Create a cross section tag",
-            Name = "SDK.Material.CreateRectangularCrossSection",
+            Name = "SDK.Utilities.CreateRectangularCrossSection",
             IsHidden = false,
             Category = "SDK.Utilities")]
         public static string CreateCrossSection([ExcelArgument(Description = "width")] double b, [ExcelArgument(Description = "height")] double h, string material)
@@ -1052,9 +1137,33 @@ namespace StructuralDesignKitExcel
             return ExcelHelpers.CreateRectangularCrossSection(b, h, ExcelHelpers.GetTimberMaterial(material));
         }
 
+
+        [ExcelFunction(Description = "Create a Bolt tag",
+            Name = "SDK.Utilities.CreateBoltTag",
+            IsHidden = false,
+            Category = "SDK.Utilities")]
+        public static string CreateBoltTag(
+            [ExcelArgument(Description = "Diameter of the fastener")] double diameter,
+            [ExcelArgument(Description = "Tensile strength of the fasterner in N/mm²")] double fu)
+        {
+            return ExcelHelpers.GenerateBoltTag(diameter, fu);
+
+        }
+
+        [ExcelFunction(Description = "Create a Dowel tag",
+            Name = "SDK.Utilities.CreateDowelTag",
+            IsHidden = false,
+            Category = "SDK.Utilities")]
+        public static string CreateDowelTag(
+            [ExcelArgument(Description = "Diameter of the fastener")] double diameter,
+            [ExcelArgument(Description = "Tensile strength of the fasterner in N/mm²")] double fu)
+        {
+            return ExcelHelpers.GenerateDowelTag(diameter, fu);
+
+        }
         #endregion
 
-
+        //TODO//
         //material encryypt and decript
 
         //Create a material which can be used following the IMaterial Timber Interface
@@ -1064,7 +1173,7 @@ namespace StructuralDesignKitExcel
         //LTB according to EC3
 
 
-
+        //Add into the SDK lib a list a generic bolt/dowel types
 
 
         #region Garbage Collector

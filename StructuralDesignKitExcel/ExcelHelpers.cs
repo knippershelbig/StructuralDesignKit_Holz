@@ -5,13 +5,8 @@ using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.Materials;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Resources;
-using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace StructuralDesignKitExcel
@@ -69,7 +64,6 @@ namespace StructuralDesignKitExcel
         public static CrossSectionRectangular CreateRectangularCrossSection(string crossSectionTag)
         {
             string error = "The cross section tag does not respect the defined syntax (i.e: CS_R_100x200_GL24h)";
-            //CS_R_100x200_GL24h
             var CS = crossSectionTag.Split('_');
             IMaterialTimber material;
 
@@ -106,15 +100,13 @@ namespace StructuralDesignKitExcel
 
         public static string CreateRectangularCrossSection(double b, double h, IMaterialTimber material)
         {
-
             //CS_R_100x200_GL24h
             return String.Format("CS_R_{0}x{1}_{2}",
                 b,
                 h,
                 material.Grade);
-
-
         }
+
 
         public static List<string> AllMaterialAsList()
         {
@@ -152,6 +144,25 @@ namespace StructuralDesignKitExcel
 
 
         /// <summary>
+        /// Method to check if a fastener type is available in the SDK based on a string
+        /// </summary>
+        /// <param name="fastenerType"></param>
+        /// <returns></returns>
+        public static bool IsFastener(string fastenerType)
+        {
+            //Get fastener types available in SDK
+            var availableFastenerTypes = Enum.GetNames(typeof(EC5_Utilities.FastenerType)).ToList();
+            List<string> availableFastenerTypesLower = new List<string>();
+            foreach (var item in availableFastenerTypes)
+            {
+                availableFastenerTypesLower.Add(item.ToLower());
+            }
+            if (availableFastenerTypesLower.Contains(fastenerType.ToLower())) return true;
+            else return false;
+        }
+
+
+        /// <summary>
         /// Return a IFastener object based on a string, diameter and steel tensile strength
         /// </summary>
         /// <param name="fastenerType"></param>
@@ -172,23 +183,44 @@ namespace StructuralDesignKitExcel
             return fastener;
         }
 
-        /// <summary>
-        /// Method to check if a fastener type is available in the SDK based on a string
-        /// </summary>
-        /// <param name="fastenerType"></param>
-        /// <returns></returns>
-        public static bool IsFastener(string fastenerType)
+
+        //Create BoltTag
+        public static string GenerateBoltTag(double diameter, double Fuk)
         {
-            //Get fastener types available in SDK
-            var availableFastenerTypes = Enum.GetNames(typeof(EC5_Utilities.FastenerType)).ToList();
-            List<string> availableFastenerTypesLower = new List<string>();
-            foreach (var item in availableFastenerTypes)
-            {
-                availableFastenerTypesLower.Add(item.ToLower());
-            }
-            if (availableFastenerTypesLower.Contains(fastenerType.ToLower())) return true;
-            else return false;
+            return string.Format("Bolt_D{0}_Fu{1}", diameter, Fuk);
         }
+
+        //Create DowelTag
+        public static string GenerateDowelTag(double diameter, double Fuk)
+        {
+            return string.Format("Bolt_D{0}_Fu{1}", diameter, Fuk);
+        }
+
+
+        public static IFastener GetFastenerFromTag(string fastenerTag)
+        {
+            var fastener = fastenerTag.Split('_');
+            string error = "Format not recognized";
+            //Proofing
+            if (string.IsNullOrWhiteSpace(fastenerTag)) throw new Exception("FastenerTag is nullOrWhiteSpace");
+            if (!IsFastener(fastener[0])) throw new Exception("Fastener type not recognized. (Bolt_D10_Fu800 | Dowel_D10_Fu360");
+            if (fastener[1][0] != 'D') throw new Exception(error);
+
+
+            string type = fastener[0];
+            double diameter = Convert.ToDouble(fastener[1].Remove(0, 1));
+            double fu = Convert.ToDouble(fastener[2].Remove(0, 2));
+
+            return GetFastener(type, diameter, fu);
+        }
+
+
+        //Create DowelTag
+
+        //Bolt_D10_Fu800
+        //
+        //Screw_Dint6_Dext10_Fu1000_Lg_30_Faxk11.2_Rhoa350
+        //Nail_DDext10_Fu1000_Lg_30_Faxk11.2_Rhoa350
 
     }
 }

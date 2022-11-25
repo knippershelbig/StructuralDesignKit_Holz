@@ -54,8 +54,6 @@ namespace StructuralDesignKitLibrary.Connections.Interface
         [Description("Limitation of the Johansen part for the rope effect based on EN 1995-1-1 §8.2.2 (2)")]
         double MaxJohansenPart { get; set; }
 
-
-
         /// <summary>
         /// Minimum spacing parallel to grain in mm
         /// </summary>
@@ -100,7 +98,6 @@ namespace StructuralDesignKitLibrary.Connections.Interface
         /// <returns></returns>
         [Description("Computes the effective number of fasteners")]
         double ComputeEffectiveFastener(int n, double a1);
-
 
         /// <summary>
         /// Computes the embedment strength of the fastener

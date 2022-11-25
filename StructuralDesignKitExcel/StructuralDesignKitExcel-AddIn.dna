@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DnaLibrary Name="StructuralDesignKitExcel Add-In" RuntimeVersion="v4.0" xmlns="http://schemas.excel-dna.net/addin/2018/05/dnalibrary">
-  <ExternalLibrary Path="StructuralDesignKitExcel.dll" ExplicitExports="false" LoadFromBytes="true" Pack="true" IncludePdb="false" />
+  <ExternalLibrary Path="StructuralDesignKitExcel.dll" ExplicitExports="true" LoadFromBytes="true" Pack="true" IncludePdb="false" />
   <Reference Path="ExcelDna.IntelliSense.dll" Pack="true" />
-
-
+	<!-- ExplicitExport indicates whether exported function and macros need to be explicitly marked with [ExcelFunction(...)] and [ExcelCommand(...)] macros to be exported,
+	or whether all public static methods with compatible signature are registered.!-->
+	
   <CustomUI>
     <customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui' loadImage='LoadImage'>
       <ribbon>

@@ -50,7 +50,6 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
         }
 
 
-
         public void ComputeFailingModes()
         {
             Fastener.ComputeEmbedmentStrength(Timber, Angle);
