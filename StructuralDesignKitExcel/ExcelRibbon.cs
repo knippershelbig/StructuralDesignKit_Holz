@@ -16,7 +16,9 @@ using System.IO;
 using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.CrossSections.Interfaces;
-
+using Microsoft.Win32;
+using StructuralDesignKitLibrary.Connections.TimberTimberShear;
+using StructuralDesignKitLibrary.Connections.Interface;
 
 namespace StructuralDesignKitExcel
 {
@@ -28,6 +30,178 @@ namespace StructuralDesignKitExcel
     public class RibbonController : ExcelRibbon
     {
 
+        public string GetConnectionMenuContent(IRibbonControl control)
+        {
+            string category = control.Tag;
+
+            var menuXml = new StringWriter();
+            using (XmlWriter writer = XmlWriter.Create(menuXml))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("menu", @"http://schemas.microsoft.com/office/2006/01/customui");
+                writer.WriteAttributeString("xmlns", @"http://schemas.microsoft.com/office/2006/01/customui");
+
+                //Get methods from a class
+                var methods = typeof(ExcelFormulae).GetMethods().ToList();
+                var methodsWithCategory = GetMethods(methods, category);
+
+
+
+                var categoryMethods = GetMethods(methods, category);
+
+                foreach (var method in categoryMethods)
+                {
+                    writer.WriteStartElement("button");
+                    writer.WriteAttributeString("id", "button_" + method.Name);
+                    writer.WriteAttributeString("label", method.Name);
+                    writer.WriteAttributeString("onAction", "OnConnectionButton");
+                    writer.WriteAttributeString("tag", method.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString());
+                    writer.WriteAttributeString("screentip", method.CustomAttributes.ToList()[0].NamedArguments[1].TypedValue.Value.ToString());
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteEndDocument();
+                writer.Flush();
+                writer.Close();
+
+            }
+            return menuXml.ToString();
+        }
+
+
+        public void OnConnectionButton(IRibbonControl control)
+        {
+            string name = control.Id.Split('_')[1];
+            string tag = control.Tag.Split('_')[1];
+
+            //Case timber to timber 
+            if (tag == "TimberTimber")
+            {
+                if (name == "TimberTimberSingleShear")
+                {
+                    var xlApp = (Excel.Application)ExcelDnaUtil.Application;
+                    ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
+                    var baseCell = xlApp.ActiveCell;
+                    var activeCell = xlApp.ActiveCell;
+
+                    var LoadDurations = ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.EC5.EC5_Utilities.LoadDuration>();
+                    var TimberTypes = ExcelHelpers.AllMaterialAsList();
+                    var ServiceClasses = ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.EC5.EC5_Utilities.ServiceClass>();
+
+                    //----INPUT----
+                    baseCell.Value2 = name;
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Timber 1";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Thickness t1";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Timber 2";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Thickness t2";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Angle 1";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Angle 2";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Diameter";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Fuk";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Rope Effect";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Fastener Tag";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Load Duration";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Service Class";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kmod";
+
+
+
+                    Range Timber1 = baseCell.Offset[1, 1]; ValidateCellWithList(Timber1, TimberTypes);
+                    Range Timber2 = Timber1.Offset[1, 0]; ValidateCellWithList(Timber2, TimberTypes);
+                    Range Thick1 = Timber2.Offset[1, 0];
+                    Range Thick2 = Thick1.Offset[1, 0];
+                    Range Angle1 = Thick2.Offset[1, 0];
+                    Range Angle2 = Angle1.Offset[1, 0];
+                    Range Diameter = Angle2.Offset[1, 0];
+                    Range Fuk = Diameter.Offset[1, 0];
+                    Range RopeEffect = Fuk.Offset[1, 0]; ValidateCellWithList(RopeEffect, new List<string>() { "TRUE", "FALSE"});
+                    Range FastenerTag = RopeEffect.Offset[1, 0]; 
+                    Range LoadDuration = FastenerTag.Offset[1, 0]; ValidateCellWithList(LoadDuration, LoadDurations);
+                    Range ServiceClass = LoadDuration.Offset[1, 0]; ValidateCellWithList(ServiceClass, ServiceClasses);
+                    Range Kmod = ServiceClass.Offset[1, 0];
+
+
+                    Timber1.Value2 = "GL24h";
+                    Timber2.Value2 = "GL24h";
+                    Thick1.Value2 = 100;
+                    Thick2.Value2 = 150;
+                    Angle1.Value2 = 0;
+                    Angle2.Value2 = 90;
+                    Diameter.Value2 = 16;
+                    Fuk.Value2 = 400;
+                    RopeEffect.Value2 = true;
+                    FastenerTag.Formula = String.Format("=SDK.Utilities.CreateBoltTag({0},{1})", Diameter.Address[false, false], Fuk.Address[false, false]);
+                    LoadDuration.Value2 = "Permanent";
+                    ServiceClass.Value2 = "SC2";
+                    //Kmod.Formula = string.Format("=((SDK.Factors.Kmod({0},{1},{2})*(SDK.Factors.Kmod({3},{1},{2}))",
+                    //    Timber1.Address[false, false], ServiceClass.Address[false, false], LoadDuration.Address[false, false], Timber2.Address[false, false]);
+                    Kmod.Formula = string.Format("=SDK.Factors.Kmod({0},{1},{2}",
+    Timber1.Address[false, false], ServiceClass.Address[false, false], LoadDuration.Address[false, false]);
+
+
+                    //Results
+
+                    //Generate calculation to determine the failure mechanisms
+                    var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag.Value2);
+                    var timber1 = ExcelHelpers.GetTimberMaterialFromTag(Timber1.Value2);
+                    var timber2 = ExcelHelpers.GetTimberMaterialFromTag(Timber2.Value2);
+
+                    var shearCalculation = new TimberTimberSingleShear(fastener, timber1, Thick1.Value2, Angle1.Value2, timber2, Thick2.Value2, Angle2.Value2, RopeEffect.Value2);
+
+
+
+                    //----Results
+                    activeCell = Kmod.Offset[1, -1]; activeCell.Value2 = "Fh1k";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Fh2k";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "β";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Myrk";
+
+                    foreach (string failureMode in shearCalculation.FailureModes)
+                    {
+                        activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Failure Mode " + failureMode;
+                    }
+
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Minimum Characteristic Strength Rk";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Design Capacity Rd";
+
+                    activeCell = Kmod.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.Fhk({0},{1},{2})",
+                        FastenerTag.Address[false, false], Angle1.Address[false, false], Timber1.Address[false, false]);
+
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.Fhk({0},{1},{2})",
+                        FastenerTag.Address[false, false], Angle2.Address[false, false], Timber2.Address[false, false]);
+
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("={0}/{1}",
+                        activeCell.Offset[-1, 0].Address[false, false], activeCell.Offset[-2, 0].Address[false, false]);
+
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.Myrk({0})",
+                        FastenerTag.Address[false, false]);
+
+                    foreach (string failureMode in shearCalculation.FailureModes)
+                    {
+                        activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connection.TimberTimberSingleShearFailureMode({0},{1},{2},{3},{4},{5},{6},{7},\"{8}\")",
+                            FastenerTag.Address[false, false], Timber1.Address[false, false], Thick1.Address[false, false], Angle1.Address[false, false],
+                            Timber2.Address[false, false], Thick2.Address[false, false], Angle2.Address[false, false], RopeEffect.Address[false, false], failureMode);
+                    }
+
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connection.TimberTimberSingleShear({0},{1},{2},{3},{4},{5},{6},{7})",
+                            FastenerTag.Address[false, false], Timber1.Address[false, false], Thick1.Address[false, false], Angle1.Address[false, false],
+                            Timber2.Address[false, false], Thick2.Address[false, false], Angle2.Address[false, false], RopeEffect.Address[false, false]);
+
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("={0}*{1}/1.3/1000", activeCell.Offset[-1, 0].Address[false, false], Kmod.Address[false,false]);
+
+                }
+            }
+        }
+
+
+
+        /// <summary>
+        /// Populate a dynamic button with the function available under the SDK.XXXX namespace.
+        /// Return a XML string         /// 
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
         public string GetMenuContent(IRibbonControl control)
         {
             string category = control.Tag;
@@ -40,22 +214,23 @@ namespace StructuralDesignKitExcel
                 writer.WriteAttributeString("xmlns", @"http://schemas.microsoft.com/office/2006/01/customui");
 
                 //Get methods from a class
-                var methods = typeof(ExcelFormulae).GetMethods();
+                var methods = typeof(ExcelFormulae).GetMethods().ToList();
 
                 //filtering Factors Methods
-                List<System.Reflection.MethodInfo> methodsWithArgument = new List<System.Reflection.MethodInfo>();
-                foreach (var method in methods)
-                {
-                    if (method.CustomAttributes.ToList().Count >= 1)
-                    {
-                        if (method.CustomAttributes.ToList()[0].NamedArguments.Count >= 3)
-                        {
-                            methodsWithArgument.Add(method);
-                        }
-                    }
-                }
+                //List<System.Reflection.MethodInfo> methodsWithArgument = new List<System.Reflection.MethodInfo>();
+                //foreach (var method in methods)
+                //{
+                //    if (method.CustomAttributes.ToList().Count >= 1)
+                //    {
+                //        if (method.CustomAttributes.ToList()[0].NamedArguments.Count >= 3)
+                //        {
+                //            methodsWithArgument.Add(method);
+                //        }
+                //    }
+                //}
 
-                var categoryMethods = methodsWithArgument.Where(p => p.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == category).ToList();
+                //var categoryMethods = methodsWithArgument.Where(p => p.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == category).ToList();
+                var categoryMethods = GetMethods(methods, category);
 
                 foreach (var method in categoryMethods)
                 {
@@ -73,7 +248,10 @@ namespace StructuralDesignKitExcel
                 writer.Close();
 
             }
+
             return menuXML.ToString();
+
+
         }
 
 
@@ -589,6 +767,131 @@ namespace StructuralDesignKitExcel
         }
 
 
+        #region ConnectionButtons
+
+        /// <summary>
+        /// Validate a cell with all the fastener types currently available in the SDK
+        /// </summary>
+        /// <param name="control"></param>
+        public void OnButtonPressedGetFastenerTypes(IRibbonControl control, Range insertCell = null)
+        {
+            Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
+            var availableFastenerTypes = Enum.GetNames(typeof(EC5_Utilities.FastenerType)).ToList();
+
+            Range InsertCell = null;
+            if (insertCell == null) InsertCell = xlApp.ActiveCell;
+            else InsertCell = insertCell;
+
+            ValidateCellWithList(InsertCell, availableFastenerTypes);
+        }
+
+
+
+        public void OnButtonPressedMinimumSpacings(IRibbonControl control)
+        {
+            Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
+            var baseCell = xlApp.ActiveCell;
+            var activeCell = baseCell;
+
+            //Description
+            activeCell.Value2 = "Minimum fastener spacings";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Fastener Type";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Diameter";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Angle";
+
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "a1";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "a2";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "a3t";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "a3c";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "a4t";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "a4c";
+
+            //Data
+            Range fastenerType = baseCell.Offset[1, 1];
+            Range Diameter = fastenerType.Offset[1, 0];
+            Range Angle = Diameter.Offset[1, 0];
+            OnButtonPressedGetFastenerTypes(control, fastenerType);
+            Diameter.Value2 = 16;
+            Angle.Value2 = 0;
+
+            activeCell = Angle.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a1Min({0},{1},{2})",
+                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a2Min({0},{1},{2})",
+                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a3tMin({0},{1},{2})",
+                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a3cMin({0},{1},{2})",
+                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a4tMin({0},{1},{2})",
+                 fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a4cMin({0},{1},{2})",
+                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+
+            //Units
+            activeCell = baseCell.Offset[2, 2]; activeCell.Value2 = "mm";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Deg";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
+
+            //Additional description
+            activeCell = baseCell.Offset[4, 3]; activeCell.Value2 = "Minimum spacing parallel to grain";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Minimum spacing perpendicular to grain";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Minimum spacing to loaded end";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Minimum spacing to unloaded end";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Minimum spacing to loaded edge";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Minimum spacing to unloaded edge";
+
+
+            //Formating
+            baseCell.Font.Bold = true;
+
+            for (int i = 0; i < 3; i++)
+            {
+                baseCell.Offset[i + 1, 1].Interior.Color = XlRgbColor.rgbLightYellow;
+                baseCell.Offset[i + 1, 1].HorizontalAlignment = XlHAlign.xlHAlignRight;
+
+            }
+
+            for (int i = 0; i < 6; i++)
+            {
+                baseCell.Offset[4 + i, 1].HorizontalAlignment = XlHAlign.xlHAlignRight;
+                ((dynamic)activeCell.Offset[4 + i, 1]).NumberFormatLocal = "0";
+                baseCell.Offset[4 + i, 3].Font.Italic = true;
+
+            }
+
+            var range = xlApp.Range[baseCell, baseCell.Offset[9, 2]];
+            var range1 = xlApp.Range[baseCell.Offset[1, 0], baseCell.Offset[9, 3]];
+            range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
+            range1.Columns.AutoFit();
+
+            for (int i = 0; i < 3; i++)
+            {
+                baseCell.Offset[0, i + 1].ColumnWidth += 2;
+            }
+
+            xlApp.Range[baseCell, baseCell.Offset[0, 2]].Merge();
+            baseCell.HorizontalAlignment = XlHAlign.xlHAlignCenter;
+        }
+
+
+
+
+        #endregion
+
+
+
+
+
+        #region utilities
         /// <summary>
         /// Create a cell validation with a given list
         /// </summary>
@@ -612,5 +915,32 @@ namespace StructuralDesignKitExcel
             cell.Validation.InCellDropdown = true;
             cell.Value2 = initialValue;
         }
+
+
+
+        private List<System.Reflection.MethodInfo> GetMethods(List<System.Reflection.MethodInfo> methods, string category)
+        {
+
+            //filtering Factors Methods
+            List<System.Reflection.MethodInfo> methodsWithArgument = new List<System.Reflection.MethodInfo>();
+            foreach (var method in methods)
+            {
+                if (method.CustomAttributes.ToList().Count >= 1)
+                {
+                    if (method.CustomAttributes.ToList()[0].NamedArguments.Count >= 3)
+                    {
+                        methodsWithArgument.Add(method);
+                    }
+                }
+            }
+
+            return methodsWithArgument.Where(p => p.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == category).ToList();
+        }
+
+        #endregion
+
+
+
+
     }
 }

@@ -21,6 +21,7 @@ using StructuralDesignKitLibrary.Connections.Interface;
 using System.CodeDom;
 using StructuralDesignKitLibrary.Connections.SteelTimberShear;
 using StructuralDesignKitLibrary.Connections.TimberTimberShear;
+using StructuralDesignKitLibrary.Utilities;
 
 namespace StructuralDesignKitExcel
 {
@@ -67,7 +68,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "load Duration" +
             "(Permanent - LongTerm - MediumTerm - ShortTerm - Instantaneous - ShortTerm_Instantaneous")] string loadDuration)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(TimberGrade).Type;
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade).Type;
             var SC = EC5_Utilities.GetServiceClass(serviceClass);
             var LC = EC5_Utilities.GetLoadDuration(loadDuration);
             return EC5_Factors.Kmod(mat, SC, LC);
@@ -83,7 +84,7 @@ namespace StructuralDesignKitExcel
             Category = "SDK.EC5_Factors")]
         public static double Ym([ExcelArgument(Description = "Timber grade")] string TimberGrade)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(TimberGrade).Type;
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade).Type;
             return EC5_Factors.Ym(mat);
         }
 
@@ -97,7 +98,7 @@ namespace StructuralDesignKitExcel
              Category = "SDK.EC5_Factors")]
         public static double Kdef([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "Service class (SC1,SC2 or SC3)")] string serviceClass)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(TimberGrade).Type;
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade).Type;
             var SC = EC5_Utilities.GetServiceClass(serviceClass);
 
             return EC5_Factors.Kdef(mat, SC);
@@ -113,7 +114,7 @@ namespace StructuralDesignKitExcel
              Category = "SDK.EC5_Factors")]
         public static double KhBending([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "Bending height in [mm]")] double height)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(TimberGrade).Type;
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade).Type;
             return EC5_Factors.Kh_Bending(mat, height);
         }
 
@@ -127,7 +128,7 @@ namespace StructuralDesignKitExcel
              Category = "SDK.EC5_Factors")]
         public static double KhTension([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "beam height in [mm]")] double height)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(TimberGrade).Type;
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade).Type;
             return EC5_Factors.Kh_Tension(mat, height);
         }
 
@@ -141,7 +142,7 @@ namespace StructuralDesignKitExcel
              Category = "SDK.EC5_Factors")]
         public static double Kl_LVL([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "member length subjected to tension in [mm]")] double length)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(TimberGrade).Type;
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade).Type;
             return EC5_Factors.Kl_LVL(mat, length);
         }
 
@@ -155,7 +156,7 @@ namespace StructuralDesignKitExcel
                Category = "SDK.EC5_Factors")]
         public static double Kcr([ExcelArgument(Description = "Timber grade")] string TimberGrade)
         {
-            return EC5_Factors.Kcr(ExcelHelpers.GetTimberMaterial(TimberGrade));
+            return EC5_Factors.Kcr(ExcelHelpers.GetTimberMaterialFromTag(TimberGrade));
         }
 
 
@@ -275,7 +276,7 @@ namespace StructuralDesignKitExcel
             try
             {
                 if (SupportType != 0 && SupportType != 1) throw new Exception("Support type should be 0 or 1");
-                var mat = ExcelHelpers.GetTimberMaterial(TimberGrade);
+                var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade);
                 kc90 = EC5_Factors.Kc90(mat, SupportType);
 
             }
@@ -305,7 +306,7 @@ namespace StructuralDesignKitExcel
 
             try
             {
-                var mat = ExcelHelpers.GetTimberMaterial(TimberGrade);
+                var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade);
                 kmalpha = EC5_Factors.Km_Alpha_Compression(mat, angle);
 
             }
@@ -335,7 +336,7 @@ namespace StructuralDesignKitExcel
 
             try
             {
-                var mat = ExcelHelpers.GetTimberMaterial(TimberGrade);
+                var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade);
                 kmalpha = EC5_Factors.Km_Alpha_Tension(mat, angle);
 
             }
@@ -424,7 +425,7 @@ namespace StructuralDesignKitExcel
 
             try
             {
-                var mat = ExcelHelpers.GetTimberMaterial(material);
+                var mat = ExcelHelpers.GetTimberMaterialFromTag(material);
                 kvol = EC5_Factors.Kvol(mat, Vstressed, Vtot);
 
             }
@@ -517,7 +518,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Size Factor for Cross section")] double Kh,
             [ExcelArgument(Description = "Mofification factor for LVL member length")] double Kl_LVL = 1)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(timberGrade);
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
 
             return EC5_CrossSectionCheck.TensionParallelToGrain(Sig0_t_d, mat, Kmod, Ym, Kh, Kl_LVL);
         }
@@ -537,7 +538,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Kmod factor")] double Kmod,
             [ExcelArgument(Description = "safety factor Ym")] double Ym)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(timberGrade);
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
             return EC5_CrossSectionCheck.CompressionParallelToGrain(Sig0_c_d, mat, Kmod, Ym);
         }
 
@@ -557,7 +558,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "safety factor Ym")] double Ym,
             [ExcelArgument(Description = "factor taking into account the effect of stresses perpendicular to the grain")] double kc90)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(timberGrade);
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
             return EC5_CrossSectionCheck.CompressionAtAnAngleToGrain(SigAlpha_c_d, angleToGrain, mat, Kmod, Ym, kc90 = 1);
         }
 
@@ -598,7 +599,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Kmod factor")] double Kmod,
             [ExcelArgument(Description = "safety factor Ym")] double Ym)
         {
-            var mat = ExcelHelpers.GetTimberMaterial(timberGrade);
+            var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
             return EC5_CrossSectionCheck.Shear(TauYd, TauZd, mat, Kmod, Ym);
         }
 
@@ -731,42 +732,24 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Characteristic yield moment of the fastener in N.mm",
             Name = "SDK.EC5.Connections.Myrk",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
-        public static double Myrk([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
-            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
-            [ExcelArgument(Description = "Tensile strength of the steel the fastener is made of")] double fuk)
+            Category = "SDK.EC5.Connections_Utilities")]
+        public static double Myrk([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerTag)
         {
-
-            double myrk = 0;
-
-            if (ExcelHelpers.IsFastener(fastenerType))
-            {
-                myrk = ExcelHelpers.GetFastener(fastenerType, diameter, fuk).MyRk;
-            }
-            else
-            {
-                throw new Exception("The fasterner type is not recognized");
-            }
-            return myrk;
+            IFastener fastener = ExcelHelpers.GetFastenerFromTag(fastenerTag);
+            return fastener.MyRk;
         }
 
 
         [ExcelFunction(Description = "Embedment Strength of the fastener in N/mm²",
             Name = "SDK.EC5.Connections.Fhk",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
-        public static double Fhk([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
-            [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
-            [ExcelArgument(Description = "Tensile strength of the steel the fastener is made of")] double fuk,
+            Category = "SDK.EC5.Connections_Utilities")]
+        public static double Fhk([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerTag,
             [ExcelArgument(Description = "Load angle to the timber grain")] double angle,
             [ExcelArgument(Description = "Timber type")] string timber)
         {
-
-            IFastener fastener = null;
-            IMaterialTimber timberMaterial = null;
-
-            if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, fuk);
-            timberMaterial = ExcelHelpers.GetTimberMaterial(timber);
+            IFastener fastener = ExcelHelpers.GetFastenerFromTag(fastenerTag);
+            IMaterialTimber timberMaterial = ExcelHelpers.GetTimberMaterialFromTag(timber);
             fastener.ComputeEmbedmentStrength(timberMaterial, angle);
             return fastener.Fhk;
         }
@@ -775,7 +758,7 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Get the percentage of the Johansen Part that the rope effect can contribute to",
             Name = "SDK.EC5.Connections.MaxJohansenPart",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
+            Category = "SDK.EC5.Connections_Utilities")]
         public static double MaxJohansenPart([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType)
         {
 
@@ -784,11 +767,28 @@ namespace StructuralDesignKitExcel
             return fastener.MaxJohansenPart;
         }
 
+        [ExcelFunction(Description = "K90 is a factor taking into consideration the splitting risk and the degree of compressive deformation - According to EN 1995-1-1 Eq (8.33)",
+             Name = "SDK.EC5.Connections.K90",
+             IsHidden = false,
+             Category = "SDK.EC5.Connections_Utilities")]
+        public static double K90(
+            [ExcelArgument(Description = "String representing the fastener type (i.e Bolt_D10_Fu800)")] string fastenerTag,
+            [ExcelArgument(Description = "String representing the timber grade")] string timber)
+        {
+            IFastener fastener =  ExcelHelpers.GetFastenerFromTag(fastenerTag);
+            var timberObj = ExcelHelpers.GetTimberMaterialFromTag(timber);
+
+            var bolt = new FastenerBolt(fastener.Diameter, fastener.Fuk);
+            return bolt.ComputeK90(timberObj);
+        }
+
+
+
 
         [ExcelFunction(Description = "Minimum spacing parallel to grain in mm",
             Name = "SDK.EC5.Connections.a1Min",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
+            Category = "SDK.EC5.Connections_Utilities")]
         public static double A1Min([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
             [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
             [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
@@ -796,6 +796,7 @@ namespace StructuralDesignKitExcel
 
             IFastener fastener = null;
             if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, 800);
+            
             fastener.ComputeSpacings(angle);
             return fastener.a1min;
         }
@@ -804,7 +805,7 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Minimum spacing perpendicular to grain in mm",
             Name = "SDK.EC5.Connections.a2Min",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
+            Category = "SDK.EC5.Connections_Utilities")]
         public static double A2Min([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
             [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
             [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
@@ -819,7 +820,7 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Minimum spacing to loaded end in mm",
             Name = "SDK.EC5.Connections.a3tMin",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
+            Category = "SDK.EC5.Connections_Utilities")]
         public static double A3tMin([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
             [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
             [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
@@ -834,7 +835,7 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Minimum spacing to unloaded end in mm",
             Name = "SDK.EC5.Connections.a3cMin",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
+            Category = "SDK.EC5.Connections_Utilities")]
         public static double A3cMin([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
             [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
             [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
@@ -849,7 +850,7 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Minimum spacing to loaded edge in mm",
             Name = "SDK.EC5.Connections.a4tMin",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
+            Category = "SDK.EC5.Connections_Utilities")]
         public static double A4tMin([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
             [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
             [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
@@ -864,7 +865,7 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Minimum spacing to unloaded edge in mm",
             Name = "SDK.EC5.Connections.a4cMin",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
+            Category = "SDK.EC5.Connections_Utilities")]
         public static double A4cMin([ExcelArgument(Description = "String representing the fastener type (i.e \"Bolt\", \"Dowel\", ...")] string fastenerType,
             [ExcelArgument(Description = "Fastener diameter in mm")] double diameter,
             [ExcelArgument(Description = "Load angle to the timber grain")] double angle)
@@ -876,6 +877,20 @@ namespace StructuralDesignKitExcel
         }
 
 
+        [ExcelFunction(Description = "Compute the effective number of fastener to consider",
+            Name = "SDK.EC5.Connections.Neff",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections_Utilities")]
+        public static double Neff(
+            [ExcelArgument(Description = "String representing the fastener type (i.e Bolt_D10_Fu800)")] string fastenerTag,
+            [ExcelArgument(Description = "Number of fasterner in a row")] int n,
+            [ExcelArgument(Description = "Spacing alongside the grain a1 in [mm]")] double a1,
+            [ExcelArgument(Description = "Load angle to the grain in [degree]")] double angle)
+        {
+            IFastener fastener = ExcelHelpers.GetFastenerFromTag(fastenerTag);
+            return fastener.ComputeEffectiveNumberOfFastener(n, a1, angle);
+        }
+
         /*
          * -------------------------
          * STEEL TO TIMBER CONNECTIONS
@@ -884,8 +899,8 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to steel connection with inner plate in [N]. The value is for 2 shear planes",
             Name = "SDK.EC5.Connection.InnerSteelPlate",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
-        public static double ComputeSteelSingleInnerPLateCapacity(
+            Category = "SDK.EC5.Connections_SteelTimber")]
+        public static double InnerSteelPlate(
             [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
             [ExcelArgument(Description = "Steel plate thickness in [mm]")] double steelPlateThickness,
             [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle,
@@ -894,7 +909,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect)
         {
             var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
-            var timber = ExcelHelpers.GetTimberMaterial(material);
+            var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
             return new SteelSingleInnerPlate(fastener, steelPlateThickness, angle, timber, timberThickness, ropeEffect).Capacity;
         }
 
@@ -902,8 +917,8 @@ namespace StructuralDesignKitExcel
         [ExcelFunction(Description = "Return the shear capacity of a chosen failure mode for a timber to steel connection with inner plate in [N]. The value is for 1 shear plane",
             Name = "SDK.EC5.Connection.InnerSteelPlateFailureMode",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
-        public static double ComputeSteelSingleInnerPLateFailureMode(
+            Category = "SDK.EC5.Connections_Utilities")]
+        public static double InnerSteelPlateFailureMode(
             [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
             [ExcelArgument(Description = "Steel plate thickness in [mm]")] double steelPlateThickness,
             [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle,
@@ -913,7 +928,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Failure mode to consider")] string failureMode)
         {
             var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
-            var timber = ExcelHelpers.GetTimberMaterial(material);
+            var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
             var connection = new SteelSingleInnerPlate(fastener, steelPlateThickness, angle, timber, timberThickness, ropeEffect);
 
             if (connection.FailureModes.Contains(failureMode)) return connection.Capacities[connection.FailureModes.IndexOf(failureMode)];
@@ -928,10 +943,10 @@ namespace StructuralDesignKitExcel
          * -------------------------
          */
         [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to timber connection in [N]. The value is for 1 shear plane",
-            Name = "SDK.EC5.Connection.TimberToTimber",
+            Name = "SDK.EC5.Connection.TimberTimberSingleShear",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
-        public static double ComputeTimberToTimberCapacity(
+            Category = "SDK.EC5.Connections_TimberTimber")]
+        public static double TimberTimberSingleShear(
             [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
             [ExcelArgument(Description = "First timber material used in the shear plane")] string timber1,
             [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber1,
@@ -942,17 +957,17 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect)
         {
             var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
-            var Timber1 = ExcelHelpers.GetTimberMaterial(timber1);
-            var Timber2 = ExcelHelpers.GetTimberMaterial(timber2);
+            var Timber1 = ExcelHelpers.GetTimberMaterialFromTag(timber1);
+            var Timber2 = ExcelHelpers.GetTimberMaterialFromTag(timber2);
 
             return new TimberTimberSingleShear(fastener,Timber1, ThicknessTimber1,angle1, Timber2, ThicknessTimber2, angle2, ropeEffect).Capacity;
         }
 
         [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to timber connection in [N]. The value is for 1 shear plane",
-            Name = "SDK.EC5.Connection.TimberToTimberFailureMode",
+            Name = "SDK.EC5.Connection.TimberTimberSingleShearFailureMode",
             IsHidden = false,
-            Category = "SDK.EC5.Connections")]
-        public static double ComputeTimberToTimberFailureMode(
+            Category = "SDK.EC5.Connections_Utilities")]
+        public static double TimberTimberSingleShearFailureMode(
             [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
             [ExcelArgument(Description = "First timber material used in the shear plane")] string timber1,
             [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber1,
@@ -964,8 +979,8 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Failure mode to consider")] string failureMode)
         {
             var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
-            var Timber1 = ExcelHelpers.GetTimberMaterial(timber1);
-            var Timber2 = ExcelHelpers.GetTimberMaterial(timber2);
+            var Timber1 = ExcelHelpers.GetTimberMaterialFromTag(timber1);
+            var Timber2 = ExcelHelpers.GetTimberMaterialFromTag(timber2);
 
             var connection = new TimberTimberSingleShear(fastener, Timber1, ThicknessTimber1, angle1, Timber2, ThicknessTimber2, angle2, ropeEffect);
 
@@ -1134,7 +1149,7 @@ namespace StructuralDesignKitExcel
             Category = "SDK.Utilities")]
         public static string CreateCrossSection([ExcelArgument(Description = "width")] double b, [ExcelArgument(Description = "height")] double h, string material)
         {
-            return ExcelHelpers.CreateRectangularCrossSection(b, h, ExcelHelpers.GetTimberMaterial(material));
+            return ExcelHelpers.CreateRectangularCrossSection(b, h, ExcelHelpers.GetTimberMaterialFromTag(material));
         }
 
 

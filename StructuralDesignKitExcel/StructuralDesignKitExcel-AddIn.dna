@@ -15,19 +15,26 @@
 				  <dynamicMenu id="dynamicCS_Checks" label="Eurocode checks" getContent="GetMenuContent" tag="SDK.EC5_CrossSection_Checks"/>
 				  <dynamicMenu id="dynamicCS_Stresses" label="Compute stresses" getContent="GetMenuContent" tag="SDK.CrossSection_StressCompute"/>
 			  </group>
-			  
-			  
-			  
+
+			  <group id="EC5_Connections" label="Connections">
+
+				  <dynamicMenu id="dynamicConnections_SteelTimber" label="Steel to Timber" getContent="GetConnectionMenuContent" tag="SDK.EC5.Connections_SteelTimber" size="large"/>
+				  <dynamicMenu id="dynamicConnections_TimberTimber" label="Timber to Timber" getContent="GetConnectionMenuContent" tag="SDK.EC5.Connections_TimberTimber" size="large"/>
+				  <dynamicMenu id="dynamicConnectionUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.EC5.Connections_Utilities" size="normal"/>
+				  <button id ="SpacingsButton" label="Minimum Spacings" size="normal" onAction="OnButtonPressedMinimumSpacings" screentip="Create a table with the minimal spacings"/>
+				  <button id ="FastenerTypesButton" label="FastenerType" size="normal" onAction="OnButtonPressedGetFastenerTypes" screentip="Create droplist cell with the available fastener types in the SDK"/>
+				  <button id ="NeffButton" label="Neff" size="normal" onAction="OnButtonPressedEffectivefasteners" screentip="Create droplist cell with the available fastener types in the SDK"/>
+
+			  </group>
 			  
 			  <group id='EC5_Factors' label='EC5 Factors'>
 				  <dynamicMenu id="dynamicFactors" label="Cross Section factors" getContent="GetMenuContent" tag="SDK.EC5_Factors" size="large" image="Factors"/>
-				  <button id ="kmodButton" label ="kmod" onAction="OnButtonPressedKmod" screentip="Kmod factor"/>
-				  <button id ="kdefButton" label ="kdef" onAction="OnButtonPressedKdef" supertip="Kdef factor"/>
-				  <button id ="YmButton" label ="Ym" onAction="OnButtonPressedYm"/>
 			  </group>
+			  
 			  <group id="SDK_Utilities" label ="Utilities">
-				  <dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities"/>
+				  <dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities" size="large"/>
 			  </group>
+			  
 			  
 		  <group id="EC5_Material" label="Material">
 			  <button id="AllMaterial" label ="All Timber Type" tag ="All" onAction="MaterialList" size ="large" image="Timber"/>

@@ -4,6 +4,7 @@ using StructuralDesignKitLibrary.Connections.TimberTimberShear;
 using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.EC5.Connections.Interface;
 using StructuralDesignKitLibrary.Materials;
+using StructuralDesignKitLibrary.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -161,10 +162,15 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
 
         public void ComputeEmbedmentStrength(IMaterialTimber timber, double angle)
         {
-            double AngleRad = angle * Math.PI / 180;
-            double fh0k = 0.082 * (1 - 0.01 * Diameter) * timber.RhoK; //EN 1995-1-1 Eq (8.32)
-            K90 = ComputeK90(timber);
-            Fhk = fh0k / (K90 * Math.Pow(Math.Sin(AngleRad), 2) + Math.Pow(Math.Cos(AngleRad), 2)); //EN 1995-1-1 Eq (8.32)
+            List<string> CoveredTimber = new List<string>() { "Softwood", "Hardwood", "Glulam", "LVL", "Baubuche" };
+            if (CoveredTimber.Contains(timber.Type.ToString()))
+            {
+                double AngleRad = angle * Math.PI / 180;
+                double fh0k = 0.082 * (1 - 0.01 * Diameter) * timber.RhoK; //EN 1995-1-1 Eq (8.32)
+                K90 = ComputeK90(timber);
+                Fhk = fh0k / (K90 * Math.Pow(Math.Sin(AngleRad), 2) + Math.Pow(Math.Cos(AngleRad), 2)); //EN 1995-1-1 Eq (8.32)
+            }
+            else throw new Exception("Timber type not yet covered in the SDK");
 
         }
         /// <summary>
@@ -197,9 +203,10 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
         }
 
 
-        public double ComputeEffectiveFastener(int n, double a1)
+        public double ComputeEffectiveNumberOfFastener(int n, double a1, double angle)
         {
-            throw new NotImplementedException();
+            double nef_0 = Math.Min(n, Math.Pow(n, 0.9) * Math.Pow(a1 / (13 * Diameter), 0.25));
+            return SDKUtilities.LinearInterpolation(angle, 0, nef_0, 90, n);
         }
 
         public void ComputeSpacings(double angle)

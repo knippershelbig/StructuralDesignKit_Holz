@@ -15,6 +15,7 @@ using System.Xml;
 using StructuralDesignKitLibrary.Connections.Fasteners;
 using StructuralDesignKitLibrary.Connections.SteelTimberShear;
 using StructuralDesignKitLibrary.Connections.TimberTimberShear;
+using StructuralDesignKitLibrary.Utilities;
 
 namespace StructuralDesignKit
 {
@@ -69,38 +70,6 @@ namespace StructuralDesignKit
                 EC5_CrossSectionCheck.LateralTorsionalBuckling(cs1.ComputeStressBendingY(My), cs1.ComputeStressBendingZ(Mz), cs1.ComputeNormalStress(N), leffy, leffz, ltb_Eff, cs1, mat, kmod, ym, Kh_Bending(mat.Type, cs1.H), 1)));
 
 
-            double angle = 10;
-            Console.WriteLine("Compression at an angle {0}: {1:0.00}", angle,
-                EC5_CrossSectionCheck.CompressionAtAnAngleToGrain(2, angle, cs1.Material, kmod, ym, 1.5));
-
-
-            Console.WriteLine(EC5_Factors.Kp(320, 25, 25000));
-
-
-            DescriptionAttribute attribute = (DescriptionAttribute)typeof(EC5_Factors).GetMethod("Kdis").GetCustomAttributes(false)[0];
-
-            var methods = typeof(StructuralDesignKitExcel.ExcelFormulae).GetMethods();
-
-            var test = methods[0].CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value;
-
-            foreach (var method in methods)
-            {
-                if (method.CustomAttributes.ToList().Count >= 1)
-                {
-                    if (method.CustomAttributes.ToList()[0].NamedArguments.Count >= 3)
-                    {
-
-                        Console.WriteLine(method.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString());
-                        if (method.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == "SDK.EC5_Factors")
-                        {
-                            Console.WriteLine("True");
-                        }
-                    }
-                }
-            }
-            //var FactorMethods = methods.Where(p => (string)p.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == "SDK.EC5_Factors").ToList();
-            //Console.WriteLine(methods[0].Name);
-
             Console.WriteLine("\n-------------------------------------------------------------------\n");
             Console.WriteLine("Fastener checks\n");
 
@@ -125,6 +94,10 @@ namespace StructuralDesignKit
             Console.WriteLine(String.Format("a1={0:0}mm\na2={1:0}mm\na3t={2:0}mm\na3c={3:0}mm\na4t={4:0}mm\na4c={5:0.}mm\n",
                 Dowel.a1min, Dowel.a2min, Dowel.a3tmin, Dowel.a3cmin, Dowel.a4tmin, Dowel.a4cmin));
 
+
+
+
+            Console.WriteLine(SDKUtilities.LinearInterpolation(5, 10, 2, 25, 52));
 
 
 

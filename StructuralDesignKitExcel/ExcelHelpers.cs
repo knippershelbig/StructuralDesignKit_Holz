@@ -20,7 +20,7 @@ namespace StructuralDesignKitExcel
         /// <param name="material"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static IMaterialTimber GetTimberMaterial(string material)
+        public static IMaterialTimber GetTimberMaterialFromTag(string material)
         {
             string ExceptionMaterialUnknown = string.Format("The material {0} is not part of the database, please define a correct material name or create a new material using the SDK.Material.Create function", material);
 
@@ -88,7 +88,7 @@ namespace StructuralDesignKitExcel
 
             try
             {
-                material = GetTimberMaterial(CS[3]);
+                material = GetTimberMaterialFromTag(CS[3]);
             }
             catch (Exception)
             {
@@ -118,6 +118,7 @@ namespace StructuralDesignKitExcel
 
             return allTimber;
         }
+
 
         public static List<string> GetStringValuesFromEnum<T>()
         {

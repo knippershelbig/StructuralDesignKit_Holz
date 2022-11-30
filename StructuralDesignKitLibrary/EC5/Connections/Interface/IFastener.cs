@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -92,12 +94,15 @@ namespace StructuralDesignKitLibrary.Connections.Interface
 
         /// <summary>
         /// Computes the effective number of fasteners
+        /// The spacing parallel to the grain a1 influences the effective number of fasteners and hence the overall load‐bearing capacity of the joint, since an insufficient
+        /// spacing a1 may trigger premature splitting of the joint along the set of fasteners in the grain direction
         /// </summary>
         /// <param name="n">number of fasteners aligned parallel to the grain</param>
         /// <param name="a1">spacing parallel to the grain</param>
+        /// <param name="angle">Load angle toward the timber grain in degree</param>
         /// <returns></returns>
         [Description("Computes the effective number of fasteners")]
-        double ComputeEffectiveFastener(int n, double a1);
+        double ComputeEffectiveNumberOfFastener(int n, double a1, double angle);
 
         /// <summary>
         /// Computes the embedment strength of the fastener
