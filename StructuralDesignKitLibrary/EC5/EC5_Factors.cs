@@ -501,7 +501,12 @@ namespace StructuralDesignKitLibrary.EC5
             double SigmaCrit = 0;
 
             //According to DIN EN 1995-1 NA §6.3.3(2), for Glulam, characteristic elastic properties can be increased by a factor 1.4
-            if (timber.Type == TimberType.Glulam) SigmaCrit = Math.PI * Math.Sqrt(timber.E0_005 * 1.4 * crossSection.MomentOfInertia_Z * timber.G0_005 * 1.4 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
+            if (timber.Type == TimberType.Glulam) SigmaCrit = Math.PI * Math.Sqrt(1.4 * timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
+
+            //According to Pollmeier Design Guide 2019 P.18: "For beams made of BauBuche GL75 the product of the 5% ­quantile of the stifness variables
+            //E0,05 · G0,05 may be multiplied by the factor 1.2.
+            if (timber.Type == TimberType.Baubuche) SigmaCrit = Math.PI * Math.Sqrt(1.2 * timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
+
             else SigmaCrit = Math.PI * Math.Sqrt(timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
 
             double lambdaRel_m = Math.Sqrt(timber.Fmyk / SigmaCrit);
@@ -670,7 +675,7 @@ namespace StructuralDesignKitLibrary.EC5
         }
         #endregion
 
-            
+
         #region Kdis
         /// <summary>
         /// Factor taking into consideration the influence of stress distribution - EN 1995-1 §6.4.3 eq (6.52)
@@ -697,7 +702,7 @@ namespace StructuralDesignKitLibrary.EC5
         [Description("Factor for the verification of tension perpendicular to the grain at apex - EN 1995-1 §6.4.3 eq (6.56)")]
         public static double Kp(double heightApex, double angleApex, double internalRadius)
         {
-            double angleRad = angleApex* Math.PI / 180;
+            double angleRad = angleApex * Math.PI / 180;
             double r = internalRadius + heightApex / 2;
             double h_ap = heightApex;
 

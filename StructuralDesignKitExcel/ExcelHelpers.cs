@@ -194,7 +194,7 @@ namespace StructuralDesignKitExcel
         //Create DowelTag
         public static string GenerateDowelTag(double diameter, double Fuk)
         {
-            return string.Format("Bolt_D{0}_Fu{1}", diameter, Fuk);
+            return string.Format("Dowel_D{0}_Fu{1}", diameter, Fuk);
         }
 
 
