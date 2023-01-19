@@ -42,8 +42,6 @@ namespace StructuralDesignKitExcel
     public static class ExcelFormulae
     {
 
-
-
         #region Eurocode 5 Factors
 
         //-------------------------------------------
@@ -484,6 +482,29 @@ namespace StructuralDesignKitExcel
         }
 
 
+        //-------------------------------------------
+        //Kfi
+        //-------------------------------------------
+        [ExcelFunction(Description = "Kfi is the coefficient to go from 5% to 20% characteristic fractile in case of fire design according to DIN EN 1995-1-2 Table 2.1",
+            Name ="SDK.Factors.Kfi",
+            IsHidden =false,
+            Category ="SDK.EC5_Factors")]
+        public static double Kfi(string material)
+        {
+            double kfi = 0;
+
+            try
+            {
+                var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
+                kfi = EC5_Factors.Kfi(timber);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+
+            return kfi;
+        }
 
 
         #endregion
@@ -505,11 +526,12 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Kmod factor")] double Kmod,
             [ExcelArgument(Description = "safety factor Ym")] double Ym,
             [ExcelArgument(Description = "Size Factor for Cross section")] double Kh,
-            [ExcelArgument(Description = "Mofification factor for LVL member length")] double Kl_LVL = 1)
+            [ExcelArgument(Description = "Mofification factor for LVL member length")] double Kl_LVL = 1,
+            [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
 
-            return EC5_CrossSectionCheck.TensionParallelToGrain(Sig0_t_d, mat, Kmod, Ym, Kh, Kl_LVL);
+            return EC5_CrossSectionCheck.TensionParallelToGrain(Sig0_t_d, mat, Kmod, Ym, Kh, Kl_LVL, fireDesign);
         }
 
 
@@ -525,10 +547,11 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Design compressive stress")] double Sig0_c_d,
             [ExcelArgument(Description = "Timber grade")] string timberGrade,
             [ExcelArgument(Description = "Kmod factor")] double Kmod,
-            [ExcelArgument(Description = "safety factor Ym")] double Ym)
+            [ExcelArgument(Description = "safety factor Ym")] double Ym,
+            [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
-            return EC5_CrossSectionCheck.CompressionParallelToGrain(Sig0_c_d, mat, Kmod, Ym);
+            return EC5_CrossSectionCheck.CompressionParallelToGrain(Sig0_c_d, mat, Kmod, Ym, fireDesign);
         }
 
 
@@ -545,10 +568,11 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "stress angle to the grain in Degree")] double angleToGrain,
             [ExcelArgument(Description = "Kmod factor")] double Kmod,
             [ExcelArgument(Description = "safety factor Ym")] double Ym,
-            [ExcelArgument(Description = "factor taking into account the effect of stresses perpendicular to the grain")] double kc90)
+            [ExcelArgument(Description = "factor taking into account the effect of stresses perpendicular to the grain")] double kc90,
+            [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
-            return EC5_CrossSectionCheck.CompressionAtAnAngleToGrain(SigAlpha_c_d, angleToGrain, mat, Kmod, Ym, kc90 = 1);
+            return EC5_CrossSectionCheck.CompressionAtAnAngleToGrain(SigAlpha_c_d, angleToGrain, mat, Kmod, Ym, kc90 = 1, fireDesign);
         }
 
 
@@ -566,11 +590,12 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Kmod factor")] double Kmod,
             [ExcelArgument(Description = "safety factor Ym")] double Ym,
             [ExcelArgument(Description = "Size Factor for Cross section in Y axis")] double khy = 1,
-            [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1)
+            [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1,
+            [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var CS = ExcelHelpers.CreateRectangularCrossSection(crossSection);
             var mat = CS.Material;
-            return EC5_CrossSectionCheck.Bending(SigMyd, SigMzd, CS, mat, Kmod, Ym, khy, khz);
+            return EC5_CrossSectionCheck.Bending(SigMyd, SigMzd, CS, mat, Kmod, Ym, khy, khz, fireDesign);
         }
 
 
@@ -586,10 +611,11 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Design shear stress on Z")] double TauZd,
             [ExcelArgument(Description = "Timber grade")] string timberGrade,
             [ExcelArgument(Description = "Kmod factor")] double Kmod,
-            [ExcelArgument(Description = "safety factor Ym")] double Ym)
+            [ExcelArgument(Description = "safety factor Ym")] double Ym,
+            [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
-            return EC5_CrossSectionCheck.Shear(TauYd, TauZd, mat, Kmod, Ym);
+            return EC5_CrossSectionCheck.Shear(TauYd, TauZd, mat, Kmod, Ym, fireDesign);
         }
 
 
@@ -606,11 +632,12 @@ namespace StructuralDesignKitExcel
              [ExcelArgument(Description = "Design shear stress on Z")] double TauZd,
              [ExcelArgument(Description = "Cross section")] string crossSection,
              [ExcelArgument(Description = "Kmod factor")] double Kmod,
-             [ExcelArgument(Description = "safety factor Ym")] double Ym)
+             [ExcelArgument(Description = "safety factor Ym")] double Ym,
+             [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var CS = ExcelHelpers.CreateRectangularCrossSection(crossSection);
             var mat = CS.Material;
-            return EC5_CrossSectionCheck.Torsion(TauTorsion, TauYd, TauZd, CS, mat, Kmod, Ym);
+            return EC5_CrossSectionCheck.Torsion(TauTorsion, TauYd, TauZd, CS, mat, Kmod, Ym, fireDesign);
         }
 
 
@@ -631,11 +658,12 @@ namespace StructuralDesignKitExcel
              [ExcelArgument(Description = "Size Factor for Cross section in Y axis")] double khy = 1,
              [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1,
              [ExcelArgument(Description = "Size Factor for Cross section in tension")] double Kh_Tension = 1,
-             [ExcelArgument(Description = "Mofification factor for member Length")] double Kl_LVL = 1)
+             [ExcelArgument(Description = "Mofification factor for member Length")] double Kl_LVL = 1,
+             [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var CS = ExcelHelpers.CreateRectangularCrossSection(crossSection);
             var mat = CS.Material;
-            return EC5_CrossSectionCheck.BendingAndTension(SigMyd, SigMzd, Sig0_t_d, CS, mat, Kmod, Ym, khy, khz, Kh_Tension, Kl_LVL);
+            return EC5_CrossSectionCheck.BendingAndTension(SigMyd, SigMzd, Sig0_t_d, CS, mat, Kmod, Ym, khy, khz, Kh_Tension, Kl_LVL, fireDesign);
         }
 
 
@@ -654,11 +682,12 @@ namespace StructuralDesignKitExcel
              [ExcelArgument(Description = "Kmod factor")] double Kmod,
              [ExcelArgument(Description = "safety factor Ym")] double Ym,
              [ExcelArgument(Description = "Size Factor for Cross section in Y axis")] double khy = 1,
-             [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1)
+             [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1,
+             [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var CS = ExcelHelpers.CreateRectangularCrossSection(crossSection);
             var mat = CS.Material;
-            return EC5_CrossSectionCheck.BendingAndCompression(SigMyd, SigMzd, Sig0_c_d, CS, mat, Kmod, Ym, khy, khz); ;
+            return EC5_CrossSectionCheck.BendingAndCompression(SigMyd, SigMzd, Sig0_c_d, CS, mat, Kmod, Ym, khy, khz, fireDesign); ;
         }
 
 
@@ -679,11 +708,12 @@ namespace StructuralDesignKitExcel
              [ExcelArgument(Description = "Kmod factor")] double Kmod,
              [ExcelArgument(Description = "safety factor Ym")] double Ym,
              [ExcelArgument(Description = "Size Factor for Cross section in Y axis")] double khy = 1,
-             [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1)
+             [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1,
+             [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var CS = ExcelHelpers.CreateRectangularCrossSection(crossSection);
             var mat = CS.Material;
-            return EC5_CrossSectionCheck.BendingAndBuckling(SigMyd, SigMzd, Sig0_c_d, Leff_Y, Leff_Z, CS, mat, Kmod, Ym, khy, khz);
+            return EC5_CrossSectionCheck.BendingAndBuckling(SigMyd, SigMzd, Sig0_c_d, Leff_Y, Leff_Z, CS, mat, Kmod, Ym, khy, khz, fireDesign);
         }
 
 
@@ -705,11 +735,12 @@ namespace StructuralDesignKitExcel
              [ExcelArgument(Description = "Kmod factor")] double Kmod,
              [ExcelArgument(Description = "safety factor Ym")] double Ym,
              [ExcelArgument(Description = "Size Factor for Cross section in Y axis")] double khy = 1,
-             [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1)
+             [ExcelArgument(Description = "Size Factor for Cross section in Z axis")] double khz = 1,
+             [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             var CS = ExcelHelpers.CreateRectangularCrossSection(crossSection);
             var mat = CS.Material;
-            return EC5_CrossSectionCheck.LateralTorsionalBuckling(SigMyd, SigMzd, Sig0_c_d, Leff_Y, Leff_Z, Leff_LTB, CS, mat, Kmod, Ym, khy, khz);
+            return EC5_CrossSectionCheck.LateralTorsionalBuckling(SigMyd, SigMzd, Sig0_c_d, Leff_Y, Leff_Z, Leff_LTB, CS, mat, Kmod, Ym, khy, khz, fireDesign);
         }
 
         #endregion
@@ -1172,7 +1203,7 @@ namespace StructuralDesignKitExcel
             }
             genericMaterialTag += propertiesToModify[propertiesToModify.Count - 1] + "-" + values[values.Count - 1];
 
-            
+
 
             return genericMaterialTag;
         }
@@ -1290,6 +1321,39 @@ namespace StructuralDesignKitExcel
         #endregion
 
 
+        #region Fire Design
+
+
+        //-------------------------------------------
+        //Charring depth
+        //-------------------------------------------
+        [ExcelFunction(Description ="Compute the charring depth for a beam in [mm]",
+            Name ="SDK.FireDesign.ComputeCharringDepthUnprotected",
+            IsHidden =false,
+            Category ="SDK.FireDesign")]
+        public static double ComputeCharringDepthUnprotected(
+            [ExcelArgument(Description = "Fire duration in minutes")] int t,
+            [ExcelArgument(Description = "Material Tag")] string material)
+        {
+            double def = -1;
+
+            try
+            {
+                var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
+                def = EC5_Utilities.ComputeCharringDepthUnprotected(t, timber);
+            }
+            catch (Exception e)
+            {
+
+                MessageBox.Show(e.Message);
+            }
+            return def;
+
+        }
+
+        #endregion
+
+
         #region utilities
         [ExcelFunction(Description = "Create a cross section tag",
             Name = "SDK.Utilities.CreateRectangularCrossSection",
@@ -1325,6 +1389,7 @@ namespace StructuralDesignKitExcel
 
         }
         #endregion
+
 
         //TODO//
         //material encryypt and decript

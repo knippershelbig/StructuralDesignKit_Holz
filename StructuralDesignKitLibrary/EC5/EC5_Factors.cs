@@ -716,6 +716,33 @@ namespace StructuralDesignKitLibrary.EC5
 
         #endregion
 
+        #region Kfi
+        /// <summary>
+        /// Kfi is the coefficient to go from 5% to 20% characteristic fractile in case of fire design according to DIN EN 1995-1-2 Table 2.1
+        /// </summary>
+        /// <param name="timber">Material Object</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static double Kfi(IMaterialTimber timber)
+        {
+            switch (timber.Type)
+            {
+                case TimberType.Softwood:
+                    return 1.25;
+                case TimberType.Hardwood:
+                    return 1.25;
+                case TimberType.Glulam:
+                    return 1.15;
+                case TimberType.LVL:
+                    return 1.1;
+                case TimberType.Baubuche:
+                    return 1.1;
+                default:
+                    throw new Exception("Kfi for this material is not implemented");
+            }
+        }
+        #endregion
+
 
 
 

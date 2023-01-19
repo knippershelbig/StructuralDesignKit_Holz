@@ -113,6 +113,16 @@ namespace StructuralDesignKitLibrary.Materials
         [Description("Characteristic Density")]
         double RhoK { get; set; }
 
+        /// <summary>
+        /// Design charring rate for panel according to DIN EN 1995-1-2 table 3.1
+        /// </summary>
+        [Description("Notional charring Rate B0")]
+        double B0 { get; set; }
 
+        /// <summary>
+        /// Notional charring rate for beams according to DIN EN 1995-1-2 table 3.1
+        /// </summary>
+        [Description("Notional charring Rate Bn")]
+        double Bn { get; set; }
     }
 }

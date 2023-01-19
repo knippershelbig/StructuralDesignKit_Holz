@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,7 +39,7 @@ namespace StructuralDesignKitLibrary.CrossSections
         [Description("Height")]
         public int H { get; set; }
 
-        
+
         #endregion
 
 
@@ -89,7 +90,7 @@ namespace StructuralDesignKitLibrary.CrossSections
 
             //Torsion
             double c1 = (1.0 / 3.0) * (1 - (0.63 / (H / (double)B)) + (0.052 / Math.Pow((H / (double)B), 5)));
-            TorsionalInertia= c1 * H * Math.Pow(B, 3);
+            TorsionalInertia = c1 * H * Math.Pow(B, 3);
 
             double c2 = 1 - (0.65 / (1 + Math.Pow((H / (double)B), 3)));
             TorsionalModulus = (c1 / c2) * H * Math.Pow(B, 2);
@@ -126,6 +127,24 @@ namespace StructuralDesignKitLibrary.CrossSections
         {
             return Math.Abs(TorsionMoment) * 1e6 / TorsionalModulus;
         }
+
         #endregion
+
+
+        //Fire design
+        public CrossSectionRectangular ComputeReducedCrossSection(int fireDuration, bool top, bool bottom, bool left, bool right)
+        {
+
+            double d_ef = EC5.EC5_Utilities.ComputeCharringDepthUnprotected(fireDuration, (IMaterialTimber)this.Material);
+            double b = this.B;
+            double h = this.H;
+            if (left) b -= d_ef;
+            if (right) b -= d_ef;
+            if (top) h -= d_ef;
+            if (bottom) h -= d_ef;
+
+            return new CrossSectionRectangular((Int32)Math.Floor(b), (Int32)Math.Floor(h), this.Material);
+
+        }
     }
 }

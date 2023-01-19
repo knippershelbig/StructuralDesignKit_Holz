@@ -53,6 +53,10 @@ namespace StructuralDesignKitLibrary.Materials
         public double RhoMean { get; set; }
 
         public double RhoK { get; set; }
+
+        public double B0 { get; set; }
+
+        public double Bn { get; set; }
         #endregion
 
         #region constructor
@@ -81,6 +85,8 @@ namespace StructuralDesignKitLibrary.Materials
             G0_005 = MaterialTimberBaubuche.g0_005[Grade];
             RhoMean = MaterialTimberBaubuche.rhoMean[Grade];
             RhoK = MaterialTimberBaubuche.rhoK[Grade];
+            B0 = MaterialTimberBaubuche.b0;
+            Bn = MaterialTimberBaubuche.bn;
 
             Density = RhoMean;
             E = E0mean;
@@ -108,6 +114,8 @@ namespace StructuralDesignKitLibrary.Materials
             G0_005 = MaterialTimberBaubuche.g0_005[Grade];
             RhoMean = MaterialTimberBaubuche.rhoMean[Grade];
             RhoK = MaterialTimberBaubuche.rhoK[Grade];
+            B0 = MaterialTimberBaubuche.b0;
+            Bn = MaterialTimberBaubuche.bn;
 
             //according to design guide, density for load calculation 850Kg/m³
             Density = 850;
@@ -256,6 +264,13 @@ namespace StructuralDesignKitLibrary.Materials
 
 
         };
+
+
+        public static readonly double b0 = 0.65; //according to ETA 14-0354
+        public static readonly double bn = 0.70; //according to ETA 14-0354
+
+
+
         #endregion
 
 

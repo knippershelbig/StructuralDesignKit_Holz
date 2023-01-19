@@ -56,12 +56,16 @@ namespace StructuralDesignKitLibrary.Materials
 
         public double RhoK { get; set; }
 
+        public double B0 { get; set; }
+
+        public double Bn { get; set; }
+
         #endregion
 
         #region constructor
 
         public MaterialTimberGeneric(string name, TimberType type, double fmyk, double fmzk, double ft0k, double ft90k, double fc0k, double fc90k, double fvk, double frk, double e0mean,
-            double e90mean, double g0mean, double e0_005, double g0_005, double rhoMean, double rhoK)
+            double e90mean, double g0mean, double e0_005, double g0_005, double rhoMean, double rhoK, double b0, double bn)
         {
             Grade = name;
             Type = type;
@@ -80,6 +84,8 @@ namespace StructuralDesignKitLibrary.Materials
             G0_005 = g0_005;
             RhoMean = rhoMean;
             RhoK = rhoK;
+            B0=b0;  
+            Bn= bn; 
 
             Density = RhoMean;
             E = E0mean;
@@ -115,6 +121,8 @@ namespace StructuralDesignKitLibrary.Materials
             this.G0_005 = baseMaterial.G0_005;
             this.RhoMean = baseMaterial.RhoMean;
             this.RhoK = baseMaterial.RhoK;
+            this.B0 = baseMaterial.B0;
+            this.Bn = baseMaterial.Bn;
 
             this.Density = baseMaterial.Density;
             this.E = baseMaterial.E;

@@ -54,6 +54,10 @@ namespace StructuralDesignKitLibrary.Materials
         public double RhoMean { get; set; }
 
         public double RhoK { get; set; }
+
+        public double B0 { get; set; }
+
+        public double Bn { get; set; }
         #endregion
 
         #region constructor
@@ -82,6 +86,8 @@ namespace StructuralDesignKitLibrary.Materials
             G0_005 = MaterialTimberGlulam.g0_005[Grade];
             RhoMean = MaterialTimberGlulam.rhoMean[Grade];
             RhoK = MaterialTimberGlulam.rhoK[Grade];
+            B0 = MaterialTimberGlulam.b0;
+            Bn = MaterialTimberGlulam.bn;
 
             Density = RhoMean;
             E = E0mean;
@@ -109,6 +115,8 @@ namespace StructuralDesignKitLibrary.Materials
             G0_005 = MaterialTimberGlulam.g0_005[Grade];
             RhoMean = MaterialTimberGlulam.rhoMean[Grade];
             RhoK = MaterialTimberGlulam.rhoK[Grade];
+            B0 = MaterialTimberGlulam.b0;
+            Bn = MaterialTimberGlulam.bn;
 
             Density = RhoMean;
             E = E0mean;
@@ -464,6 +472,9 @@ namespace StructuralDesignKitLibrary.Materials
 
 
         };
+
+        public static readonly double b0 = 0.65; //according to DIN EN 1995 - 1 - 2 table 3.1
+        public static readonly double bn = 0.70; //according to DIN EN 1995 - 1 - 2 table 3.1
         #endregion
     }
 }

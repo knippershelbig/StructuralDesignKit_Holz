@@ -143,7 +143,24 @@ namespace StructuralDesignKitLibrary.EC5
 
         }
 
+        //Charring calculation for beams
+        public static double ComputeCharringDepthUnprotected(int t, IMaterialTimber timber)
+        {
+            //No strength layer according to DIN EN 1995-1-2 §4.2.2
+            double d0 = 7.0;
+            
+            //Unprotected cross section
+            //double t_ch = 0; //Beginning of combustion
 
+            //Reduction factor based on the beginning of combustion
+            double k0 = 1;
+            if (t < 20) k0 = (double)t / 20;
+
+            double d_char = timber.Bn * t;
+            double d_eff = d_char + k0 * d0;
+
+            return d_eff;
+        }
 
         #endregion
 

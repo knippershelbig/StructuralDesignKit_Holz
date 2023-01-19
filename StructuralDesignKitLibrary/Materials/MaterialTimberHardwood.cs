@@ -54,6 +54,10 @@ namespace StructuralDesignKitLibrary.Materials
         public double RhoMean { get; set; }
 
         public double RhoK { get; set; }
+
+        public double B0 { get; set; }
+
+        public double Bn { get; set; }
         #endregion
 
 
@@ -83,6 +87,9 @@ namespace StructuralDesignKitLibrary.Materials
             G0_005 = MaterialTimberHardwood.g0_005[Grade];
             RhoMean = MaterialTimberHardwood.rhoMean[Grade];
             RhoK = MaterialTimberHardwood.rhoK[Grade];
+            B0 = MaterialTimberHardwood.b0;
+            Bn = MaterialTimberHardwood.bn;
+
 
             Density = RhoMean;
             E = E0mean;
@@ -110,6 +117,8 @@ namespace StructuralDesignKitLibrary.Materials
             G0_005 = MaterialTimberHardwood.g0_005[Grade];
             RhoMean = MaterialTimberHardwood.rhoMean[Grade];
             RhoK = MaterialTimberHardwood.rhoK[Grade];
+            B0 = MaterialTimberHardwood.b0;
+            Bn = MaterialTimberHardwood.bn;
 
             Density = RhoMean;
             E = E0mean;
@@ -290,6 +299,9 @@ namespace StructuralDesignKitLibrary.Materials
 
 
         };
+
+        public static readonly double b0 = 0.50; //according to DIN EN 1995 - 1 - 2 table 3.1
+        public static readonly double bn = 0.55; //according to DIN EN 1995 - 1 - 2 table 3.1
         #endregion
     }
 }
