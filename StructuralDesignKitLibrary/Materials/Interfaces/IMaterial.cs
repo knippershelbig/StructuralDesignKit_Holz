@@ -10,8 +10,6 @@ namespace StructuralDesignKitLibrary.Materials
     [Description("Interface for materials - regroups the basic properties needed to define a material")]
     public interface IMaterial
     {
-
-
         /// <summary>
         /// Material grade according to the relevant standard
         /// </summary>
@@ -35,11 +33,6 @@ namespace StructuralDesignKitLibrary.Materials
         /// </summary>
         [Description("Shear Modulus")]
         double G { get; set; }
-
-
-
-
-
     }
 }
 

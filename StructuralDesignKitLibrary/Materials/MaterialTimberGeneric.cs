@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using StructuralDesignKitLibrary.EC5;
 using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
+using System.Reflection;
 
 namespace StructuralDesignKitLibrary.Materials
 {
@@ -83,7 +84,61 @@ namespace StructuralDesignKitLibrary.Materials
             Density = RhoMean;
             E = E0mean;
             G = G0mean;
+        }
 
+        public MaterialTimberGeneric(IMaterialTimber baseMaterial, List<string> propertiesToModify, List<object> values, string tag)
+        {
+
+            //Make sure both list have the same length and their content is not null
+            if (propertiesToModify == null) throw new Exception("The propertiesToModify list is null");
+            if (values == null) throw new Exception("The propertiesToModify list is null");
+
+            if (propertiesToModify.Count != values.Count) throw new Exception("The propertiesToModify list and the values list do not have the same length");
+
+            //To refactor
+            this.Grade = tag;
+            //
+
+            this.Type = baseMaterial.Type;
+            this.Fmyk = baseMaterial.Fmyk;
+            this.Fmzk = baseMaterial.Fmzk;
+            this.Ft0k = baseMaterial.Ft0k;
+            this.Ft90k = baseMaterial.Ft90k;
+            this.Fc0k = baseMaterial.Fc0k;
+            this.Fc90k = baseMaterial.Fc90k;
+            this.Fvk = baseMaterial.Fvk;
+            this.Frk = baseMaterial.Frk;
+            this.E0mean = baseMaterial.E0mean;
+            this.E90mean = baseMaterial.E90mean;
+            this.G0mean = baseMaterial.G0mean;
+            this.E0_005 = baseMaterial.E0_005;
+            this.G0_005 = baseMaterial.G0_005;
+            this.RhoMean = baseMaterial.RhoMean;
+            this.RhoK = baseMaterial.RhoK;
+
+            this.Density = baseMaterial.Density;
+            this.E = baseMaterial.E;
+            this.G = baseMaterial.G;
+
+            var typ = typeof(IMaterialTimber);
+            List<PropertyInfo> properties = typeof(IMaterialTimber).GetProperties().ToList();
+            properties.AddRange(typeof(IMaterial).GetProperties().ToList());
+
+
+            int count = 0;
+            foreach (string property in propertiesToModify)
+
+            {
+                if (properties.Any(p => p.Name == property))
+                {
+                    var prop = this.GetType().GetProperty(property);
+                    //Get property type:
+                    var propType = prop.PropertyType;
+                    prop.SetValue(this, Convert.ChangeType(values[count], propType, null));
+                }
+                else throw new Exception(String.Format("The property \"{0}\" does not exist", property));
+                count += 1;
+            }
         }
 
         #endregion

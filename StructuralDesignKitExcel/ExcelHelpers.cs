@@ -24,44 +24,77 @@ namespace StructuralDesignKitExcel
         {
             string ExceptionMaterialUnknown = string.Format("The material {0} is not part of the database, please define a correct material name or create a new material using the SDK.Material.Create function", material);
 
-            //Lookup first letters to orient the search
-            switch (material[0])
+
+            if (material.Split('|').ToList().Count > 1 && material.Split('|')[0].Substring(0, 4) == "Base")
             {
-                //Lookup if material is a defined Softwood
-                case 'C':
-                    if (Enum.GetNames(typeof(MaterialTimberSoftwood.Grades)).Contains(material))
-                    {
-                        return new MaterialTimberSoftwood(material);
-                    }
-                    else throw new Exception(ExceptionMaterialUnknown);
-
-                //Lookup if material is a defined Hardwood
-                case 'D':
-                    if (Enum.GetNames(typeof(MaterialTimberHardwood.Grades)).Contains(material))
-                    {
-                        return new MaterialTimberHardwood(material);
-                    }
-                    else throw new Exception(ExceptionMaterialUnknown);
-
-
-                //Lookup if material is a defined Glulam
-                case 'G':
-                    if (Enum.GetNames(typeof(MaterialTimberGlulam.Grades)).Contains(material))
-                    {
-                        return new MaterialTimberGlulam(material);
-                    }
-                    else if (Enum.GetNames(typeof(MaterialTimberBaubuche.Grades)).Contains(material))
-                    {
-                        return new MaterialTimberBaubuche(material);
-                    }
-                    else throw new Exception(ExceptionMaterialUnknown);
-
-                default:
-                    throw new Exception(ExceptionMaterialUnknown);
+                return CreateGenericMaterialFromTag(material);
             }
+
+
+            else
+            {
+                //Lookup first letters to orient the search
+                switch (material[0])
+                {
+                    //Lookup if material is a defined Softwood
+                    case 'C':
+                        if (Enum.GetNames(typeof(MaterialTimberSoftwood.Grades)).Contains(material))
+                        {
+                            return new MaterialTimberSoftwood(material);
+                        }
+                        else throw new Exception(ExceptionMaterialUnknown);
+
+                    //Lookup if material is a defined Hardwood
+                    case 'D':
+                        if (Enum.GetNames(typeof(MaterialTimberHardwood.Grades)).Contains(material))
+                        {
+                            return new MaterialTimberHardwood(material);
+                        }
+                        else throw new Exception(ExceptionMaterialUnknown);
+
+
+                    //Lookup if material is a defined Glulam
+                    case 'G':
+                        if (Enum.GetNames(typeof(MaterialTimberGlulam.Grades)).Contains(material))
+                        {
+                            return new MaterialTimberGlulam(material);
+                        }
+                        else if (Enum.GetNames(typeof(MaterialTimberBaubuche.Grades)).Contains(material))
+                        {
+                            return new MaterialTimberBaubuche(material);
+                        }
+                        else throw new Exception(ExceptionMaterialUnknown);
+
+                    default:
+                        throw new Exception(ExceptionMaterialUnknown);
+                }
+            }
+
+        }
+
+        public static IMaterialTimber CreateGenericMaterialFromTag(string material)
+        {
+            var properties = material.Split('|').ToList();
+
+            //If based on a existing material
+            List<string> propertiesToModify = new List<string>();
+            List<object> values = new List<object>();
+
+            if (properties[0].Substring(0, 4) == "Base")
+            {
+                for (int i = 1; i <= properties.Count - 1; i++)
+                {
+                    propertiesToModify.Add(properties[i].Split('-')[0]);
+                    values.Add(properties[i].Split('-')[1]);
+                }
+            }
+            IMaterialTimber baseMaterial = GetTimberMaterialFromTag((string)properties[0].Split('-')[1]);
+            return new MaterialTimberGeneric(baseMaterial, propertiesToModify, values, material);
+
         }
 
         public static CrossSectionRectangular CreateRectangularCrossSection(string crossSectionTag)
+
         {
             string error = "The cross section tag does not respect the defined syntax (i.e: CS_R_100x200_GL24h)";
             var CS = crossSectionTag.Split('_');
@@ -97,6 +130,7 @@ namespace StructuralDesignKitExcel
             }
             return new CrossSectionRectangular(b, h, material);
         }
+
 
         public static string CreateRectangularCrossSection(double b, double h, IMaterialTimber material)
         {

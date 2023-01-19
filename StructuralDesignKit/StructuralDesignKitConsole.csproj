@@ -35,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ExcelDna.Integration, Version=1.1.0.0, Culture=neutral, PublicKeyToken=f225e9659857edbe, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDna.Integration.1.6.0\lib\net452\ExcelDna.Integration.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDna.Registration, Version=1.1.0.0, Culture=neutral, PublicKeyToken=f225e9659857edbe, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDna.Registration.1.6.0\lib\net452\ExcelDna.Registration.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StructuralDesignKitExcel\StructuralDesignKitExcel.csproj">

@@ -1,60 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DnaLibrary Name="StructuralDesignKitExcel Add-In" RuntimeVersion="v4.0" xmlns="http://schemas.excel-dna.net/addin/2018/05/dnalibrary">
-  <ExternalLibrary Path="StructuralDesignKitExcel.dll" ExplicitExports="true" LoadFromBytes="true" Pack="true" IncludePdb="false" />
-  <Reference Path="ExcelDna.IntelliSense.dll" Pack="true" />
+	<ExternalLibrary Path="StructuralDesignKitExcel.dll" ExplicitExports="true" LoadFromBytes="true" Pack="true" IncludePdb="false" />
+	<Reference Path="ExcelDna.IntelliSense.dll" Pack="true" />
+	<Reference Path="StructuralDesignKitLibrary.dll" Pack="true" />
+	
 	<!-- ExplicitExport indicates whether exported function and macros need to be explicitly marked with [ExcelFunction(...)] and [ExcelCommand(...)] macros to be exported,
 	or whether all public static methods with compatible signature are registered.!-->
+
 	
-  <CustomUI>
-    <customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui' loadImage='LoadImage'>
-      <ribbon>
-        <tabs>
-          <tab id='SDK' label='SDK Timber'> 
-			  <group id="EC5_Checks" label ="Cross section checks" >
-				  <button id ="CrossSectionCheckButton" label="CS Check" onAction="OnButtonPressedCSCheck" size="large" image="Checks"/>
-				  <dynamicMenu id="dynamicCS_Checks" label="Eurocode checks" getContent="GetMenuContent" tag="SDK.EC5_CrossSection_Checks"/>
-				  <dynamicMenu id="dynamicCS_Stresses" label="Compute stresses" getContent="GetMenuContent" tag="SDK.CrossSection_StressCompute"/>
-			  </group>
 
-			  <group id="EC5_Connections" label="Connections">
+	<CustomUI>
+		<customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui' loadImage='LoadImage'>
+			<ribbon>
+				<tabs>
+					<tab id='SDK' label='SDK Timber'>
+						<group id="EC5_Checks" label ="Cross section checks" >
+							<button id ="CrossSectionCheckButton" label="CS Check" onAction="OnButtonPressedCSCheck" size="large" image="Checks"/>
+							<dynamicMenu id="dynamicCS_Checks" label="Eurocode checks" getContent="GetMenuContent" tag="SDK.EC5_CrossSection_Checks"/>
+							<dynamicMenu id="dynamicCS_Stresses" label="Compute stresses" getContent="GetMenuContent" tag="SDK.CrossSection_StressCompute"/>
+						</group>
 
-				  <dynamicMenu id="dynamicConnections_SteelTimber" label="Steel to Timber" getContent="GetConnectionMenuContent" tag="SDK.EC5.Connections_SteelTimber" size="large"/>
-				  <dynamicMenu id="dynamicConnections_TimberTimber" label="Timber to Timber" getContent="GetConnectionMenuContent" tag="SDK.EC5.Connections_TimberTimber" size="large"/>
-				  <dynamicMenu id="dynamicConnectionUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.EC5.Connections_Utilities" size="normal"/>
-				  <button id ="SpacingsButton" label="Minimum Spacings" size="normal" onAction="OnButtonPressedMinimumSpacings" screentip="Create a table with the minimal spacings"/>
-				  <button id ="FastenerTypesButton" label="FastenerType" size="normal" onAction="OnButtonPressedGetFastenerTypes" screentip="Create droplist cell with the available fastener types in the SDK"/>
-				  <button id ="NeffButton" label="Neff" size="normal" onAction="OnButtonPressedEffectivefasteners" screentip="Create droplist cell with the available fastener types in the SDK"/>
+						<group id="EC5_Connections" label="Connections">
 
-			  </group>
-			  
-			  <group id='EC5_Factors' label='EC5 Factors'>
-				  <dynamicMenu id="dynamicFactors" label="Cross Section factors" getContent="GetMenuContent" tag="SDK.EC5_Factors" size="large" image="Factors"/>
-			  </group>
-			  
-			  <group id="SDK_Utilities" label ="Utilities">
-				  <dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities" size="large"/>
-			  </group>
-			  
-			  
-		  <group id="EC5_Material" label="Material">
-			  <button id="AllMaterial" label ="All Timber Type" tag ="All" onAction="MaterialList" size ="large" image="Timber"/>
-			  <menu id ="MaterialListButton" label ="Material Lists">
-				  <button id="SoftwoodButton" label ="Softwood" tag ="Softwood" onAction="MaterialList"/>
-				  <button id="HardwoodButton" label ="Hardwood" tag ="Hardwood" onAction="MaterialList"/>
-				  <button id="GlulamButton" label ="Glulam" tag ="Glulam" onAction="MaterialList"/>
-				  <button id="BaubucheButton" label ="Baubuche" tag ="Baubuche" onAction="MaterialList"/>
-			  </menu>
-			  <button id="MaterialProperty" label="properties" onAction="MaterialProperties"/>
-		  </group>
-          </tab>
-        </tabs>
-      </ribbon>
-    </customUI>
-  </CustomUI>
+							<dynamicMenu id="dynamicConnections_SteelTimber" label="Steel to Timber" getContent="GetConnectionMenuContent" tag="SDK.EC5.Connections_SteelTimber" size="large"/>
+							<dynamicMenu id="dynamicConnections_TimberTimber" label="Timber to Timber" getContent="GetConnectionMenuContent" tag="SDK.EC5.Connections_TimberTimber" size="large"/>
+							<dynamicMenu id="dynamicConnectionUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.EC5.Connections_Utilities" size="normal"/>
+							<button id ="SpacingsButton" label="Minimum Spacings" size="normal" onAction="OnButtonPressedMinimumSpacings" screentip="Create a table with the minimal spacings"/>
+							<button id ="FastenerTypesButton" label="FastenerType" size="normal" onAction="OnButtonPressedGetFastenerTypes" screentip="Create droplist cell with the available fastener types in the SDK"/>
+							<button id ="NeffButton" label="Neff" size="normal" onAction="OnButtonPressedEffectivefasteners" screentip="Create droplist cell with the available fastener types in the SDK"/>
+
+						</group>
+
+						<group id='EC5_Factors' label='EC5 Factors'>
+							<dynamicMenu id="dynamicFactors" label="Cross Section factors" getContent="GetMenuContent" tag="SDK.EC5_Factors" size="large" image="Factors"/>
+						</group>
+
+						<group id="SDK_Utilities" label ="Utilities">
+							<dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities" size="large"/>
+						</group>
+
+
+						<group id="EC5_Material" label="Material">
+							<button id="AllMaterial" label ="All Timber Type" tag ="All" onAction="MaterialList" size ="large" image="Timber"/>
+							<menu id ="MaterialListButton" label ="Material Lists">
+								<button id="SoftwoodButton" label ="Softwood" tag ="Softwood" onAction="MaterialList"/>
+								<button id="HardwoodButton" label ="Hardwood" tag ="Hardwood" onAction="MaterialList"/>
+								<button id="GlulamButton" label ="Glulam" tag ="Glulam" onAction="MaterialList"/>
+								<button id="BaubucheButton" label ="Baubuche" tag ="Baubuche" onAction="MaterialList"/>
+							</menu>
+							<button id="MaterialProperty" label="properties" onAction="MaterialProperties"/>
+						</group>
+					</tab>
+				</tabs>
+			</ribbon>
+		</customUI>
+	</CustomUI>
 
 	<Image Name="Checks" Path="icons\Checks.png" Pack="true"/>
 	<Image Name="Factors" Path="icons\Factors.png" Pack="true"/>
 	<Image Name="Timber" Path="icons\Timber.png" Pack="true"/>
-  
-  
+
+
 </DnaLibrary>

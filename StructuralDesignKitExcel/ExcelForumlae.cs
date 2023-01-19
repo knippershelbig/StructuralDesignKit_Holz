@@ -1,27 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ExcelDna.Integration;
-using ExcelDna.Registration;
-using Excel = Microsoft.Office.Interop.Excel;
-using StructuralDesignKitLibrary.CrossSections;
 using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.Materials;
-using Microsoft.Office.Interop.Excel;
-using System.ComponentModel;
 using System.Windows;
 using System.Runtime.InteropServices;
-using System.Runtime.ConstrainedExecution;
-using System.Diagnostics.Eventing.Reader;
 using StructuralDesignKitLibrary.Connections.Fasteners;
-using System.Reflection;
 using StructuralDesignKitLibrary.Connections.Interface;
-using System.CodeDom;
 using StructuralDesignKitLibrary.Connections.SteelTimberShear;
 using StructuralDesignKitLibrary.Connections.TimberTimberShear;
-using StructuralDesignKitLibrary.Utilities;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace StructuralDesignKitExcel
 {
@@ -35,7 +25,6 @@ namespace StructuralDesignKitExcel
             {
                 ExcelDna.IntelliSense.IntelliSenseServer.Install();
             }
-
             catch (Exception e)
             {
 
@@ -775,7 +764,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "String representing the fastener type (i.e Bolt_D10_Fu800)")] string fastenerTag,
             [ExcelArgument(Description = "String representing the timber grade")] string timber)
         {
-            IFastener fastener =  ExcelHelpers.GetFastenerFromTag(fastenerTag);
+            IFastener fastener = ExcelHelpers.GetFastenerFromTag(fastenerTag);
             var timberObj = ExcelHelpers.GetTimberMaterialFromTag(timber);
 
             var bolt = new FastenerBolt(fastener.Diameter, fastener.Fuk);
@@ -796,7 +785,7 @@ namespace StructuralDesignKitExcel
 
             IFastener fastener = null;
             if (ExcelHelpers.IsFastener(fastenerType)) fastener = ExcelHelpers.GetFastener(fastenerType, diameter, 800);
-            
+
             fastener.ComputeSpacings(angle);
             return fastener.a1min;
         }
@@ -960,7 +949,7 @@ namespace StructuralDesignKitExcel
             var Timber1 = ExcelHelpers.GetTimberMaterialFromTag(timber1);
             var Timber2 = ExcelHelpers.GetTimberMaterialFromTag(timber2);
 
-            return new TimberTimberSingleShear(fastener,Timber1, ThicknessTimber1,angle1, Timber2, ThicknessTimber2, angle2, ropeEffect).Capacity;
+            return new TimberTimberSingleShear(fastener, Timber1, ThicknessTimber1, angle1, Timber2, ThicknessTimber2, angle2, ropeEffect).Capacity;
         }
 
         [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to timber connection in [N]. The value is for 1 shear plane",
@@ -1037,6 +1026,165 @@ namespace StructuralDesignKitExcel
             }
 
         }
+
+
+
+
+        //-------------------------------------------
+        //Create Generic material based on existing material
+        //-------------------------------------------
+        [ExcelFunction(Description = "Create a generic timber material based on an existing material. Only the given fields are modified",
+            Name = "SDK.Material.CreateGenericTimberMaterialTag",
+            IsHidden = false,
+            Category = "SDK.EC5_Material")]
+        public static string CreateGenericTimberMaterialTag(
+            [ExcelArgument(Description = "Base Material")][Optional] string Base,
+             [ExcelArgument(Description = "Timber type (Softwood,Hardwood,Glulam,LVL,Baubuche")][Optional] object Type,
+             [ExcelArgument(Description = "Characteristic bending strength - Y axis")][Optional] object Fmyk,
+             [ExcelArgument(Description = "Characteristic bending strength - Z axis")][Optional] object Fmzk,
+             [ExcelArgument(Description = "Characteristic tension strength parallel to grain")][Optional] object Ft0k,
+             [ExcelArgument(Description = "Characteristic tension strength perpendicular to grain")][Optional] object Ft90k,
+             [ExcelArgument(Description = "Characteristic compression strength parallel to grain")][Optional] object Fc0k,
+             [ExcelArgument(Description = "Characteristic compression strength perpendicular to grain")][Optional] object Fc90k,
+             [ExcelArgument(Description = "Characteristic shear strength parallel to grain")][Optional] object Fvk,
+             [ExcelArgument(Description = "Characteristic rolling shear strength")][Optional] object Frk,
+             [ExcelArgument(Description = "Mean Modulus of Elasticity parallel to grain")][Optional] object E0mean,
+             [ExcelArgument(Description = "Mean Modulus of Elasticity perpendicular to grain")][Optional] object E90mean,
+             [ExcelArgument(Description = "Mean shear Modulus")][Optional] object G0mean,
+             [ExcelArgument(Description = "Characteristic Modulus of Elasticity parallel to grain")][Optional] object E0_005,
+             [ExcelArgument(Description = "Characteristic shear Modulus")][Optional] object G0_005,
+             [ExcelArgument(Description = "Characteristic Density")][Optional] object RhoK,
+             [ExcelArgument(Description = "Mean Density")][Optional] object RhoMean)
+        {
+
+            List<string> propertiesToModify = new List<string>();
+            List<object> values = new List<object>();
+
+            #region PopulateLists
+            if (Base.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Base");
+                values.Add(Base);
+            }
+
+            if (Type.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Type");
+                values.Add(Type);
+            }
+
+            if (Fmyk.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Fmyk");
+                values.Add(Fmyk);
+            }
+
+            if (Fmzk.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Fmzk");
+                values.Add(Fmzk);
+            }
+
+            if (Ft0k.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Ft0k");
+                values.Add(Ft0k);
+            }
+
+            if (Ft90k.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Ft90k");
+                values.Add(Ft90k);
+            }
+
+            if (Fc0k.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Fc0k");
+                values.Add(Fc0k);
+            }
+
+            if (Fc90k.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Fc90k");
+                values.Add(Fc90k);
+            }
+
+            if (Fvk.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Fvk");
+                values.Add(Fvk);
+            }
+
+            if (Frk.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("Frk");
+                values.Add(Frk);
+            }
+
+            if (E0mean.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("E0mean");
+                values.Add(E0mean);
+            }
+
+            if (E90mean.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("E90mean");
+                values.Add(E90mean);
+            }
+
+            if (G0mean.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("G0mean");
+                values.Add(G0mean);
+            }
+
+            if (E0_005.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("E0_005");
+                values.Add(E0_005);
+            }
+
+            if (G0_005.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("G0_005");
+                values.Add(G0_005);
+            }
+
+            if (RhoK.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("RhoK");
+                values.Add(RhoK);
+            }
+
+            if (RhoMean.GetType() != typeof(ExcelMissing))
+            {
+                propertiesToModify.Add("RhoMean");
+                values.Add(RhoMean);
+            }
+
+            #endregion
+
+            string genericMaterialTag = "";
+            for (int i = 0; i < propertiesToModify.Count - 1; i++)
+            {
+                genericMaterialTag += propertiesToModify[i] + "-" + values[i] + "|";
+            }
+            genericMaterialTag += propertiesToModify[propertiesToModify.Count - 1] + "-" + values[values.Count - 1];
+
+            
+
+            return genericMaterialTag;
+        }
+
+
+
+
+
+
+        //-------------------------------------------
+        //Create Generic material based on all set of properties
+        //-------------------------------------------
 
 
 
