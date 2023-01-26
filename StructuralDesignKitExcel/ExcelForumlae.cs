@@ -39,7 +39,7 @@ namespace StructuralDesignKitExcel
         }
     }
 
-    public static class ExcelFormulae
+    public static partial class ExcelFormulae
     {
 
         #region Eurocode 5 Factors
@@ -197,7 +197,8 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Cross section definition (i.e i.e: CS_R_100x200_GL24h)")] string CrossSection,
             [ExcelArgument(Description = "Buckling Length relative to Y in [mm]")] double BucklingLength_Y,
             [ExcelArgument(Description = "Buckling Length relative to Z in [mm]")] double BucklingLength_Z,
-            [ExcelArgument(Description = "Kcy = 0, Kcz = 1")] int axis)
+            [ExcelArgument(Description = "Kcy = 0, Kcz = 1")] int axis,
+            [ExcelArgument(Description = "boolean for Fire check - in case of fire, the material properties are increased with the Kfi factor")] bool FireCheck)
         {
             double Kc = 0;
 
@@ -205,7 +206,7 @@ namespace StructuralDesignKitExcel
             {
                 if (axis != 0 && axis != 1) throw new Exception("Axis should be either 0 or 1");
                 var CS = ExcelHelpers.CreateRectangularCrossSection(CrossSection);
-                Kc = EC5_Factors.Kc(CS, CS.Material, BucklingLength_Y, BucklingLength_Z)[axis];
+                Kc = EC5_Factors.Kc(CS, CS.Material, BucklingLength_Y, BucklingLength_Z,FireCheck)[axis];
 
             }
             catch (Exception e)
@@ -227,14 +228,15 @@ namespace StructuralDesignKitExcel
             Category = "SDK.EC5_Factors")]
         public static double Kcrit(
             [ExcelArgument(Description = "Cross section definition (i.e i.e: CS_R_100x200_GL24h)")] string CrossSection,
-            [ExcelArgument(Description = "Lateral Buckling Length in [mm]")] double LatBucklingLength)
+            [ExcelArgument(Description = "Lateral Buckling Length in [mm]")] double LatBucklingLength,
+            [ExcelArgument(Description = "boolean for Fire check - in case of fire, the material properties are increased with the Kfi factor")] bool FireCheck)
         {
             double kcrit = 0;
 
             try
             {
                 var CS = ExcelHelpers.CreateRectangularCrossSection(CrossSection);
-                kcrit = EC5_Factors.Kcrit(CS.Material, CS, LatBucklingLength);
+                kcrit = EC5_Factors.Kcrit(CS.Material, CS, LatBucklingLength,FireCheck);
 
             }
             catch (Exception e)
@@ -486,9 +488,9 @@ namespace StructuralDesignKitExcel
         //Kfi
         //-------------------------------------------
         [ExcelFunction(Description = "Kfi is the coefficient to go from 5% to 20% characteristic fractile in case of fire design according to DIN EN 1995-1-2 Table 2.1",
-            Name ="SDK.Factors.Kfi",
-            IsHidden =false,
-            Category ="SDK.EC5_Factors")]
+            Name = "SDK.Factors.Kfi",
+            IsHidden = false,
+            Category = "SDK.EC5_Factors")]
         public static double Kfi(string material)
         {
             double kfi = 0;
@@ -529,6 +531,11 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Mofification factor for LVL member length")] double Kl_LVL = 1,
             [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
+            
+            
+            
+            
+            
             var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
 
             return EC5_CrossSectionCheck.TensionParallelToGrain(Sig0_t_d, mat, Kmod, Ym, Kh, Kl_LVL, fireDesign);
@@ -1321,87 +1328,12 @@ namespace StructuralDesignKitExcel
         #endregion
 
 
-        #region Fire Design
-
-
-        //-------------------------------------------
-        //Charring depth
-        //-------------------------------------------
-        [ExcelFunction(Description ="Compute the charring depth for a beam in [mm]",
-            Name ="SDK.FireDesign.ComputeCharringDepthUnprotected",
-            IsHidden =false,
-            Category ="SDK.FireDesign")]
-        public static double ComputeCharringDepthUnprotected(
-            [ExcelArgument(Description = "Fire duration in minutes")] int t,
-            [ExcelArgument(Description = "Material Tag")] string material)
-        {
-            double def = -1;
-
-            try
-            {
-                var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
-                def = EC5_Utilities.ComputeCharringDepthUnprotected(t, timber);
-            }
-            catch (Exception e)
-            {
-
-                MessageBox.Show(e.Message);
-            }
-            return def;
-
-        }
-
-        #endregion
-
-
-        #region utilities
-        [ExcelFunction(Description = "Create a cross section tag",
-            Name = "SDK.Utilities.CreateRectangularCrossSection",
-            IsHidden = false,
-            Category = "SDK.Utilities")]
-        public static string CreateCrossSection([ExcelArgument(Description = "width")] double b, [ExcelArgument(Description = "height")] double h, string material)
-        {
-            return ExcelHelpers.CreateRectangularCrossSection(b, h, ExcelHelpers.GetTimberMaterialFromTag(material));
-        }
-
-
-        [ExcelFunction(Description = "Create a Bolt tag",
-            Name = "SDK.Utilities.CreateBoltTag",
-            IsHidden = false,
-            Category = "SDK.Utilities")]
-        public static string CreateBoltTag(
-            [ExcelArgument(Description = "Diameter of the fastener")] double diameter,
-            [ExcelArgument(Description = "Tensile strength of the fasterner in N/mm²")] double fu)
-        {
-            return ExcelHelpers.GenerateBoltTag(diameter, fu);
-
-        }
-
-        [ExcelFunction(Description = "Create a Dowel tag",
-            Name = "SDK.Utilities.CreateDowelTag",
-            IsHidden = false,
-            Category = "SDK.Utilities")]
-        public static string CreateDowelTag(
-            [ExcelArgument(Description = "Diameter of the fastener")] double diameter,
-            [ExcelArgument(Description = "Tensile strength of the fasterner in N/mm²")] double fu)
-        {
-            return ExcelHelpers.GenerateDowelTag(diameter, fu);
-
-        }
-        #endregion
-
 
         //TODO//
-        //material encryypt and decript
-
-        //Create a material which can be used following the IMaterial Timber Interface
 
         //Add optimisation (Cross section / material for given check)
 
         //LTB according to EC3
-
-
-        //Add into the SDK lib a list a generic bolt/dowel types
 
 
         #region Garbage Collector

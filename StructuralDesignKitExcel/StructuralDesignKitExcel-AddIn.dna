@@ -21,14 +21,12 @@
 						</group>
 
 						<group id="EC5_Connections" label="Connections">
-
 							<dynamicMenu id="dynamicConnections_SteelTimber" label="Steel to Timber" getContent="GetConnectionMenuContent" tag="SDK.EC5.Connections_SteelTimber" size="large"/>
 							<dynamicMenu id="dynamicConnections_TimberTimber" label="Timber to Timber" getContent="GetConnectionMenuContent" tag="SDK.EC5.Connections_TimberTimber" size="large"/>
 							<dynamicMenu id="dynamicConnectionUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.EC5.Connections_Utilities" size="normal"/>
 							<button id ="SpacingsButton" label="Minimum Spacings" size="normal" onAction="OnButtonPressedMinimumSpacings" screentip="Create a table with the minimal spacings"/>
 							<button id ="FastenerTypesButton" label="FastenerType" size="normal" onAction="OnButtonPressedGetFastenerTypes" screentip="Create droplist cell with the available fastener types in the SDK"/>
 							<button id ="NeffButton" label="Neff" size="normal" onAction="OnButtonPressedEffectivefasteners" screentip="Create droplist cell with the available fastener types in the SDK"/>
-
 						</group>
 
 						<group id='EC5_Factors' label='EC5 Factors'>
@@ -36,7 +34,11 @@
 						</group>
 
 						<group id="SDK_Utilities" label ="Utilities">
-							<dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities" size="large"/>
+							<dynamicMenu id="dynamicUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.Utilities" size="large" image="Utilities"/>
+						</group>
+
+						<group id="SDK_Fire" label="Fire Design">
+							<dynamicMenu id="dynamicFireDesign" label="Fire" getContent="GetMenuContent" tag ="SDK.FireDesign" size="large" image="Fire"/>
 						</group>
 
 
@@ -55,10 +57,13 @@
 			</ribbon>
 		</customUI>
 	</CustomUI>
+	
 
 	<Image Name="Checks" Path="icons\Checks.png" Pack="true"/>
 	<Image Name="Factors" Path="icons\Factors.png" Pack="true"/>
 	<Image Name="Timber" Path="icons\Timber.png" Pack="true"/>
+	<Image Name="Fire" Path="icons\Fire.png" Pack="true"/>
+	<Image Name="Utilities" Path="icons\Utilities.png" Pack="true"/>
 
 
 </DnaLibrary>

@@ -5,7 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-
+using StructuralDesignKitLibrary.CrossSections;
+using System.Security.Policy;
 
 namespace StructuralDesignKitLibrary.EC5
 {
@@ -389,7 +390,7 @@ namespace StructuralDesignKitLibrary.EC5
             double fc0_k = timber.Fc0k;
 
             double km = EC5_Factors.Km(crossSection, material);
-            List<double> Kc = EC5_Factors.Kc(crossSection, timber, Leff_Y, Leff_Z);
+            List<double> Kc = EC5_Factors.Kc(crossSection, timber, Leff_Y, Leff_Z, FireCheck);
             double CompressionRatio = Sig0_c_d / (fc0_k * Kmod / Ym * kfi);
 
             double eq_6_23 = CompressionRatio / Kc[0] + SigMyd / (fmy_k * khy * Kmod / Ym * kfi) + km * SigMzd / (fmz_k * khz * Kmod / Ym * kfi);
@@ -417,7 +418,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="khz">Size Factor for Cross section in Y axis</param>
         /// <returns>Return the largest value of the 4 equations considered</returns>
         /// <exception cref="Exception"></exception>
-        [Description("Lateral Torsional buckling according to DIN EN 1995-1 §6.3.3 Eq(6.33) + Eq(6.35) + Eq(NA.58) + Eq(NA.59)")]
+        [Description("Lateral Torsional buckling according to DIN EN 1995-1 §6.3.3 Eq(6.33) + Eq(6.35) + Eq(NA.60) + Eq(NA.61)")]
         public static double LateralTorsionalBuckling(double SigMyd, double SigMzd, double Sig0_c_d, double Leff_Y, double Leff_Z, double Leff_LTB, ICrossSection crossSection, IMaterial material, double Kmod, double Ym, double khy = 1, double khz = 1, bool FireCheck = false)
         {
 
@@ -433,25 +434,40 @@ namespace StructuralDesignKitLibrary.EC5
                 Ym = 1;
             }
 
-
             var timber = (IMaterialTimber)material;
             double fmy_k = timber.Fmyk;
             double fmz_k = timber.Fmzk;
             double fc0_k = timber.Fc0k;
 
 
-            double kcrit = EC5_Factors.Kcrit(material, crossSection, Leff_LTB);
-            List<double> kc = EC5_Factors.Kc(crossSection, material, Leff_Y, Leff_Z);
+            double kcrit = EC5_Factors.Kcrit(material, crossSection, Leff_LTB, FireCheck);
+            List<double> kc = EC5_Factors.Kc(crossSection, material, Leff_Y, Leff_Z, FireCheck);
 
-            double Eq6_33 = SigMyd / (kcrit * fmy_k * Kmod / Ym * kfi);
+            double Eq6_33 = 0;
+            double Eq6_35 = 0;
+            double EqNA_60 = 0;
+            double EqNA_61 = 0;
 
-            double Eq6_35 = Math.Pow(SigMyd / (kcrit * fmy_k * Kmod / Ym * kfi), 2) + Sig0_c_d / (kc[1] * fc0_k * Kmod / Ym * kfi);
 
-            double EqNA_58 = Sig0_c_d / (kc[0] * fc0_k * Kmod / Ym * kfi) + SigMyd / (kcrit * fmy_k * Kmod / Ym * kfi) + Math.Pow(SigMzd / (fmz_k * Kmod / Ym * kfi), 2);
+            //The decision has been taken to disregard the clause specifying that Eq(6.33) should be considered only when a moment My acts alone without any accompanying force
+            //To our appreciation, this could lead to unsafe designs as a small compressive forces could eventually result in a much lower utilisation ratio
 
-            double EqNA_59 = Sig0_c_d / (kc[1] * fc0_k * Kmod / Ym * kfi) + Math.Pow(SigMyd / (kcrit * fmy_k * Kmod / Ym * kfi), 2) + SigMzd / (fmz_k * Kmod / Ym * kfi);
 
-            List<double> results = new List<double>() { Eq6_33, Eq6_35, EqNA_58, EqNA_59 }.OrderByDescending(p => p).ToList();
+                Eq6_33 = SigMyd / (kcrit * fmy_k * Kmod / Ym * kfi);
+                Eq6_35 = Math.Pow(SigMyd / (kcrit * fmy_k * Kmod / Ym * kfi), 2) + Sig0_c_d / (kc[1] * fc0_k * Kmod / Ym * kfi);
+
+                var cs = (CrossSectionRectangular)crossSection;
+
+                //According to DIN EN 1995 §NA.7
+                if (cs.H / cs.B >= 4 || (SigMyd > 0 && SigMzd > 0))
+                {
+                    EqNA_60 = Sig0_c_d / (kc[0] * fc0_k * Kmod / Ym * kfi) + SigMyd / (kcrit * fmy_k * Kmod / Ym * kfi) + Math.Pow(SigMzd / (fmz_k * Kmod / Ym * kfi), 2);
+
+                    EqNA_61 = Sig0_c_d / (kc[1] * fc0_k * Kmod / Ym * kfi) + Math.Pow(SigMyd / (kcrit * fmy_k * Kmod / Ym * kfi), 2) + SigMzd / (fmz_k * Kmod / Ym * kfi);
+                }
+            
+
+            List<double> results = new List<double>() { Eq6_33, Eq6_35, EqNA_60, EqNA_61 }.OrderByDescending(p => p).ToList();
 
             return results[0];
         }

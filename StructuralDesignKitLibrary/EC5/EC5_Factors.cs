@@ -364,12 +364,9 @@ namespace StructuralDesignKitLibrary.EC5
             {
                 CrossSectionRectangular rectCS = (CrossSectionRectangular)crossSection;
 
-                if (material is MaterialTimberBaubuche)
-                {
-                    //according to Baubuche design guide §4.1.8 Torsion and Eq (6.15)
-                    Kshape = Math.Min(1 + 0.05 * rectCS.H / rectCS.B, 1.3);
-                }
-                else Kshape = Math.Min(1 + 0.15 * rectCS.H / rectCS.B, 2);
+                //according to Baubuche design guide §4.1.8 Torsion and Eq (6.15) //Corrigendum August 2012 + Ammendment from 2014
+                Kshape = Math.Min(1 + 0.05 * rectCS.H / rectCS.B, 1.3);
+
             }
             else throw new Exception("Currently only Rectangular Cross sections are covered for torsion check");
 
@@ -424,16 +421,23 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="material">Material object</param>
         /// <param name="Leff_Y">Buckling length along Y in mm</param>
         /// <param name="Leff_Z">Buckling Length along Z in mm</param>
+        /// <param name="FireCheck">if the factor is defined for a fire check, the material properties are increased by the factor Kfi</param>
         /// <returns>Returns the buckling instability factors kcy and kcz as a list of doubles </double></returns>
         /// <exception cref="Exception"></exception>
         [Description("Conmputes and returns the buckling instability factors kcy and kcz as a list of doubles - According to EN 1995-1 Eq(6.27) + Eq(6.28)")]
-        public static List<double> Kc(ICrossSection crossSection, IMaterial material, double Leff_Y, double Leff_Z)
+        public static List<double> Kc(ICrossSection crossSection, IMaterial material, double Leff_Y, double Leff_Z, bool FireCheck)
         {
 
             if (!(crossSection is CrossSectionRectangular)) throw new Exception("The buckling Factor Kc is currently only implemented for rectangular cross section");
             CrossSectionRectangular RectCS = (CrossSectionRectangular)crossSection;
             if (!(material is IMaterialTimber)) throw new Exception("The buckling Factor Kc is currently only implemented for IMaterialTimber");
             IMaterialTimber timber = (IMaterialTimber)material;
+
+            double kfi = 1;
+            if (FireCheck)
+            {
+                kfi = EC5_Factors.Kfi((IMaterialTimber)material);
+            }
 
 
             double iy = RectCS.H / Math.Sqrt(12);
@@ -442,8 +446,8 @@ namespace StructuralDesignKitLibrary.EC5
             double lambdaY = Leff_Y / iy;
             double lambdaZ = Leff_Z / iz;
 
-            double lambdaRelY = lambdaY / Math.PI * Math.Sqrt(timber.Fc0k / timber.E0_005);
-            double lambdaRelZ = lambdaZ / Math.PI * Math.Sqrt(timber.Fc0k / timber.E0_005);
+            double lambdaRelY = lambdaY / Math.PI * Math.Sqrt(timber.Fc0k*kfi / (timber.E0_005 * kfi));
+            double lambdaRelZ = lambdaZ / Math.PI * Math.Sqrt(timber.Fc0k*kfi / (timber.E0_005 * kfi));
 
 
             double Bc = 0;
@@ -491,23 +495,31 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="Leff">Lateral buckling effective length in mm</param>
         /// <returns>return the Kcrit factor</returns>
         /// <exception cref="Exception"></exception>
-        public static double Kcrit(IMaterial material, ICrossSection crossSection, double Leff)
+        public static double Kcrit(IMaterial material, ICrossSection crossSection, double Leff, bool FireCheck)
         {
             if (!(material is IMaterialTimber)) throw new Exception("Kcrit can only be calculated fot timber material");
             var timber = (IMaterialTimber)material;
 
             double kcrit = 1;
+            //Fire factors
+            double kfi = 1;
+            if (FireCheck)
+            {
+                kfi = EC5_Factors.Kfi((IMaterialTimber)material);
+            }
+
+
 
             double SigmaCrit = 0;
 
             //According to DIN EN 1995-1 NA §6.3.3(2), for Glulam, characteristic elastic properties can be increased by a factor 1.4
-            if (timber.Type == TimberType.Glulam) SigmaCrit = Math.PI * Math.Sqrt(1.4 * timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
+            if (timber.Type == TimberType.Glulam) SigmaCrit = Math.PI * Math.Sqrt(1.4 * kfi * timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
 
             //According to Pollmeier Design Guide 2019 P.18: "For beams made of BauBuche GL75 the product of the 5% ­quantile of the stifness variables
             //E0,05 · G0,05 may be multiplied by the factor 1.2.
-            if (timber.Type == TimberType.Baubuche) SigmaCrit = Math.PI * Math.Sqrt(1.2 * timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
+            else if (timber.Type == TimberType.Baubuche) SigmaCrit = Math.PI * Math.Sqrt(1.2 * kfi * timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
 
-            else SigmaCrit = Math.PI * Math.Sqrt(timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
+            else SigmaCrit = Math.PI * Math.Sqrt(kfi * timber.E0_005 * crossSection.MomentOfInertia_Z * timber.G0_005 * crossSection.TorsionalInertia) / (Leff * crossSection.SectionModulus_Y);
 
             double lambdaRel_m = Math.Sqrt(timber.Fmyk / SigmaCrit);
 

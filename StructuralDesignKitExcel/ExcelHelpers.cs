@@ -132,7 +132,7 @@ namespace StructuralDesignKitExcel
         }
 
 
-        public static string CreateRectangularCrossSection(double b, double h, IMaterialTimber material)
+        public static string CreateRectangularCrossSectionTag(double b, double h, IMaterialTimber material)
         {
             //CS_R_100x200_GL24h
             return String.Format("CS_R_{0}x{1}_{2}",

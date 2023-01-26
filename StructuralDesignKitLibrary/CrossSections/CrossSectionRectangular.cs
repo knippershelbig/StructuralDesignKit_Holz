@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,13 +32,32 @@ namespace StructuralDesignKitLibrary.CrossSections
         /// Width
         /// </summary>
         [Description("Width")]
-        public int B { get; set; }
+        private int _B;
+        public int B
+        {
+            get { return _B; }
+            set
+            {
+                if (value <= 0) throw new ArgumentOutOfRangeException("the width of a cross section cannot be inferior or equal to 0");
+                else _B = value;
+            }
+        }
 
         /// <summary>
         /// Height
         /// </summary>
         [Description("Height")]
-        public int H { get; set; }
+        private int _H;
+        public int H
+        {
+            get { return _H; }
+            set
+            {
+                if (value <= 0) throw new ArgumentOutOfRangeException("the height of a cross section cannot be inferior or equal to 0");
+                else _H = value;
+
+            }
+        }
 
 
         #endregion

@@ -2,25 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.Windows;
 using Excel = Microsoft.Office.Interop.Excel;
 using ExcelDna.Integration;
 using Microsoft.Office.Interop.Excel;
-using StructuralDesignKitLibrary;
-using StructuralDesignKitLibrary.Materials;
 using System.Xml;
 using System.IO;
-using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using StructuralDesignKitLibrary.EC5;
-using StructuralDesignKitLibrary.CrossSections.Interfaces;
-using Microsoft.Win32;
 using StructuralDesignKitLibrary.Connections.TimberTimberShear;
-using StructuralDesignKitLibrary.Connections.Interface;
-using System.Windows.Controls;
-using System.Diagnostics.Eventing.Reader;
 using StructuralDesignKitLibrary.Connections.SteelTimberShear;
 
 namespace StructuralDesignKitExcel
@@ -94,13 +83,13 @@ namespace StructuralDesignKitExcel
             {
                 if (name == "TimberTimberSingleShear")
                 {
-                    
+
 
                     //----INPUT----
                     baseCell.Value2 = name;
                     activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Timber 1";
-                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Thickness t1";
                     activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Timber 2";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Thickness t1";
                     activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Thickness t2";
                     activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Angle 1";
                     activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Angle 2";
@@ -122,8 +111,8 @@ namespace StructuralDesignKitExcel
                     Range Angle2 = Angle1.Offset[1, 0];
                     Range Diameter = Angle2.Offset[1, 0];
                     Range Fuk = Diameter.Offset[1, 0];
-                    Range RopeEffect = Fuk.Offset[1, 0]; ValidateCellWithList(RopeEffect, new List<string>() { "TRUE", "FALSE"});
-                    Range FastenerTag = RopeEffect.Offset[1, 0]; 
+                    Range RopeEffect = Fuk.Offset[1, 0]; ValidateCellWithList(RopeEffect, new List<string>() { "TRUE", "FALSE" });
+                    Range FastenerTag = RopeEffect.Offset[1, 0];
                     Range LoadDuration = FastenerTag.Offset[1, 0]; ValidateCellWithList(LoadDuration, LoadDurations);
                     Range ServiceClass = LoadDuration.Offset[1, 0]; ValidateCellWithList(ServiceClass, ServiceClasses);
                     Range Kmod = ServiceClass.Offset[1, 0];
@@ -193,19 +182,19 @@ namespace StructuralDesignKitExcel
                             FastenerTag.Address[false, false], Timber1.Address[false, false], Thick1.Address[false, false], Angle1.Address[false, false],
                             Timber2.Address[false, false], Thick2.Address[false, false], Angle2.Address[false, false], RopeEffect.Address[false, false]);
 
-                    activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("={0}*{1}/1.3/1000", activeCell.Offset[-1, 0].Address[false, false], Kmod.Address[false,false]);
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("={0}*{1}/1.3/1000", activeCell.Offset[-1, 0].Address[false, false], Kmod.Address[false, false]);
 
 
                     //Units
-                    activeCell = baseCell.Offset[3, 2];activeCell.Value2 = "mm";
-                    activeCell = activeCell.Offset[1, 0];activeCell.Value2 = "mm";
-                    activeCell = activeCell.Offset[1, 0];activeCell.Value2 = "°";
-                    activeCell = activeCell.Offset[1, 0];activeCell.Value2 = "°";
-                    activeCell = activeCell.Offset[1, 0];activeCell.Value2 = "mm";
-                    activeCell = activeCell.Offset[1, 0];activeCell.Value2 = "N/mm²";
-                    activeCell = activeCell.Offset[6, 0];activeCell.Value2 = "N/mm²";
-                    activeCell = activeCell.Offset[1, 0];activeCell.Value2 = "N/mm²";
-                    activeCell = activeCell.Offset[2, 0];activeCell.Value2 = "N.mm";
+                    activeCell = baseCell.Offset[3, 2]; activeCell.Value2 = "mm";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "°";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "°";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "N/mm²";
+                    activeCell = activeCell.Offset[6, 0]; activeCell.Value2 = "N/mm²";
+                    activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "N/mm²";
+                    activeCell = activeCell.Offset[2, 0]; activeCell.Value2 = "N.mm";
                     foreach (string failureMode in shearCalculation.FailureModes)
                     {
                         activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "N";
@@ -231,8 +220,8 @@ namespace StructuralDesignKitExcel
                     }
 
                     int count = shearCalculation.FailureModes.Count;
-                    
-                    for (int i = 0; i < count+2; i++)
+
+                    for (int i = 0; i < count + 2; i++)
                     {
                         activeCell = activeCell.Offset[1, 0];
                         ((dynamic)activeCell).NumberFormatLocal = "0";
@@ -240,26 +229,26 @@ namespace StructuralDesignKitExcel
 
                     ((dynamic)activeCell.Offset[1, 0]).NumberFormatLocal = "0.00";
 
-                    var range = xlApp.Range[baseCell, baseCell.Offset[19+ count, 2]];
+                    var range = xlApp.Range[baseCell, baseCell.Offset[19 + count, 2]];
                     range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
                     range.Columns.AutoFit();
 
-                    xlApp.Range[baseCell.Offset[0,1], baseCell.Offset[19 + count, 1]].HorizontalAlignment = XlHAlign.xlHAlignCenter;
+                    xlApp.Range[baseCell.Offset[0, 1], baseCell.Offset[19 + count, 1]].HorizontalAlignment = XlHAlign.xlHAlignCenter;
 
                     baseCell.HorizontalAlignment = XlHAlign.xlHAlignCenter;
                     xlApp.Range[baseCell, baseCell.Offset[0, 2]].Merge();
-                    
+
 
                 }
             }
 
 
             //Case Steel to timber
-            if(tag == "SteelTimber")
+            if (tag == "SteelTimber")
             {
                 if (name == "InnerSteelPlate")
                     //----INPUT----
-                baseCell.Value2 = name;
+                    baseCell.Value2 = name;
                 activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Timber 1";
                 activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Thickness t1";
                 activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Angle 1";
@@ -454,10 +443,7 @@ namespace StructuralDesignKitExcel
                 writer.Close();
 
             }
-
             return menuXML.ToString();
-
-
         }
 
 
@@ -562,17 +548,91 @@ namespace StructuralDesignKitExcel
 
             string formula = string.Empty;
 
+
+            //------------------------------------------------------------------------------------------------
+            //define block length - Represent how many rows are in each section to ease selection process
+            //------------------------------------------------------------------------------------------------
+
+
+            //Cross section and input definition
+            int blockCSLength = 12;
+
+            //Loads definition
+            int blockForceStart = blockCSLength + 1;
+            int blockForceLength = 9;
+
+            //Stresses 
+            int blockStressesStart = blockForceStart + blockForceLength + 1;
+            int blockStressesLength = 8;
+
+            //Checks
+            int BlockCheckLength = 10;
+
+            //Factors
+            int blockFactorStart = BlockCheckLength + 1;
+            int BlockFactorLength = 11;
+
+
+            //--------------------------------------------------------
+            //Cell Adresses
+            //--------------------------------------------------------
+
+            var bAdr = baseCell.Offset[1, 1].Address[false, false];
+            var hAdr = baseCell.Offset[2, 1].Address[false, false];
+            var MaterialAdr = baseCell.Offset[3, 1].Address[false, false];
+            var FireAdr = baseCell.Offset[5, 1].Address[false, false];
+            var CSAdr = baseCell.Offset[6, 1].Address[false, false];
+            var ServiceClassAdr = baseCell.Offset[7, 1].Address[false, false];
+            var BuckLyAdr = baseCell.Offset[8, 1].Address[false, false];
+            var BuckLzAdr = baseCell.Offset[9, 1].Address[false, false];
+            var LTBAdr = baseCell.Offset[10, 1].Address[false, false];
+            var TensionLengthAdr = baseCell.Offset[11, 1].Address[false, false];
+
+
+            var LoadDurationAdr = baseCell.Offset[blockForceStart + 1, 1].Address[false, false];
+            var NTensAdr = baseCell.Offset[blockForceStart + 2, 1].Address[false, false];
+            var NCompAdr = baseCell.Offset[blockForceStart + 3, 1].Address[false, false];
+            var VyAdr = baseCell.Offset[blockForceStart + 4, 1].Address[false, false];
+            var VzAdr = baseCell.Offset[blockForceStart + 5, 1].Address[false, false];
+            var MxAdr = baseCell.Offset[blockForceStart + 6, 1].Address[false, false];
+            var MyAdr = baseCell.Offset[blockForceStart + 7, 1].Address[false, false];
+            var MzAdr = baseCell.Offset[blockForceStart + 8, 1].Address[false, false];
+
+
+            var SigNTenAdr = baseCell.Offset[blockStressesStart + 1, 1].Address[false, false];
+            var SigNCompAdr = baseCell.Offset[blockStressesStart + 2, 1].Address[false, false];
+            var TauYAdr = baseCell.Offset[blockStressesStart + 3, 1].Address[false, false];
+            var TauZAdr = baseCell.Offset[blockStressesStart + 4, 1].Address[false, false];
+            var TauTorAdr = baseCell.Offset[blockStressesStart + 5, 1].Address[false, false];
+            var SigMyAdr = baseCell.Offset[blockStressesStart + 6, 1].Address[false, false];
+            var SigMzAdr = baseCell.Offset[blockStressesStart + 7, 1].Address[false, false];
+
+
+            var kmodAdr = baseCell.Offset[blockFactorStart + 1, 5].Address[false, false];
+            var YmAdr = baseCell.Offset[blockFactorStart + 2, 5].Address[false, false];
+            var khyAdr = baseCell.Offset[blockFactorStart + 3, 5].Address[false, false];
+            var khzAdr = baseCell.Offset[blockFactorStart + 4, 5].Address[false, false];
+            var kcyAdr = baseCell.Offset[blockFactorStart + 5, 5].Address[false, false];
+            var kczAdr = baseCell.Offset[blockFactorStart + 6, 5].Address[false, false];
+            var kcritAdr = baseCell.Offset[blockFactorStart + 7, 5].Address[false, false];
+            var kcrAdr = baseCell.Offset[blockFactorStart + 8, 5].Address[false, false];
+            var Kh_TensionAdr = baseCell.Offset[blockFactorStart + 9, 5].Address[false, false];
+            var Kh_TensionLVLAdr = baseCell.Offset[blockFactorStart + 10, 5].Address[false, false];
+
+
+
             //----------------------------------
             //Define cross section and material
             //----------------------------------
 
-            int blockCSLength = 10;
             //Captions
             activeCell.Value2 = "Cross section";
             activeCell = baseCell.Offset[1, 0]; activeCell.Value2 = "b";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "h";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Material";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Cross Section";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Fire Duration";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Reduced Cross Section";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Service Class";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Buckling Length Ly";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Buckling Length Lz";
@@ -585,9 +645,15 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "400";
             activeCell = activeCell.Offset[1, 0]; ValidateCellWithList(activeCell, ExcelHelpers.AllMaterialAsList());
             activeCell.Value2 = "GL24h";
-            formula = string.Format("=SDK.Utilities.CreateRectangularCrossSection({0},{1},{2})", activeCell.Offset[-2, 0].Address[false, false], activeCell.Offset[-1, 0].Address[false, false], activeCell.Address[false, false]);
+            formula = string.Format("=SDK.Utilities.CreateRectangularCrossSection({0},{1},{2})", activeCell.Offset[-2, 0].Address[false, false],
+                activeCell.Offset[-1, 0].Address[false, false], activeCell.Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = formula;
-            activeCell = activeCell.Offset[1, 0]; ValidateCellWithList(activeCell, ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.EC5.EC5_Utilities.ServiceClass>());
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = 0;
+            //formula = ;
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = String.Format("=SDK.FireDesign.CreateReducedCrossSection({0},{1},1,1,1,1)", activeCell.Offset[-2, 0].Address[false, false],
+                activeCell.Offset[-1, 0].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; ValidateCellWithList(activeCell,
+                ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.EC5.EC5_Utilities.ServiceClass>());
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "3";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "1.5";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "3";
@@ -597,7 +663,8 @@ namespace StructuralDesignKitExcel
             //Units - Comments
             activeCell = baseCell.Offset[1, 2]; activeCell.Value2 = "mm";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "mm";
-            activeCell = activeCell.Offset[4, 0]; activeCell.Value2 = "m";
+            activeCell = activeCell.Offset[3, 0]; activeCell.Value2 = "min";
+            activeCell = activeCell.Offset[3, 0]; activeCell.Value2 = "m";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "m";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "m";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "m";
@@ -620,8 +687,7 @@ namespace StructuralDesignKitExcel
             //----------------------------------
             //Define forces/loads
             //----------------------------------
-            int blockForceStart = blockCSLength + 1;
-            int blockForceLength = 9;
+
             //Captions
             activeCell = baseCell.Offset[blockForceStart, 0]; activeCell.Value2 = "Loads";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Load duration";
@@ -668,8 +734,6 @@ namespace StructuralDesignKitExcel
             //----------------------------------
             //Define Stresses
             //----------------------------------
-            int blockStressesStart = blockForceStart + blockForceLength + 1;
-            int blockStressesLength = 8;
 
             //Captions
             activeCell = baseCell.Offset[blockStressesStart, 0]; activeCell.Formula = "Stresses";
@@ -683,22 +747,15 @@ namespace StructuralDesignKitExcel
 
 
             //Values
-            var CrossSectionAdress = baseCell.Offset[4, 1].Address[false, false];
+            xlApp.Range[SigNTenAdr].Formula = String.Format("=SDK.CrossSection_StressCompute.NormalForce({0},{1})", NTensAdr, CSAdr);
+            xlApp.Range[SigNCompAdr].Formula = String.Format("=SDK.CrossSection_StressCompute.NormalForce({0},{1})", NCompAdr, CSAdr);
+            xlApp.Range[TauYAdr].Formula = String.Format("=SDK.CrossSection_StressCompute.ShearY({0},{1})", VyAdr, CSAdr);
+            xlApp.Range[TauZAdr].Formula = String.Format("=SDK.CrossSection_StressCompute.ShearZ({0},{1})", VzAdr, CSAdr);
+            xlApp.Range[TauTorAdr].Formula = String.Format("=SDK.CrossSection_StressCompute.TorsionShear({0},{1})", MxAdr, CSAdr);
+            xlApp.Range[SigMyAdr].Formula = String.Format("=SDK.CrossSection_StressCompute.BendingY({0},{1})", MyAdr, CSAdr);
+            xlApp.Range[SigMzAdr].Formula = String.Format("=SDK.CrossSection_StressCompute.BendingZ({0},{1})", MzAdr, CSAdr);
 
-            activeCell = baseCell.Offset[blockStressesStart + 1, 1]; activeCell.Formula = String.Format("=SDK.CrossSection_StressCompute.NormalForce({0},{1})",
-                activeCell.Offset[-9, 0].Address[false, false], CrossSectionAdress);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = String.Format("=SDK.CrossSection_StressCompute.NormalForce({0},{1})",
-                activeCell.Offset[-9, 0].Address[false, false], CrossSectionAdress);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = String.Format("=SDK.CrossSection_StressCompute.ShearY({0},{1})",
-                activeCell.Offset[-9, 0].Address[false, false], CrossSectionAdress);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = String.Format("=SDK.CrossSection_StressCompute.ShearZ({0},{1})",
-                activeCell.Offset[-9, 0].Address[false, false], CrossSectionAdress);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = String.Format("=SDK.CrossSection_StressCompute.TorsionShear({0},{1})",
-                activeCell.Offset[-9, 0].Address[false, false], CrossSectionAdress);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = String.Format("=SDK.CrossSection_StressCompute.BendingY({0},{1})",
-                activeCell.Offset[-9, 0].Address[false, false], CrossSectionAdress);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = String.Format("=SDK.CrossSection_StressCompute.BendingZ({0},{1})",
-                activeCell.Offset[-9, 0].Address[false, false], CrossSectionAdress);
+
 
 
             //Units-Comments
@@ -726,10 +783,6 @@ namespace StructuralDesignKitExcel
             //----------------------------------
             //Define Checks Factors
             //----------------------------------
-
-            int blockFactorStart = 11;
-            int BlockFactorLength = 11;
-
             //Captions
             activeCell = baseCell.Offset[blockFactorStart, 4]; activeCell.Value2 = "Factors";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kmod";
@@ -741,23 +794,21 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kcrit";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kcr";
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kh_tension";
-            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kl_tension_LVL";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Kh_tension_LVL";
+
 
             //values
-            formula = String.Format("=SDK.Factors.Kmod({0},{1},{2})",
-                baseCell.Offset[3, 1].Address[false, false],
-                baseCell.Offset[5, 1].Address[false, false],
-                baseCell.Offset[blockForceStart + 1, 1].Address[false, false]);
-            activeCell = baseCell.Offset[blockFactorStart + 1, 5]; activeCell.Formula = formula;
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Ym({0})", baseCell.Offset[3, 1].Address[false, false]);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kh_Bending({0},{1})", baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[2, 1].Address[false, false]);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kh_Bending({0},{1})", baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[1, 1].Address[false, false]);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kc({0},{1}*1000,{2}*1000,0)", baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[6, 1].Address[false, false], baseCell.Offset[7, 1].Address[false, false]);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kc({0},{1}*1000,{2}*1000,1)", baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[6, 1].Address[false, false], baseCell.Offset[7, 1].Address[false, false]);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kcrit({0},{1}*1000)", baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[8, 1].Address[false, false]);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kcr({0})", baseCell.Offset[3, 1].Address[false, false]);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kh_Tension({0},{1})", baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[2, 1].Address[false, false]);
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.Factors.Kl_LVL({0},{1}*1000)", baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[8, 1].Address[false, false]);
+            xlApp.Range[kmodAdr].Formula = String.Format("=SDK.Factors.Kmod({0},{1},{2})", MaterialAdr, ServiceClassAdr, LoadDurationAdr);
+            xlApp.Range[YmAdr].Formula = String.Format("=SDK.Factors.Ym({0})", MaterialAdr);
+            xlApp.Range[khyAdr].Formula = String.Format("=SDK.Factors.Kh_Bending({0},{1})", MaterialAdr, hAdr);
+            xlApp.Range[khzAdr].Formula = String.Format("=SDK.Factors.Kh_Bending({0},{1})", MaterialAdr, bAdr);
+            xlApp.Range[kcyAdr].Formula = String.Format("=SDK.Factors.Kc({0},{1}*1000,{2}*1000,0,{3})", CSAdr, BuckLyAdr, BuckLzAdr, FireAdr);
+            xlApp.Range[kczAdr].Formula = String.Format("=SDK.Factors.Kc({0},{1}*1000,{2}*1000,1,{3})", CSAdr, BuckLyAdr, BuckLzAdr, FireAdr);
+            xlApp.Range[kcritAdr].Formula = String.Format("=SDK.Factors.Kcrit({0},{1}*1000,{2})", CSAdr, LTBAdr, FireAdr);
+            xlApp.Range[kcrAdr].Formula = String.Format("=SDK.Factors.Kcr({0})", MaterialAdr);
+            xlApp.Range[Kh_TensionAdr].Formula = String.Format("=SDK.Factors.Kh_Tension({0},{1})", MaterialAdr, hAdr);
+            xlApp.Range[Kh_TensionLVLAdr].Formula = String.Format("=SDK.Factors.Kl_LVL({0},{1}*1000)", MaterialAdr, TensionLengthAdr);
+
 
 
             //Format
@@ -771,10 +822,12 @@ namespace StructuralDesignKitExcel
             range = xlApp.Range[baseCell.Offset[blockFactorStart, 4], baseCell.Offset[blockFactorStart + BlockFactorLength - 1, 5]];
             range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
 
+
+
+
             //----------------------------------
             //Define checks
             //----------------------------------
-            int BlockCheckLength = 10;
 
             //Captions
             activeCell = baseCell.Offset[0, 4]; activeCell.Value2 = "Eurocodes 5 DIN EN 1995-1 Checks";
@@ -789,50 +842,32 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Torsion_6.1.8 : ";
 
             //Value
-            activeCell = baseCell.Offset[1, 5]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.TensionParallelToGrain_6.1.2({0},{1},{2},{3},{4},{5})",
-                baseCell.Offset[blockStressesStart + 1, 1].Address[false, false], baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[blockFactorStart + 1, 5].Address[false, false],
-                baseCell.Offset[blockFactorStart + 2, 5].Address[false, false], baseCell.Offset[blockFactorStart + 8, 5].Address[false, false], baseCell.Offset[blockFactorStart + 9, 5].Address[false, false]);
+            activeCell = baseCell.Offset[1, 5]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.TensionParallelToGrain_6.1.2({0},{1},{2},{3},{4},{5},{6})",
+                SigNTenAdr, MaterialAdr, kmodAdr, YmAdr, khzAdr, Kh_TensionAdr, FireAdr);
 
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.CompressionParallelToGrain_6.1.4({0},{1},{2},{3})",
-                baseCell.Offset[blockStressesStart + 2, 1].Address[false, false], baseCell.Offset[3, 1].Address[false, false], baseCell.Offset[blockFactorStart + 1, 5].Address[false, false],
-                baseCell.Offset[blockFactorStart + 2, 5].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.CompressionParallelToGrain_6.1.4({0},{1},{2},{3},{4})",
+                SigNCompAdr, MaterialAdr, kmodAdr, YmAdr, FireAdr);
 
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.Bending_6.1.6({0},{1},{2},{3},{4},{5},{6})",
-                baseCell.Offset[blockStressesStart + 6, 1].Address[false, false], baseCell.Offset[blockStressesStart + 7, 1].Address[false, false], baseCell.Offset[4, 1].Address[false, false],
-                baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false],
-                baseCell.Offset[blockFactorStart + 3, 5].Address[false, false], baseCell.Offset[blockFactorStart + 4, 5].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.Bending_6.1.6({0},{1},{2},{3},{4},{5},{6},{7})",
+                SigMyAdr, SigMzAdr, CSAdr, kmodAdr, YmAdr, khyAdr, khzAdr, FireAdr);
 
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndTension_6.2.3({0},{1},{2},{3},{4},{5},{6},{7},{8},{9})",
-                baseCell.Offset[blockStressesStart + 6, 1].Address[false, false], baseCell.Offset[blockStressesStart + 7, 1].Address[false, false], baseCell.Offset[blockStressesStart + 1, 1].Address[false, false],
-                baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false],
-                baseCell.Offset[blockFactorStart + 3, 5].Address[false, false], baseCell.Offset[blockFactorStart + 4, 5].Address[false, false],
-                baseCell.Offset[blockFactorStart + 8, 5].Address[false, false], baseCell.Offset[blockFactorStart + 9, 5].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndTension_6.2.3({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10})",
+                SigMyAdr, SigMzAdr, SigNTenAdr, CSAdr, kmodAdr, YmAdr, khyAdr, khzAdr, Kh_TensionAdr, Kh_TensionLVLAdr, FireAdr);
 
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndCompression_6.2.4({0},{1},{2},{3},{4},{5},{6},{7})",
-                baseCell.Offset[blockStressesStart + 6, 1].Address[false, false], baseCell.Offset[blockStressesStart + 7, 1].Address[false, false], baseCell.Offset[blockStressesStart + 2, 1].Address[false, false],
-                baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false],
-                baseCell.Offset[blockFactorStart + 3, 5].Address[false, false], baseCell.Offset[blockFactorStart + 4, 5].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndCompression_6.2.4({0},{1},{2},{3},{4},{5},{6},{7},{8})",
+                SigMyAdr, SigMzAdr, SigNCompAdr, CSAdr, kmodAdr, YmAdr, khyAdr, khzAdr, FireAdr);
 
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndBuckling_6.3.2({0},{1},{2},{3}*1000,{4}*1000,{5},{6},{7},{8},{9})",
-                baseCell.Offset[blockStressesStart + 6, 1].Address[false, false], baseCell.Offset[blockStressesStart + 7, 1].Address[false, false], baseCell.Offset[blockStressesStart + 2, 1].Address[false, false],
-                baseCell.Offset[6, 1].Address[false, false], baseCell.Offset[7, 1].Address[false, false], baseCell.Offset[4, 1].Address[false, false],
-                baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false],
-                baseCell.Offset[blockFactorStart + 3, 5].Address[false, false], baseCell.Offset[blockFactorStart + 4, 5].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndBuckling_6.3.2({0},{1},{2},{3}*1000,{4}*1000,{5},{6},{7},{8},{9},{10})",
+                SigMyAdr, SigMzAdr, SigNCompAdr, BuckLyAdr, BuckLzAdr, CSAdr, kmodAdr, YmAdr, khyAdr, khzAdr, FireAdr);
 
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.LateralTorsionalBuckling_6.3.3({0},{1},{2},{3}*1000,{4}*1000,{5}*1000,{6},{7},{8},{9},{10})",
-                   baseCell.Offset[blockStressesStart + 6, 1].Address[false, false], baseCell.Offset[blockStressesStart + 7, 1].Address[false, false], baseCell.Offset[blockStressesStart + 2, 1].Address[false, false],
-                baseCell.Offset[6, 1].Address[false, false], baseCell.Offset[7, 1].Address[false, false], baseCell.Offset[8, 1].Address[false, false], baseCell.Offset[4, 1].Address[false, false],
-                baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false],
-                baseCell.Offset[blockFactorStart + 3, 5].Address[false, false], baseCell.Offset[blockFactorStart + 4, 5].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.LateralTorsionalBuckling_6.3.3({0},{1},{2},{3}*1000,{4}*1000,{5}*1000,{6},{7},{8},{9},{10},{11})",
+                SigMyAdr, SigMzAdr, SigNCompAdr, BuckLyAdr, BuckLzAdr, LTBAdr, CSAdr, kmodAdr, YmAdr, khyAdr, khzAdr, FireAdr);
 
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.Shear_6.1.7({0},{1},{2},{3},{4},{5})",
+                TauYAdr, TauZAdr, MaterialAdr, kmodAdr, YmAdr, FireAdr);
 
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.Shear_6.1.7({0},{1},{2},{3},{4})",
-                baseCell.Offset[blockStressesStart + 3, 1].Address[false, false], baseCell.Offset[blockStressesStart + 4, 1].Address[false, false], baseCell.Offset[3, 1].Address[false, false],
-                baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false]);
-
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.Torsion_6.1.8({0},{1},{2},{3},{4},{5})",
-                baseCell.Offset[blockStressesStart + 5, 1].Address[false, false], baseCell.Offset[blockStressesStart + 3, 1].Address[false, false], baseCell.Offset[blockStressesStart + 4, 1].Address[false, false],
-                baseCell.Offset[4, 1].Address[false, false], baseCell.Offset[blockFactorStart + 1, 5].Address[false, false], baseCell.Offset[blockFactorStart + 2, 5].Address[false, false]);
+            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.Torsion_6.1.8({0},{1},{2},{3},{4},{5},{6})",
+                TauTorAdr, TauYAdr, TauZAdr, CSAdr, kmodAdr, YmAdr, FireAdr);
 
 
             //Format
@@ -850,9 +885,6 @@ namespace StructuralDesignKitExcel
             }
             range = xlApp.Range[baseCell.Offset[0, 4], baseCell.Offset[BlockCheckLength - 1, 5]];
             range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
-
-
-
 
 
 
