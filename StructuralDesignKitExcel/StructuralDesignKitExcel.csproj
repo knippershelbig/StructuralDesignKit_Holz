@@ -68,6 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExcelRibbon.cs" />
     <Compile Include="RibbonActions\CrossSectionButtonActions.cs" />
+    <Compile Include="ExcelFormulaeVibrations.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="customUI.xsd">

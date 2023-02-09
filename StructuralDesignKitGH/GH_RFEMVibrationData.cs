@@ -3,10 +3,13 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using StructuralDesignKitLibrary;
+using StructuralDesignKitLibrary.RFEM;
+using StructuralDesignKitGrasshopper;
 
-namespace StructuralDesignKitGrasshopper
+namespace StructuralDesignKitGH
 {
-    public class StructuralDesignKitGrasshopperComponent : GH_Component
+    public class GH_RFEMVibrationData : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -15,10 +18,10 @@ namespace StructuralDesignKitGrasshopper
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public StructuralDesignKitGrasshopperComponent()
-          : base("StructuralDesignKitGrasshopper", "Nickname",
-            "Description",
-            "SDK Timber", "CrossSection")
+        public GH_RFEMVibrationData()
+          : base("Get RFEM Vibration data", "VibrationData",
+            "Get the data necessary to perform a vibration analysis from an open RFEM model",
+            "SDK", "Vibrations")
         {
         }
 
@@ -27,6 +30,7 @@ namespace StructuralDesignKitGrasshopper
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            pManager.AddBooleanParameter("Run", "Run", "Get the data from the active RFEM model using the COM interface", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -34,19 +38,14 @@ namespace StructuralDesignKitGrasshopper
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
+            pManager.AddGenericParameter("Data Vibration", "data", "RFEM data necessary for vibrationpost processing", GH_ParamAccess.item);
         }
 
 
+        //Persistant data for the solve instance method
+        RFEMVibrationDataObject data = new RFEMVibrationDataObject();
 
-        //public override bool AppendMenuItems(System.Windows.Forms.ToolStripDropDown menu)
-        //{
-        //    base.AppendMenuItems(menu);
-
-
-        //}
-
-
-
+        
         /// <summary>
         /// This is the method that actually does the work.
         /// </summary>
@@ -54,6 +53,35 @@ namespace StructuralDesignKitGrasshopper
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+
+            bool run = false;
+
+
+            DA.GetData(0, ref run);
+
+            if (run)
+            {
+                var model = RFEM_Utilities.OpenModel();
+
+                var FEnodes = RFEM_Utilities.GetFENodes(model, 1);
+                var naturalFrequencies = RFEM_Utilities.GetNaturalFrequencies(model, 1);
+                var modalMasses = RFEM_Utilities.GetModalMasses(model, 1);
+                var modeDisplacement = RFEM_Utilities.GetAllStandardizedDisplacement(model, 1);
+
+                List<int> modes = new List<int>();
+                for (int i = 0; i < naturalFrequencies.Count; i++)
+                {
+                    modes.Add(i + 1);
+                }
+
+                data = new RFEMVibrationDataObject(modes, FEnodes, naturalFrequencies, modalMasses, modeDisplacement);
+
+
+                RFEM_Utilities.CloseRFEMModel(model);
+                
+            }
+                DA.SetData(0, data);
+
         }
 
         /// <summary>
@@ -69,6 +97,6 @@ namespace StructuralDesignKitGrasshopper
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("D4AC793F-BD45-4E8B-A32A-CD6913EC0D39");
+        public override Guid ComponentGuid => new Guid("752D2FB3-7894-47D2-B806-8132EF130B13");
     }
 }

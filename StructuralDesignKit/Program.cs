@@ -16,6 +16,7 @@ using StructuralDesignKitLibrary.Connections.Fasteners;
 using StructuralDesignKitLibrary.Connections.SteelTimberShear;
 using StructuralDesignKitLibrary.Connections.TimberTimberShear;
 using StructuralDesignKitLibrary.Utilities;
+using StructuralDesignKitLibrary.RFEM;
 
 namespace StructuralDesignKit
 {
@@ -27,35 +28,35 @@ namespace StructuralDesignKit
             
      
 
-            Console.WriteLine("Fastener checks\n");
+            //Console.WriteLine("Fastener checks\n");
 
-            var Dowel = new FastenerDowel(10, 360);
-            var bolt = new FastenerBolt(20, 800);
-            //var timber = new MaterialTimberHardwood(MaterialTimberHardwood.Grades.D30);
-            var timber = new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL28h);
-            double angle1 = 43;
+            //var Dowel = new FastenerDowel(10, 360);
+            //var bolt = new FastenerBolt(20, 800);
+            ////var timber = new MaterialTimberHardwood(MaterialTimberHardwood.Grades.D30);
+            //var timber = new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL28h);
+            //double angle1 = 43;
 
-            var shearCapacity2 = new SteelSingleInnerPlate(Dowel,6, angle1, timber, 45, false);
-            //var shearCapacity2 = new TimberTimberSingleShear(bolt,timber, 160, 90,timber,175,0,true);
+            //var shearCapacity2 = new SteelSingleInnerPlate(Dowel,6, angle1, timber, 45, false);
+            ////var shearCapacity2 = new TimberTimberSingleShear(bolt,timber, 160, 90,timber,175,0,true);
 
-            Dowel.ComputeSpacings(angle1);
+            //Dowel.ComputeSpacings(angle1);
 
-            for (int i = 0; i < shearCapacity2.Capacities.Count; i++)
-            {
-            Console.WriteLine(String.Format("Failure mode {0} = {1:0}N", shearCapacity2.FailureModes[i], shearCapacity2.Capacities[i]));
+            //for (int i = 0; i < shearCapacity2.Capacities.Count; i++)
+            //{
+            //Console.WriteLine(String.Format("Failure mode {0} = {1:0}N", shearCapacity2.FailureModes[i], shearCapacity2.Capacities[i]));
 
-            }
+            //}
 
-            Console.WriteLine(String.Format("Shear Capacity = {0:0.00}KN (Failure mode {1})", shearCapacity2.Capacity/1000,shearCapacity2.FailureMode));
-            Console.WriteLine(String.Format("a1={0:0}mm\na2={1:0}mm\na3t={2:0}mm\na3c={3:0}mm\na4t={4:0}mm\na4c={5:0.}mm\n",
-                Dowel.a1min, Dowel.a2min, Dowel.a3tmin, Dowel.a3cmin, Dowel.a4tmin, Dowel.a4cmin));
+            //Console.WriteLine(String.Format("Shear Capacity = {0:0.00}KN (Failure mode {1})", shearCapacity2.Capacity/1000,shearCapacity2.FailureMode));
+            //Console.WriteLine(String.Format("a1={0:0}mm\na2={1:0}mm\na3t={2:0}mm\na3c={3:0}mm\na4t={4:0}mm\na4c={5:0.}mm\n",
+            //    Dowel.a1min, Dowel.a2min, Dowel.a3tmin, Dowel.a3cmin, Dowel.a4tmin, Dowel.a4cmin));
 
-            Console.WriteLine(SDKUtilities.LinearInterpolation(5, 10, 2, 25, 52));
+            //Console.WriteLine(SDKUtilities.LinearInterpolation(5, 10, 2, 25, 52));
 
 
 
-            List<String> propertiesToModify = new List<string> { "Grade", "Fmyk"};
-            List<Object> values = new List<Object> { "GL24h_Modified", "32" };
+            //List<String> propertiesToModify = new List<string> { "Grade", "Fmyk"};
+            //List<Object> values = new List<Object> { "GL24h_Modified", "32" };
 
 
             ////MaterialTimberGeneric genericTimber = new MaterialTimberGeneric(new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL24h),propertiesToModify,values);
@@ -103,6 +104,18 @@ namespace StructuralDesignKit
 
             Console.WriteLine("\n-------------------------------------------------------------------\n");
 
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var model = RFEM_Utilities.OpenModel();
+            watch.Start();
+            //var res1 = RFEM_Utilities.GetAllStandardizedDisplacement(model,1);
+            watch.Stop();
+            Console.WriteLine("Algo1 = " + watch.ElapsedMilliseconds.ToString());
+            watch.Reset();
+            watch.Start();
+            var res2 = RFEM_Utilities.GetAllStandardizedDisplacement(model,1);
+            Console.WriteLine("Algo1 = " + watch.ElapsedMilliseconds.ToString());
+            watch.Reset();
+            RFEM_Utilities.CloseRFEMModel(model);
 
 
 

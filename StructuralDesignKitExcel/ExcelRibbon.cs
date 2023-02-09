@@ -11,6 +11,7 @@ using System.IO;
 using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.Connections.TimberTimberShear;
 using StructuralDesignKitLibrary.Connections.SteelTimberShear;
+using StructuralDesignKitLibrary.Vibrations;
 
 namespace StructuralDesignKitExcel
 {
@@ -1127,7 +1128,24 @@ namespace StructuralDesignKitExcel
 
         #endregion
 
+        #region Vibration
 
+        public void OnButtonvelocity(IRibbonControl control)
+        {
+            Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
+            var baseCell = xlApp.ActiveCell;
+
+            List<double> velocity = Vibrations.transient(1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+            for (int i = 0; i < velocity.Count-1; i++)
+            {
+                baseCell.Offset[i, 0].Value2 = velocity[i];
+            }
+
+        }
+        #endregion
 
 
 

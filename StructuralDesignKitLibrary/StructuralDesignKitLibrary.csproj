@@ -32,6 +32,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dlubal.DynamPro, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ad96acf4bd703704, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <HintPath>..\..\..\..\..\Public\Documents\Dlubal\SDK\Reference Assemblies\x64\Dlubal.DynamPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Dlubal.RFEM5, Version=5.7.0.0, Culture=neutral, PublicKeyToken=f22b2f92593d105e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <HintPath>..\..\..\..\..\Public\Documents\Dlubal\SDK\Reference Assemblies\x64\Dlubal.RFEM5.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -66,8 +78,15 @@
     <Compile Include="Materials\Interfaces\IMaterial.cs" />
     <Compile Include="Materials\Interfaces\IMaterialTimber.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RFEM\ModeShape.cs" />
+    <Compile Include="RFEM\RFEM_Utilities.cs" />
     <Compile Include="Utilities\SDKUtilities.cs" />
+    <Compile Include="Vibrations\Vibrations - Legacy.cs" />
+    <Compile Include="Vibrations\Vibrations.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>Copy "$(TargetPath)" "C:\Users\gc\AppData\Roaming\Grasshopper\Libraries\KH\StructuralDesignKitLibrary.dll</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <Version>1.0</Version>
-    <Title>StructuralDesignKitGrasshopper</Title>
-    <Description>Description of StructuralDesignKitGrasshopper</Description>
+    <Title>StructuralDesignKitGH</Title>
+    <Description>Description of StructuralDesignKitGH</Description>
     <TargetExt>.gha</TargetExt>
   </PropertyGroup>
   
@@ -17,7 +17,12 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
+    <Reference Include="Dlubal.DynamPro">
+      <HintPath>..\..\..\..\..\Public\Documents\Dlubal\SDK\Reference Assemblies\x64\Dlubal.DynamPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Dlubal.RFEM5">
+      <HintPath>..\..\..\..\..\Public\Documents\Dlubal\SDK\Reference Assemblies\x64\Dlubal.RFEM5.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">
@@ -25,5 +30,9 @@
     <StartArguments></StartArguments>
     <StartAction>Program</StartAction>
   </PropertyGroup>
+  
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="Copy &quot;$(TargetPath)&quot; &quot;C:\Users\gc\AppData\Roaming\Grasshopper\Libraries\KH\StructuralDesignKitGH.gha" />
+  </Target>
 
 </Project>

@@ -52,6 +52,10 @@
 							</menu>
 							<button id="MaterialProperty" label="properties" onAction="MaterialProperties"/>
 						</group>
+
+						<group id="Vibration" label="Vibration">
+							<button id="Velocity" label="velocity" size="normal" onAction="OnButtonvelocity"/>
+						</group>
 					</tab>
 				</tabs>
 			</ribbon>
