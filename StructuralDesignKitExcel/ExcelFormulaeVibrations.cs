@@ -45,6 +45,7 @@ namespace StructuralDesignKitExcel.RibbonActions
             [ExcelArgument(Description = "Weighting category for human perception of vibrations")] string weightingType,
             [ExcelArgument(Description = "Node to consider for the excitation")] int excitationNode,
             [ExcelArgument(Description = "Node to consider for the response")] int ResponseNode,
+            [ExcelArgument(Description = "Length of the walking path, if negative, the Eurocode resonant build up factor is considered ")] double walkingLength,
             [ExcelArgument(Description = "If true, provide the Response factor instead of the acceleration")] bool ResponseFactor)
         {
             double accelerationResponse = 0;
@@ -100,7 +101,7 @@ namespace StructuralDesignKitExcel.RibbonActions
                     urn.Add(uz[indexNodeResponse + i]);
                 }
 
-                accelerationResponse= Vibrations.ResonantResponseAnalysis(uen, urn, frequencies, modalMasses, fp, Xi, Vibrations.GetWeighting(weightingType),ResponseFactor);
+                accelerationResponse= Vibrations.ResonantResponseAnalysis(uen, urn, frequencies, modalMasses, fp, Xi, Vibrations.GetWeighting(weightingType),walkingLength, ResponseFactor);
 
 
             }

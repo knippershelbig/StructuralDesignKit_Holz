@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitExcel", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructuraldesignKitTesting", "StructuraldesignKitTesting\StructuraldesignKitTesting.csproj", "{468E68B3-0BD2-4B83-AAF6-DA8704ECB075}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitGH", "StructuralDesignKitGH\StructuralDesignKitGH.csproj", "{16ED063E-9236-4E99-8AAA-54C7C93601AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructuralDesignKitGH", "StructuralDesignKitGH\StructuralDesignKitGH.csproj", "{16ED063E-9236-4E99-8AAA-54C7C93601AD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785} = {DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}
 	EndProjectSection

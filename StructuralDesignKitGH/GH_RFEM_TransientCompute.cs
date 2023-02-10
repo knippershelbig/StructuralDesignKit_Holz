@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dlubal.DynamPro;
+
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using StructuralDesignKitGrasshopper;
@@ -8,14 +8,14 @@ using StructuralDesignKitLibrary.Vibrations;
 
 namespace StructuralDesignKitGH
 {
-    public class GH_RFEMVibrationCompute : GH_Component
+    public class GH_RFEM_TransientCompute : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the MyComponent1 class.
+        /// Initializes a new instance of the GH_RFEM_TransientCompute class.
         /// </summary>
-        public GH_RFEMVibrationCompute()
-          : base("Vibration Resonant response", "ResonantResponse",
-              "Compute the resonant response from a structure",
+        public GH_RFEM_TransientCompute()
+          : base("Vibration transient response", "TransientResponse",
+              "Compute the transient response from a structure",
               "SDK", "Vibration")
         {
         }
@@ -30,9 +30,9 @@ namespace StructuralDesignKitGH
             pManager.AddGenericParameter("PaceFrequency", "fp", "Pace frequency, either as single value or as range", GH_ParamAccess.item);
             pManager.AddNumberParameter("Damping ratio", "Xi", "Damping ratio", GH_ParamAccess.item);
             pManager.AddTextParameter("weigthingCategory", "W", weighting, GH_ParamAccess.item);
+            pManager.AddNumberParameter("Transient response resolution", "Reso", "timestep resolution to evaluate the transient response\n Usually between 0.001 and 0.02 seconds", GH_ParamAccess.item);
             pManager.AddBooleanParameter("Response Factor", "R", "If true, provide the Response factor instead of the acceleration", GH_ParamAccess.item);
-
-
+            pManager[4].Optional = true;
         }
 
         /// <summary>
@@ -42,7 +42,6 @@ namespace StructuralDesignKitGH
         {
             pManager.AddPointParameter("points", "pt", "", GH_ParamAccess.list);
             pManager.AddNumberParameter("Response", "R", "Response value", GH_ParamAccess.list);
-
         }
 
         /// <summary>
@@ -51,18 +50,21 @@ namespace StructuralDesignKitGH
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+
             RFEMVibrationDataObject data = null;
             object importFc = null;
             double fp = 0;
             double Xi = 0;
             string weighting = "";
+            double resolution = 0.010;
             bool responseFactor = false;
 
             DA.GetData(0, ref data);
             DA.GetData(1, ref importFc);
             DA.GetData(2, ref Xi);
             DA.GetData(3, ref weighting);
-            DA.GetData(4, ref responseFactor);
+            DA.GetData(4, ref resolution);
+            DA.GetData(5, ref responseFactor);
 
             string typeValue = importFc.GetType().ToString();
 
@@ -70,7 +72,7 @@ namespace StructuralDesignKitGH
             {
                 fp = double.Parse(importFc.ToString());
             }
-            else if(importFc.GetType() == typeof(double))fp = (double)importFc ;
+            else if (importFc.GetType() == typeof(double)) fp = (double)importFc;
             fp = double.Parse(importFc.ToString());
             List<Point3d> pts = new List<Point3d>();
             foreach (var pt in data.FENodes)
@@ -85,11 +87,15 @@ namespace StructuralDesignKitGH
             foreach (var item in data.ModeShapes)
             {
 
-                responses.Add(Vibrations.ResonantResponseAnalysis(item.Uz, item.Uz, data.NaturalFrequencies, data.ModalMasses, fp, Xi, W, responseFactor));
+                responses.Add(Vibrations.TransientResponseAnalysis(item.Uz, item.Uz, data.NaturalFrequencies, data.ModalMasses, fp, Xi, W, responseFactor,resolution));
             }
 
             DA.SetDataList(0, pts);
             DA.SetDataList(1, responses);
+
+
+
+
 
 
         }
@@ -112,7 +118,7 @@ namespace StructuralDesignKitGH
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("8D214E3D-E757-4699-B95D-1DBFDF715789"); }
+            get { return new Guid("6099DACF-54CA-4BB4-9E46-1BF4B703A43E"); }
         }
     }
 }

@@ -1137,7 +1137,7 @@ namespace StructuralDesignKitExcel
 
             var baseCell = xlApp.ActiveCell;
 
-            List<double> velocity = Vibrations.transient(1, 1, 1, 1, 1, 1, 1, 1, 1);
+            List<double> velocity = Vibrations.ComputeVelocityResponseTimeSeries(1, 1, 1, 1, 1, 1,Vibrations.Weighting.None , 1, 1);
 
             for (int i = 0; i < velocity.Count-1; i++)
             {

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
@@ -41,13 +42,15 @@ namespace StructuralDesignKitLibrary.Vibrations
         /// <param name="fp">pace frequency in [Hz]</param>
         /// <param name="DampingRatio">Damping as ratio to critical damping</param>
         /// <param name="weigthingCategory">Weighting category for human perception of vibrations</param>
+        /// <param name="walkingLength">Length of the walking path, if negative, the Eurocode resonant build up factor is considered</param>
         /// <param name="ResponseFactor">If true, provide the Response factor instead of the acceleration</param>
         /// <returns></returns>
-        public static double ResonantResponseAnalysis(List<double> List_uen, List<double> List_urn, List<double> NaturalFrequencies, List<double> List_Mg,double fp,double DampingRatio, Weighting weigthingCategory,bool ResponseFactor)
+        public static double ResonantResponseAnalysis(List<double> List_uen, List<double> List_urn, List<double> NaturalFrequencies, List<double> List_Mg, double fp, double DampingRatio, Weighting weigthingCategory, double walkingLength = -1, bool ResponseFactor = false)
         {
             int Q = 746; //Static force exerted by an average person normally taken as 76kg x 9.81m/s² = 746 N
-            double Xi = DampingRatio;                   
+            double Xi = DampingRatio;
 
+            double BuildupFactor = ComputeResonanceBuildupFactor(walkingLength, fp, DampingRatio);
 
             List<List<double>> accelerationResponse = new List<List<double>>();
 
@@ -55,7 +58,7 @@ namespace StructuralDesignKitLibrary.Vibrations
             for (int i = 1; i < 5; i++)
             {
                 int h = i;
-                
+
                 double fh = fp * h;                             //Harmonic frequency of loading, harmonic number times walking frequency, h*fw, Hz
                 double Fh = HarmonicCoefficient(fh, h) * Q;     //Excitation force for the harmonic considered
 
@@ -65,64 +68,101 @@ namespace StructuralDesignKitLibrary.Vibrations
                 //iterate over each mode
                 foreach (double fn in NaturalFrequencies)
                 {
-                    double W = ComputeWeightingFactor(weigthingCategory,fn);
-                    responseMode.Add(ComputeAccelerationResponse(List_uen[modeCount], List_urn[modeCount], Fh, List_Mg[modeCount], ComputeDnh(h, Xi, fp, fn), W));
+                    double W = ComputeWeightingFactor(weigthingCategory, fn);
+                    responseMode.Add(ComputeAccelerationResponse(List_uen[modeCount], List_urn[modeCount], Fh, List_Mg[modeCount], ComputeDnh(h, Xi, fp, fn), W) * BuildupFactor);
                     modeCount++;
                 }
                 accelerationResponse.Add(responseMode);
             }
 
-            if (ResponseFactor) return SRSSAcceleration(accelerationResponse)/0.005;
+            if (ResponseFactor) return SRSSAcceleration(accelerationResponse) / 0.005;
             else return SRSSAcceleration(accelerationResponse);
         }
 
 
-
-
-        public static List<double> transient(double uen, double urn, double Fi, double Mn, double fn, double fp, double Xi, double W, double timeStep)
+        public static double TransientResponseAnalysis(List<double> List_uen, List<double> List_urn, List<double> NaturalFrequencies, List<double> List_Mg, double fp, double DampingRatio, Weighting weigthingCategory, bool ResponseFactor, double resolution = 0.00125)
         {
-            List<double> NaturalFrequencies = new List<double> { 18.254, 60.61, 110.854, 162.082 };
-            List<double> u = new List<double> { 1, 0, 1, 0 };
-            List<double> Mg = new List<double> { 605, 607.39, 605, 607.39 };
 
+            
+            int steps = (Int32)Math.Round(1 / fp / resolution);
+            double timeStep = 1 / fp / steps;
+
+
+            List<List<double>> VelocitySeriesPerMode = new List<List<double>>();
+            int modeCount = 0;
+
+
+            foreach (double modeFrequence in NaturalFrequencies)
+            {
+                VelocitySeriesPerMode.Add(ComputeVelocityResponseTimeSeries(List_uen[modeCount], List_urn[modeCount], List_Mg[modeCount], modeFrequence, fp, DampingRatio, weigthingCategory, resolution));
+                modeCount++;
+            }
+
+            double transientResponse = Vrms(VelocitySeriesPerMode, timeStep, fp);
+            if (ResponseFactor) transientResponse /= 0.0001;
+            return transientResponse;
+        }
+
+
+        public static double ComputeResonanceBuildupFactor(double walkingLength, double fp, double Xi)
+        {
+            double resonanceBuildupFactor = 0;
+            if (walkingLength > 0)
+            {
+                if (fp >= 1.7 && fp <= 2.4)
+                {
+                    //Walking speed according to Bachmann and Ammann for walking pace between 1.7Hz and 2Hz; SCI P354 - Eq 16
+                    double v = 1.67 * Math.Pow(fp, 2) - 4.83 * fp + 4.5;
+                    resonanceBuildupFactor = 1 - Math.Exp(-2 * Math.PI * Xi * walkingLength / v);
+                }
+            }
+            //Outside the boundaries defined by the equation or if walking length defined as negative,
+            //the normalized value of 0.4 according to the Pr EN 1995-1-1 §9.3.6 is chosen
+            else resonanceBuildupFactor = 0.4;
+
+            return resonanceBuildupFactor;
+        }
+
+
+        public static List<double> ComputeVelocityResponseTimeSeries(double uen, double urn, double Mn, double fn, double fp, double Xi, Weighting weighting, double resolution = 0.00125)
+        {
+            double steps = (Int32)Math.Round(1 / fp / resolution);
+            double timeStep = 1 / fp / steps;
+
+            List<double> velocitySeries = new List<double>();
+
+            double W = ComputeWeightingFactor(weighting, fn);
             int Q = 746;             //Static force exerted by an average person normally taken as 76kg x 9.81m/s² = 764 N
-            uen = 1;
-            urn = 1;
-            fn = 5.293;
-            fp = 2;
-            Xi = 0.03;
-            //W = Wb(fn);
-            W = 1;
-            Mn = 34273;
-
-            int steps = (Int32)Math.Round(1 / fp / 0.00125);
-            timeStep = 1 / fp / steps;
-            Fi = MeanNodalImpulseSCI(fp, fn, Q);//Equivalent impulsive force representing a single footfall in Ns
+            double Fi = MeanNodalImpulseEC5(fp, fn);//Equivalent impulsive force representing a single footfall in Ns
 
 
-
-
-            //Compute velocity response
-            List<double> velocityResponse = new List<double>();
             double t = 0;
             for (int i = 0; i < steps; i++)
             {
-                velocityResponse.Add(uen * urn * Fi / Mn * Math.Sin(2 * Math.PI * fn * Math.Sqrt(1 - Math.Pow(Xi, 2)) * t) * Math.Exp(-2 * Math.PI * Xi * fn * t) * W);
+                velocitySeries.Add(VelocityResponse(uen, urn, fn, fp, Fi, W, Xi, t, Mn, weighting));
                 t += timeStep;
             }
 
-            List<List<double>> velocity = new List<List<double>>();
-            velocity.Add(velocityResponse);
-            double v = Vrms(velocity, timeStep, fp);
-
-            return velocityResponse;
+            return velocitySeries;
         }
+
+
+        public static double VelocityResponse(double uen, double urn, double fn, double fp, double Fi, double W, double Xi, double t, double Mn, Weighting weighting)
+        {
+
+
+
+            return uen * urn * Fi / Mn * Math.Sin(2 * Math.PI * fn * Math.Sqrt(1 - Math.Pow(Xi, 2)) * t) * Math.Exp(-2 * Math.PI * Xi * fn * t) * W;
+        }
+
+
+
 
         /// <summary>
         /// Root mean square of the velocity
         /// </summary>
         /// <returns></returns>
-        public static double Vrms(List<List<double>> velocityResponses,double timeStep, double fp)
+        public static double Vrms(List<List<double>> velocityResponses, double timeStep, double fp)
         {
 
             //Check if lists have the same length
@@ -146,16 +186,12 @@ namespace StructuralDesignKitLibrary.Vibrations
             List<double> VrmsList = new List<double>();
             foreach (double v in Vwer_t)
             {
-                VrmsList.Add(Math.Pow(v, 2)*timeStep);
+                VrmsList.Add(Math.Pow(v, 2) * timeStep);
             }
             double Vrms = VrmsList.Sum();
             Vrms = Math.Sqrt(Vrms * fp);
             return Vrms;
         }
-
-        
-
-
 
 
 

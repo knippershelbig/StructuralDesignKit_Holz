@@ -17,6 +17,8 @@ using StructuralDesignKitLibrary.Connections.SteelTimberShear;
 using StructuralDesignKitLibrary.Connections.TimberTimberShear;
 using StructuralDesignKitLibrary.Utilities;
 using StructuralDesignKitLibrary.RFEM;
+using System.Diagnostics;
+using StructuralDesignKitLibrary.Vibrations;
 
 namespace StructuralDesignKit
 {
@@ -104,18 +106,13 @@ namespace StructuralDesignKit
 
             Console.WriteLine("\n-------------------------------------------------------------------\n");
 
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            var model = RFEM_Utilities.OpenModel();
-            watch.Start();
-            //var res1 = RFEM_Utilities.GetAllStandardizedDisplacement(model,1);
-            watch.Stop();
-            Console.WriteLine("Algo1 = " + watch.ElapsedMilliseconds.ToString());
-            watch.Reset();
-            watch.Start();
-            var res2 = RFEM_Utilities.GetAllStandardizedDisplacement(model,1);
-            Console.WriteLine("Algo1 = " + watch.ElapsedMilliseconds.ToString());
-            watch.Reset();
-            RFEM_Utilities.CloseRFEMModel(model);
+            List<double> NatFreq = new List<double>() { 9.665,34.631,67.537,103.298};
+            List<double> ModalMasses = new List<double>() { 874.14, 848.71, 848.71, 848.71 };
+            List<double> Ue = new List<double>() { -0.99908,0.08973,-0.99195,0.17874};
+
+
+            double response = Vibrations.TransientResponseAnalysis(Ue, Ue, NatFreq, ModalMasses, 1.8, 0.03, Vibrations.Weighting.None, true);
+            
 
 
 
