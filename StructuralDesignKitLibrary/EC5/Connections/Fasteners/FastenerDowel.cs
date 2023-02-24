@@ -174,8 +174,12 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
 
         public double ComputeEffectiveNumberOfFastener(int n, double a1, double angle)
         {
-            double nef_0 = Math.Min(n, Math.Pow(n, 0.9) * Math.Pow(a1 / (13 * Diameter), 0.25));
-            return SDKUtilities.LinearInterpolation(angle, 0, nef_0, 90, n);
+            if (n == 1) return 1;
+            else
+            {
+                double nef_0 = Math.Min(n, Math.Pow(n, 0.9) * Math.Pow(a1 / (13 * Diameter), 0.25));
+                return SDKUtilities.LinearInterpolation(angle, 0, nef_0, 90, n);
+            }
         }
 
         public void ComputeWithdrawalStrength(IShearCapacity ConnectionType)

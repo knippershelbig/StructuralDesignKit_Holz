@@ -44,9 +44,6 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
 
             Capacity = Capacities.Min() * 2;
             FailureMode = FailureModes[Capacities.IndexOf(Capacities.Min())];
-
-
-
         }
 
 
@@ -57,7 +54,7 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
             double RopeEffectCapacity = 0;
 
 
-            //Failure mode according to EN 1995-1-1 Eq (8.10)
+            //Failure mode according to EN 1995-1-1 Eq (8.11)
 
             //Failure mode f
             FailureModes.Add("f");

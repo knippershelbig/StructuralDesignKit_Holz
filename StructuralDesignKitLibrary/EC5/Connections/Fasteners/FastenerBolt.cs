@@ -29,11 +29,11 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
         public double WithdrawalStrength { get; set; }
         public double MaxJohansenPart { get; set; }
         public double a1min { get; set; }
-        public double a2min { get; set;}
-        public double a3tmin { get;set; }
-        public double a3cmin { get;set; }
-        public double a4tmin { get;set; }
-        public double a4cmin { get;set; }
+        public double a2min { get; set; }
+        public double a3tmin { get; set; }
+        public double a3cmin { get; set; }
+        public double a4tmin { get; set; }
+        public double a4cmin { get; set; }
         public double K90 { get; set; }
 
         #endregion
@@ -98,8 +98,8 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
         private double DefineA3cMin(double angle)
         {
             double AngleRad = angle * Math.PI / 180;
-            if (angle <= 150 && angle < 210) return 4*Diameter;
-            else return (1+6*Math.Sin(AngleRad))*Diameter;
+            if (angle <= 150 && angle < 210) return 4 * Diameter;
+            else return (1 + 6 * Math.Sin(AngleRad)) * Diameter;
         }
 
         /// <summary>
@@ -180,13 +180,13 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
         /// <exception cref="Exception"></exception>
         public void ComputeWithdrawalStrength(IShearCapacity ConnectionType)
         {
-            if (ConnectionType is SteelSingleInnerPlate )
+            if (ConnectionType is SteelSingleInnerPlate)
             {
                 var connection = ConnectionType as SteelSingleInnerPlate;
 
                 //Washer diameter considered as 3x the bolt diameter
                 double boltTensileCapacity = Math.PI * Math.Pow(Diameter, 2) / 4 * Fuk;
-                double washerCompressiveCapacity = Math.PI/4 * (Math.Pow(Diameter * 3, 2)- Math.Pow(Diameter +2, 2)) * connection.Timber.Fc90k * 3;
+                double washerCompressiveCapacity = Math.PI / 4 * (Math.Pow(Diameter * 3, 2) - Math.Pow(Diameter + 2, 2)) * connection.Timber.Fc90k * 3;
                 WithdrawalStrength = Math.Min(boltTensileCapacity, washerCompressiveCapacity);
             }
             else if (ConnectionType is TimberTimberSingleShear)
@@ -205,8 +205,12 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
 
         public double ComputeEffectiveNumberOfFastener(int n, double a1, double angle)
         {
-            double nef_0 = Math.Min(n, Math.Pow(n, 0.9) * Math.Pow(a1 / (13 * Diameter), 0.25));
-            return SDKUtilities.LinearInterpolation(angle, 0, nef_0, 90, n);
+            if (n == 1) return 1;
+            else
+            {
+                double nef_0 = Math.Min(n, Math.Pow(n, 0.9) * Math.Pow(a1 / (13 * Diameter), 0.25));
+                return SDKUtilities.LinearInterpolation(angle, 0, nef_0, 90, n);
+            }
         }
 
         public void ComputeSpacings(double angle)

@@ -17,7 +17,7 @@ namespace StructuralDesignKitGH
         public GH_RFEM_Resonant_ComputeTwoPoints()
           : base("Vibration Resonant response 2 Points", "ResonantResponse 2 Points",
               "Compute the resonant response from a structure for an excitation and response point",
-              "SDK", "Vibration")
+              "SDK", "Vibrations")
         {
         }
 
@@ -154,7 +154,7 @@ namespace StructuralDesignKitGH
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return StructuralDesignKitGH.Properties.Resources.IconResonant2pt;
             }
         }
 

@@ -16,7 +16,7 @@ namespace StructuralDesignKitGH
         public GH_RFEM_ResonantCompute()
           : base("Vibration Resonant response", "ResonantResponse",
               "Compute the resonant response from a structure",
-              "SDK", "Vibration")
+              "SDK", "Vibrations")
         {
         }
 
@@ -31,7 +31,7 @@ namespace StructuralDesignKitGH
             pManager.AddNumberParameter("Damping ratio", "Xi", "Damping ratio", GH_ParamAccess.item);
             pManager.AddTextParameter("weigthingCategory", "W", weighting, GH_ParamAccess.item);
             pManager.AddBooleanParameter("Response Factor", "R", "If true, provide the Response factor instead of the acceleration", GH_ParamAccess.item);
-            pManager.AddNumberParameter("walkingLength  ", "WL", "Length of the walking path, if negative, the Eurocode resonant build up factor is considered", GH_ParamAccess.item,-1);
+            pManager.AddNumberParameter("walkingLength  ", "WL", "Length of the walking path, if negative, the Eurocode resonant build up factor is considered", GH_ParamAccess.item, -1);
             pManager[5].Optional = true;
         }
 
@@ -72,7 +72,7 @@ namespace StructuralDesignKitGH
             {
                 fp = double.Parse(importFc.ToString());
             }
-            else if(importFc.GetType() == typeof(double))fp = (double)importFc ;
+            else if (importFc.GetType() == typeof(double)) fp = (double)importFc;
             fp = double.Parse(importFc.ToString());
             List<Point3d> pts = new List<Point3d>();
             foreach (var pt in data.FENodes)
@@ -105,7 +105,7 @@ namespace StructuralDesignKitGH
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return StructuralDesignKitGH.Properties.Resources.IconResonant;
             }
         }
 

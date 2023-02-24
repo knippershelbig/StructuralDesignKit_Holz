@@ -15,21 +15,15 @@ using System.Text;
 using System.Threading.Tasks;
 using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using static StructuralDesignKitLibrary.Vibrations.Vibrations;
-using static System.Net.Mime.MediaTypeNames;
+
 
 namespace StructuralDesignKitLibrary.Vibrations
 {
     public static class Vibrations
     {
-
-
         //below 8Hz : acceleration criteria - arms < Response factor × arms,base when f1 < 8 Hz 
+
         //Above 8Hz : Velocity criteria - vrms < Response factor × vrms,base when f1 ≥ 8 Hz 
-
-        //List<double> NaturalFrequencies = new List<double> { 18.254, 60.61, 110.854, 162.082 };
-        //List<double> u = new List<double> { 1, 0, 1, 0 };
-        //List<double> Mg = new List<double> { 605, 607.39, 605, 607.39 };
-
 
 
         /// <summary>
@@ -111,7 +105,7 @@ namespace StructuralDesignKitLibrary.Vibrations
             {
                 if (fp >= 1.7 && fp <= 2.4)
                 {
-                    //Walking speed according to Bachmann and Ammann for walking pace between 1.7Hz and 2Hz; SCI P354 - Eq 16
+                    //Walking speed according to Bachmann and Ammann for walking pace between 1.7Hz and 2.4Hz; SCI P354 - Eq 16
                     double v = 1.67 * Math.Pow(fp, 2) - 4.83 * fp + 4.5;
                     resonanceBuildupFactor = 1 - Math.Exp(-2 * Math.PI * Xi * walkingLength / v);
                 }
@@ -156,8 +150,6 @@ namespace StructuralDesignKitLibrary.Vibrations
         }
 
 
-
-
         /// <summary>
         /// Root mean square of the velocity
         /// </summary>
@@ -192,7 +184,6 @@ namespace StructuralDesignKitLibrary.Vibrations
             Vrms = Math.Sqrt(Vrms * fp);
             return Vrms;
         }
-
 
 
         /// <summary>
@@ -296,7 +287,6 @@ namespace StructuralDesignKitLibrary.Vibrations
             return Math.Sqrt(aw_rms_e_r) / Math.Sqrt(2);
 
         }
-
 
 
         /// <summary>

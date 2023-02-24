@@ -16,7 +16,7 @@ namespace StructuralDesignKitGH
         public GH_RFEM_TransientCompute()
           : base("Vibration transient response", "TransientResponse",
               "Compute the transient response from a structure",
-              "SDK", "Vibration")
+              "SDK", "Vibrations")
         {
         }
 
@@ -109,7 +109,7 @@ namespace StructuralDesignKitGH
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return StructuralDesignKitGH.Properties.Resources.IconTransient;
             }
         }
 

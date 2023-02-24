@@ -12,6 +12,8 @@ using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.Connections.TimberTimberShear;
 using StructuralDesignKitLibrary.Connections.SteelTimberShear;
 using StructuralDesignKitLibrary.Vibrations;
+using System.Windows;
+using System.Security.Claims;
 
 namespace StructuralDesignKitExcel
 {
@@ -77,6 +79,14 @@ namespace StructuralDesignKitExcel
             var LoadDurations = ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.EC5.EC5_Utilities.LoadDuration>();
             var TimberTypes = ExcelHelpers.AllMaterialAsList();
             var ServiceClasses = ExcelHelpers.GetStringValuesFromEnum<StructuralDesignKitLibrary.EC5.EC5_Utilities.ServiceClass>();
+
+            string formatSeparator = "0.00";
+            string formatPercent = "0.0%";
+            if (xlApp.DecimalSeparator == ",")
+            {
+                formatSeparator = "0,00";
+                formatPercent = "0,0%";
+            }
 
 
             //Case timber to timber 
@@ -217,7 +227,7 @@ namespace StructuralDesignKitExcel
                     for (int i = 0; i < 3; i++)
                     {
                         activeCell = activeCell.Offset[1, 0];
-                        ((dynamic)activeCell).NumberFormatLocal = "0.00";
+                        ((dynamic)activeCell).NumberFormatLocal = formatSeparator;
                     }
 
                     int count = shearCalculation.FailureModes.Count;
@@ -228,7 +238,7 @@ namespace StructuralDesignKitExcel
                         ((dynamic)activeCell).NumberFormatLocal = "0";
                     }
 
-                    ((dynamic)activeCell.Offset[1, 0]).NumberFormatLocal = "0.00";
+                    ((dynamic)activeCell.Offset[1, 0]).NumberFormatLocal = formatSeparator;
 
                     var range = xlApp.Range[baseCell, baseCell.Offset[19 + count, 2]];
                     range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
@@ -365,7 +375,7 @@ namespace StructuralDesignKitExcel
                 for (int i = 0; i < 1; i++)
                 {
                     activeCell = activeCell.Offset[1, 0];
-                    ((dynamic)activeCell).NumberFormatLocal = "0.00";
+                    ((dynamic)activeCell).NumberFormatLocal = formatSeparator;
                 }
 
                 int count = shearCalculation.FailureModes.Count;
@@ -376,7 +386,7 @@ namespace StructuralDesignKitExcel
                     ((dynamic)activeCell).NumberFormatLocal = "0";
                 }
 
-                    ((dynamic)activeCell.Offset[1, 0]).NumberFormatLocal = "0.00";
+                    ((dynamic)activeCell.Offset[1, 0]).NumberFormatLocal = formatSeparator;
 
                 var range = xlApp.Range[baseCell, baseCell.Offset[15 + count, 2]];
                 range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
@@ -389,7 +399,6 @@ namespace StructuralDesignKitExcel
 
             }
         }
-
 
 
         /// <summary>
@@ -548,6 +557,13 @@ namespace StructuralDesignKitExcel
             var activeCell = xlApp.ActiveCell;
 
             string formula = string.Empty;
+            string formatSeparator = "0.00";
+            string formatPercent = "0.0%";
+            if (xlApp.DecimalSeparator == ",")
+            {
+                formatSeparator = "0,00";
+                formatPercent = "0,0%";
+            }
 
 
             //------------------------------------------------------------------------------------------------
@@ -772,11 +788,10 @@ namespace StructuralDesignKitExcel
             for (int i = 0; i < blockStressesLength - 1; i++)
             {
                 activeCell.Offset[i, 0].HorizontalAlignment = XlHAlign.xlHAlignRight;
-                ((dynamic)activeCell.Offset[i, 0]).NumberFormatLocal = "0.00";
+                ((dynamic)activeCell.Offset[i, 0]).NumberFormatLocal = formatSeparator;
             }
             range = xlApp.Range[baseCell.Offset[blockStressesStart, 0], baseCell.Offset[blockStressesStart + blockStressesLength - 1, 2]];
             range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
-
 
 
 
@@ -818,7 +833,7 @@ namespace StructuralDesignKitExcel
             for (int i = 0; i < BlockFactorLength - 1; i++)
             {
                 activeCell.Offset[i, 0].HorizontalAlignment = XlHAlign.xlHAlignRight;
-                ((dynamic)activeCell.Offset[i, 0]).NumberFormatLocal = "0.00";
+                ((dynamic)activeCell.Offset[i, 0]).NumberFormatLocal = formatSeparator;
             }
             range = xlApp.Range[baseCell.Offset[blockFactorStart, 4], baseCell.Offset[blockFactorStart + BlockFactorLength - 1, 5]];
             range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
@@ -877,7 +892,7 @@ namespace StructuralDesignKitExcel
             for (int i = 0; i < BlockCheckLength; i++)
             {
                 activeCell.Offset[i, 0].HorizontalAlignment = XlHAlign.xlHAlignRight;
-                ((dynamic)activeCell.Offset[i, 0]).NumberFormatLocal = "0.0%";
+                ((dynamic)activeCell.Offset[i, 0]).NumberFormatLocal = formatPercent;
                 FormatCondition format = (FormatCondition)(activeCell.Offset[i, 0]).FormatConditions.Add(XlFormatConditionType.xlCellValue,
                                        XlFormatConditionOperator.xlGreater, 1);
 
@@ -928,6 +943,7 @@ namespace StructuralDesignKitExcel
             baseCell.HorizontalAlignment = XlHAlign.xlHAlignCenter;
 
         }
+
 
         /// <summary>
         /// Display all the material properties in a table 
@@ -1029,7 +1045,6 @@ namespace StructuralDesignKitExcel
         }
 
 
-
         public void OnButtonPressedMinimumSpacings(IRibbonControl control)
         {
             Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
@@ -1123,9 +1138,6 @@ namespace StructuralDesignKitExcel
             baseCell.HorizontalAlignment = XlHAlign.xlHAlignCenter;
         }
 
-
-
-
         #endregion
 
         #region Vibration
@@ -1137,16 +1149,15 @@ namespace StructuralDesignKitExcel
 
             var baseCell = xlApp.ActiveCell;
 
-            List<double> velocity = Vibrations.ComputeVelocityResponseTimeSeries(1, 1, 1, 1, 1, 1,Vibrations.Weighting.None , 1, 1);
+            //List<double> velocity = Vibrations.ComputeVelocityResponseTimeSeries(1, 1, 1, 1, 1, 1,Vibrations.Weighting.None , 1, 1);
 
-            for (int i = 0; i < velocity.Count-1; i++)
-            {
-                baseCell.Offset[i, 0].Value2 = velocity[i];
-            }
+            //for (int i = 0; i < velocity.Count-1; i++)
+            //{
+            //    baseCell.Offset[i, 0].Value2 = velocity[i];
+            //}
 
         }
         #endregion
-
 
 
         #region utilities
@@ -1158,7 +1169,12 @@ namespace StructuralDesignKitExcel
         private void ValidateCellWithList(Range cell, List<string> list)
         {
             if (cell == null) { throw new Exception("Please open a new workbook first"); }
-            var flatList = string.Join(",", list.ToArray());
+            Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
+
+            string separator = ",";
+            if (System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator == ";") separator = ";";
+
+            var flatList = string.Join(separator, list.ToArray());
             string initialValue = list[0];
 
 
@@ -1175,10 +1191,8 @@ namespace StructuralDesignKitExcel
         }
 
 
-
         private List<System.Reflection.MethodInfo> GetMethods(List<System.Reflection.MethodInfo> methods, string category)
         {
-
             //filtering Factors Methods
             List<System.Reflection.MethodInfo> methodsWithArgument = new List<System.Reflection.MethodInfo>();
             foreach (var method in methods)
@@ -1194,6 +1208,15 @@ namespace StructuralDesignKitExcel
 
             return methodsWithArgument.Where(p => p.CustomAttributes.ToList()[0].NamedArguments[2].TypedValue.Value.ToString() == category).ToList();
         }
+
+        public void OnButtonVersion(IRibbonControl control)
+        {
+            string currentVersion = "The current version is ";
+            var ver = System.Reflection.Assembly.GetAssembly(typeof(StructuralDesignKitExcel.AddIn)).GetName().Version;
+
+            MessageBox.Show(ver.ToString());
+        }
+
 
         #endregion
 
