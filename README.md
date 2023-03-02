@@ -11,10 +11,10 @@ The installation steps can be found here
 
 ## Authors
 The project has been started and is currently maintained by Guillaume Caussarieu at knippershelbig GmbH.
-Each contributor holds copyright over their respective contributions. The project versioning (Git) records all such contribution source information. See LICENSE and COPYRIGHT_HEADER.
+Each contributor holds copyright over their respective contributions. The project versioning (Git) records all such contribution source information. See [LICENSE.md](https://github.com/Gcaussarieu/StructuralDesignKit/blob/master/LICENSE) and COPYRIGHT_HEADER.
 
 ## Disclaimer
-The library and its associated connectors are a work in progress. The different outputs should be critically checked. Even if great care is taken to deliver validated functionalities, the code/Software is PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE. See the MIT Licence for more details.
+The library and its associated connectors are a work in progress. The different outputs should be critically checked. Even if great care is taken to deliver validated functionalities, the code/Software is PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE. See the [LICENSE.md](https://github.com/Gcaussarieu/StructuralDesignKit/blob/master/LICENSE) file for more details.
 
 ## Contribution / Feedback
 Please feel free to send any feedback. You can contact us by email or use the github issue tracker.
@@ -33,4 +33,4 @@ The list of the current features and the features in development can be found he
 The list of example files can be found here
 
 ## License
-This project is licensed under the MIT License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/Gcaussarieu/StructuralDesignKit/blob/master/LICENSE) file for more details
