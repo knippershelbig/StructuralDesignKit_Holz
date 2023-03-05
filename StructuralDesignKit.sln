@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32505.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitConsole", "StructuralDesignKit\StructuralDesignKitConsole.csproj", "{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitLibrary", "StructuralDesignKitLibrary\StructuralDesignKitLibrary.csproj", "{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitExcel", "StructuralDesignKitExcel\StructuralDesignKitExcel.csproj", "{2F7D1EAD-BD33-46BD-9C0C-49F22F99D71E}"
@@ -22,10 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}.Release|Any CPU.ActiveCfg = Release|Any CPU
