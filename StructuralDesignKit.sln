@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32505.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitConsole", "StructuralDesignKit\StructuralDesignKitConsole.csproj", "{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitLibrary", "StructuralDesignKitLibrary\StructuralDesignKitLibrary.csproj", "{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitExcel", "StructuralDesignKitExcel\StructuralDesignKitExcel.csproj", "{2F7D1EAD-BD33-46BD-9C0C-49F22F99D71E}"
@@ -16,16 +14,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructuralDesignKitGH", "St
 		{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785} = {DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuralDesignKitConsole", "StructuralDesignKitConsole\StructuralDesignKitConsole.csproj", "{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3081A8DC-8103-4667-9A48-2E67F2F3AD50}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEC4F3B3-18A2-4E3A-A4A8-5780C138E785}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,6 +43,10 @@ Global
 		{16ED063E-9236-4E99-8AAA-54C7C93601AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16ED063E-9236-4E99-8AAA-54C7C93601AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16ED063E-9236-4E99-8AAA-54C7C93601AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95AA828D-3E52-4192-90AB-C71FDC8AB4F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
