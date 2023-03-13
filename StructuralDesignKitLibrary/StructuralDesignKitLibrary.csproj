@@ -82,7 +82,6 @@
     <Compile Include="RFEM\ModeShape.cs" />
     <Compile Include="RFEM\RFEM_Utilities.cs" />
     <Compile Include="Utilities\SDKUtilities.cs" />
-    <Compile Include="Vibrations\Vibrations - Legacy.cs" />
     <Compile Include="Vibrations\Vibrations.cs" />
   </ItemGroup>
   <ItemGroup>
