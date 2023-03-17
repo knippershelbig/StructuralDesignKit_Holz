@@ -84,7 +84,9 @@
     <Compile Include="Utilities\SDKUtilities.cs" />
     <Compile Include="Vibrations\Vibrations.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include=".editorconfig" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>Copy "$(TargetPath)" "C:\Users\gc\AppData\Roaming\Grasshopper\Libraries\KH\StructuralDesignKitLibrary.dll</PostBuildEvent>

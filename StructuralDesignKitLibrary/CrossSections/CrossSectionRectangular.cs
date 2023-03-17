@@ -1,13 +1,12 @@
-﻿using StructuralDesignKitLibrary.CrossSections.Interfaces;
+﻿// "This file is part of the 'StructuralDesignKit_Holz (SDK_H)' which is released under the MIT License 
+// The project is supported and maintained by https://www.knippershelbig.com/ 
+// For more information regarding the porject: https://github.com/knippershelbig/StructuralDesignKit_Holz 
+// For the full license details: https://github.com/knippershelbig/StructuralDesignKit_Holz/blob/master/LICENSE"
+
+using StructuralDesignKitLibrary.CrossSections.Interfaces;
 using StructuralDesignKitLibrary.Materials;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StructuralDesignKitLibrary.CrossSections
 {
