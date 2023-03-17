@@ -27,6 +27,8 @@ namespace StructuralDesignKitLibrary.CrossSections
         public double SectionModulus_Y { get; set; }
         public double SectionModulus_Z { get; set; }
         public double TorsionalModulus { get; set; }
+        public double EIy { get; set; }
+
 
         /// <summary>
         /// Width
@@ -114,6 +116,7 @@ namespace StructuralDesignKitLibrary.CrossSections
 
             double c2 = 1 - (0.65 / (1 + Math.Pow((H / (double)B), 3)));
             TorsionalModulus = (c1 / c2) * H * Math.Pow(B, 2);
+            EIy = Material.E * MomentOfInertia_Y;
 
         }
 
