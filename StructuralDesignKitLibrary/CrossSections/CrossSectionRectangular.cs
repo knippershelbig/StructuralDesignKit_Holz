@@ -75,7 +75,6 @@ namespace StructuralDesignKitLibrary.CrossSections
         {
             B = b;
             H = h;
-            this.ComputeCrossSectionProperties();
             if (material is MaterialTimberBaubuche)
             {
                 MaterialTimberBaubuche baubuche = (MaterialTimberBaubuche)material;
@@ -83,6 +82,8 @@ namespace StructuralDesignKitLibrary.CrossSections
                 Material = baubuche;
             }
             else Material = material;
+
+            this.ComputeCrossSectionProperties();
         }
 
 

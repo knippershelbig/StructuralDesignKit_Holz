@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace StructuralDesignKitExcel.RibbonActions
+namespace StructuralDesignKitExcel
 {
     public static partial class ExcelFormulae
     {

@@ -43,8 +43,8 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
         public FastenerBolt(double diameter, double fuk)
         {
             Type = EC5_Utilities.FastenerType.Dowel;
-            if (diameter <= 30) Diameter = diameter;
-            else throw new Exception("According to EN 1995-1-1 §8.5(2), the maximum bolt diameter allowed is 30mm");
+            if (diameter <= 30 && diameter >= 6) Diameter = diameter;
+            else throw new Exception("According to EN 1995-1-1 §8.5(2), the bolt diameter should be between 6mm and 30mm");
             Fuk = fuk;
             MyRk = 0.3 * Fuk * Math.Pow(Diameter, 2.6); //EN 1995-1-1 Eq (8.30)
             MaxJohansenPart = 0.25;
@@ -180,26 +180,62 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
         /// <exception cref="Exception"></exception>
         public void ComputeWithdrawalStrength(IShearCapacity ConnectionType)
         {
-            if (ConnectionType is SteelSingleInnerPlate)
-            {
-                var connection = ConnectionType as SteelSingleInnerPlate;
 
-                //Washer diameter considered as 3x the bolt diameter
-                double boltTensileCapacity = Math.PI * Math.Pow(Diameter, 2) / 4 * Fuk;
-                double washerCompressiveCapacity = Math.PI / 4 * (Math.Pow(Diameter * 3, 2) - Math.Pow(Diameter + 2, 2)) * connection.Timber.Fc90k * 3;
-                WithdrawalStrength = Math.Min(boltTensileCapacity, washerCompressiveCapacity);
+            if (ConnectionType is SingleInnerSteelPlate)
+            {
+                var connection = ConnectionType as SingleInnerSteelPlate;
+                double fc90k = connection.Timber.Fc90k;
+                WithdrawalStrength = Math.Min(ComputeBoltTensileStrength(), ComputeWasherCompressiveStrength(fc90k));
             }
+
             else if (ConnectionType is TimberTimberSingleShear)
             {
                 var connection = ConnectionType as TimberTimberSingleShear;
                 double fc90k = Math.Min(connection.Timber1.Fc90k, connection.Timber2.Fc90k);
-
-                //Washer diameter considered as 3x the bolt diameter
-                double boltTensileCapacity = Math.PI * Math.Pow(Diameter, 2) / 4 * Fuk;
-                double washerCompressiveCapacity = Math.PI / 4 * (Math.Pow(Diameter * 3, 2) - Math.Pow(Diameter + 2, 2)) * fc90k * 3;
-                WithdrawalStrength = Math.Min(boltTensileCapacity, washerCompressiveCapacity);
+                WithdrawalStrength = Math.Min(ComputeBoltTensileStrength(), ComputeWasherCompressiveStrength(fc90k));
             }
+
+            else if (ConnectionType is SingleOuterSteelPlate)
+            {
+                var connection = ConnectionType as SingleOuterSteelPlate;
+                double fc90k = connection.Timber.Fc90k;
+                List<double> withdrawalStrengths = new List<double>();
+                withdrawalStrengths.Add(ComputeBoltTensileStrength());
+                withdrawalStrengths.Add(ComputeWasherCompressiveStrength(fc90k));
+                withdrawalStrengths.Add(ComputeWasherCompressiveStrength(fc90k,connection.SteelPlateThickness));
+
+                WithdrawalStrength = withdrawalStrengths.Min();
+            }
+
             else throw new Exception("Bolt Withdrawal capacity not yet implemented");
+        }
+
+        private double ComputeWasherCompressiveStrength(double fc90k, double plateThickness = -1)
+        {
+            //If a steel plate is considered as washer, contact area according to EC5 §8.5.2 (3)
+            if (plateThickness > 0)
+            {
+                double area1 = Math.PI / 4 * (Math.Pow(12 * plateThickness, 2) - Math.Pow(Diameter + 2, 2));
+                double area2 = Math.PI / 4 * (Math.Pow(Diameter * 4, 2) - Math.Pow(Diameter + 2, 2));
+                return Math.Min(area1, area2) * 3 * fc90k;
+            }
+
+            //Washer diameter considered as 3x the bolt diameter and drilling diameter diam+2;
+            else return Math.PI / 4 * (Math.Pow(Diameter * 3, 2) - Math.Pow(Diameter + 2, 2)) * fc90k * 3;
+        }
+
+        /// <summary>
+        /// Compute the tensile strength of a bolt according to EC3-1.8 §3.6.1 table 3.4
+        /// </summary>
+        /// <returns></returns>
+        private double ComputeBoltTensileStrength()
+        {
+            //To replace by a simple dictionary...
+            //2nd Order polynomial equation to go from diameter to Stress area (threaded part) As[mm2] based on values from diameter 6 to 30mm
+            //Provides results with a margin error of 3% 
+            double aeff = (-0.00007 * Math.Pow(Diameter, 2) + 0.00575 * Diameter + 0.69089) * Math.PI * Math.Pow(Diameter, 2) / 4;
+
+            return 0.9 * aeff * Fuk / 1.25; //consider k2 = 0.9 and Ym2 = 1.25
         }
 
 

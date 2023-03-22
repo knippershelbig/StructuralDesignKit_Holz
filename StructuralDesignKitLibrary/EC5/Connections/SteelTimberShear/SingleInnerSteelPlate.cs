@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
 {
-    public class SteelSingleInnerPlate : ISteelTimberShear
+    public class SingleInnerSteelPlate : ISteelTimberShear
     {
 
 
@@ -27,7 +27,7 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
         
 
 
-        public SteelSingleInnerPlate(IFastener fastener, double steelPlateThickness, double angle, IMaterialTimber timber, double timberThickness, bool ropeEffect)
+        public SingleInnerSteelPlate(IFastener fastener, double steelPlateThickness, double angle, IMaterialTimber timber, double timberThickness, bool ropeEffect)
         {
             Fastener = fastener;
             SteelPlateThickness = steelPlateThickness;

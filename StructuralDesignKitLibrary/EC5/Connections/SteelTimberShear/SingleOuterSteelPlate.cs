@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
 {
-    public class SteelSingleOuterPlate : ISteelTimberShear
+    public class SingleOuterSteelPlate : ISteelTimberShear
     {
 
 
@@ -27,7 +27,7 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
 
 
 
-        public SteelSingleOuterPlate(IFastener fastener, double steelPlateThickness, double angle, IMaterialTimber timber, double timberThickness, bool ropeEffect)
+        public SingleOuterSteelPlate(IFastener fastener, double steelPlateThickness, double angle, IMaterialTimber timber, double timberThickness, bool ropeEffect)
         {
             Fastener = fastener;
             SteelPlateThickness = steelPlateThickness;
@@ -42,7 +42,7 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
 
             ComputeFailingModes();
 
-            double capacityThinPlate = Math.Min(Capacities[0], Capacities[0]);
+            double capacityThinPlate = Math.Min(Capacities[0], Capacities[1]);
             double capacityThickPlate = Capacities.GetRange(2, 3).Min();
 
             //case thin plate
