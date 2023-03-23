@@ -62,9 +62,9 @@
     <Compile Include="EC5\Connections\Interface\IShearCapacity.cs" />
     <Compile Include="EC5\Connections\Interface\ITimberTimberShear.cs" />
     <Compile Include="EC5\Connections\Interface\ISteelTimberShear.cs" />
-    <Compile Include="EC5\Connections\SteelTimberShear\SteelSingleOuterPlate.cs" />
+    <Compile Include="EC5\Connections\SteelTimberShear\SingleOuterSteelPlate.cs" />
     <Compile Include="EC5\Connections\TimberTimberShear\TimberTimberSingleShear.cs" />
-    <Compile Include="EC5\Connections\SteelTimberShear\SteelSingleInnerPlate.cs" />
+    <Compile Include="EC5\Connections\SteelTimberShear\SingleInnerSteelPlate.cs" />
     <Compile Include="CrossSections\CrossSectionRectangular.cs" />
     <Compile Include="CrossSections\Interfaces\ICrossSection.cs" />
     <Compile Include="EC5\EC5_ConnectionCheck.cs" />

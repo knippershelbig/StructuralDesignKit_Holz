@@ -257,5 +257,28 @@ namespace StructuralDesignKitExcel
         //Screw_Dint6_Dext10_Fu1000_Lg_30_Faxk11.2_Rhoa350
         //Nail_DDext10_Fu1000_Lg_30_Faxk11.2_Rhoa350
 
+
+
+        /// <summary>
+        /// return the correct format string depending on the geographic settings of Excel
+        /// </summary>
+        /// <param name="xlApp">Excel App</param>
+        /// <returns></returns>
+        public static string FormatSeparator(Excel.Application xlApp)
+        {
+            if (xlApp.DecimalSeparator == ",") return "0,00";
+            else return "0.00";
+        }
+
+        /// <summary>
+        /// return the correct format string depending on the geographic settings of Excel
+        /// </summary>
+        /// <param name="xlApp">Excel App</param>
+        /// <returns></returns>
+        public static string FormatPercent(Excel.Application xlApp)
+        {
+            if (xlApp.DecimalSeparator == ",") return "0,0%";
+            else return "0.0%";
+        }
     }
 }
