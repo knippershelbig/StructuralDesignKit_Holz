@@ -17,7 +17,7 @@ namespace StructuralDesignKitLibrary.Materials
         string Grade { get; set; }
 
         /// <summary>
-        /// Density used for mass calculation
+        /// Density used for mass calculation in kg/m³
         /// </summary>
         [Description("Density used for mass calculation")]
         double Density { get; set; }
