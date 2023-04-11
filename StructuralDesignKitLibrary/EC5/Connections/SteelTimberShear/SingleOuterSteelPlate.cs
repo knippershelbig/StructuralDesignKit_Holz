@@ -51,7 +51,7 @@ namespace StructuralDesignKitLibrary.Connections.SteelTimberShear
             //case thick plate
             else if (SteelPlateThickness >= Fastener.Diameter) Capacity = capacityThickPlate;
 
-            //Case interpolation between thin and thick
+            //Case interpolation between thin and thick plate
             else Capacity = Utilities.SDKUtilities.LinearInterpolation(steelPlateThickness, 0.5 * Fastener.Diameter, capacityThinPlate, Fastener.Diameter, capacityThickPlate);
 
             FailureMode = FailureModes[Capacities.IndexOf(Capacities.Min())];

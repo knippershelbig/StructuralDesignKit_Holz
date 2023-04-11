@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace StructuralDesignKitLibrary.Connections.TimberTimberShear
 {
-    public class TimberTimberSingleShear : ITimberTimberShear
+    public class TimberTimberDoubleShear : ITimberTimberShear
     {
 
-
+        #region Properties
         public IFastener Fastener { get; set; }
         public double Angle1 { get; set; }
         public double Angle2 { get; set; }
@@ -23,13 +23,19 @@ namespace StructuralDesignKitLibrary.Connections.TimberTimberShear
         public List<string> FailureModes { get; set; }
         public List<double> Capacities { get; set; }
         public string FailureMode { get; set; }
+
+        /// <summary>
+        /// Characteristic strength for 2 shear planes
+        /// </summary>
         public double Capacity { get; set; }
         public bool RopeEffect { get; set; }
 
         public double Fhk1 { get; set; }
         public double Fhk2 { get; set; }
 
-        public TimberTimberSingleShear(IFastener fastener, IMaterialTimber timber1, double timberThickness1, double angle1, IMaterialTimber timber2, double timberThickness2, double angle2, bool ropeEffect)
+        #endregion
+
+        public TimberTimberDoubleShear(IFastener fastener, IMaterialTimber timber1, double timberThickness1, double angle1, IMaterialTimber timber2, double timberThickness2, double angle2, bool ropeEffect)
         {
             Fastener = fastener;
             Angle1 = angle1;
@@ -45,11 +51,9 @@ namespace StructuralDesignKitLibrary.Connections.TimberTimberShear
             Capacities = new List<double>();
 
             ComputeFailingModes();
-            Capacity = Capacities.Min();
+            Capacity = Capacities.Min() * 2;
             FailureMode = FailureModes[Capacities.IndexOf(Capacities.Min())];
         }
-
-
 
 
 
@@ -68,30 +72,20 @@ namespace StructuralDesignKitLibrary.Connections.TimberTimberShear
             double RopeEffectCapacity = 0;
             double B = Fhk2 / Fhk1;
 
-            //Failure mode according to EN 1995-1-1 Eq (8.6)
+            //Failure mode according to EN 1995-1-1 Eq (8.7)
 
-            //Failure mode a
-            FailureModes.Add("a");
+            //Failure mode g
+            FailureModes.Add("g");
             Capacities.Add(Fhk1 * T1 * Fastener.Diameter);
 
-            //Failure mode b
-            FailureModes.Add("b");
-            Capacities.Add(Fhk2 * T2 * Fastener.Diameter);
 
-            //Failure mode c
-            FailureModes.Add("c");
-            capacity = Capacities[0] / (1 + B) * (Math.Sqrt(B + 2 * Math.Pow(B, 2) * (1 + T2 / T1 + Math.Pow(T2 / T1, 2)) + Math.Pow(B, 3) * Math.Pow(T2 / T1, 2)) - B * (1 + T2 / T1));
-            if (RopeEffect)
-            {
-                Fastener.ComputeWithdrawalStrength(this);
-                RopeEffectCapacity = Fastener.WithdrawalStrength / 4;
-                capacity += Math.Min(Fastener.MaxJohansenPart * capacity, RopeEffectCapacity);
-            }
-            Capacities.Add(capacity);
+            //Failure mode h
+            FailureModes.Add("h");
+            Capacities.Add(0.5*Fhk2 * T2 * Fastener.Diameter);
 
 
-            //Failure mode d
-            FailureModes.Add("d");
+            //Failure mode j
+            FailureModes.Add("j");
             capacity = 1.05 * Capacities[0] / (2 + B) * (Math.Sqrt(2 * B * (1 + B) + 4 * B * (2 + B) * Fastener.MyRk / (Fhk1 * Fastener.Diameter * Math.Pow(T1, 2))) - B);
             if (RopeEffect)
             {
@@ -101,20 +95,9 @@ namespace StructuralDesignKitLibrary.Connections.TimberTimberShear
             }
             Capacities.Add(capacity);
 
-            //Failure mode e
-            FailureModes.Add("e");
-            capacity = 1.05 * Fhk1*T2*Fastener.Diameter/(1+2*B)*(Math.Sqrt(2*Math.Pow(B,2)*(1+B)+4*B*(1+2*B)*Fastener.MyRk/(Fhk1*Fastener.Diameter*Math.Pow(T2,2)))-B);
-            if (RopeEffect)
-            {
-                Fastener.ComputeWithdrawalStrength(this);
-                RopeEffectCapacity = Fastener.WithdrawalStrength / 4;
-                capacity += Math.Min(Fastener.MaxJohansenPart * capacity, RopeEffectCapacity);
-            }
-            Capacities.Add(capacity);
 
-
-            //Failure mode f
-            FailureModes.Add("f");
+            //Failure mode k
+            FailureModes.Add("k");
             capacity = 1.15 * Math.Sqrt(2 * B / (1 + B)) * Math.Sqrt(2 * Fastener.MyRk * Fhk1 * Fastener.Diameter);
             if (RopeEffect)
             {
@@ -123,10 +106,6 @@ namespace StructuralDesignKitLibrary.Connections.TimberTimberShear
                 capacity += Math.Min(Fastener.MaxJohansenPart * capacity, RopeEffectCapacity);
             }
             Capacities.Add(capacity);
-
-
-
-
         }
     }
 }
