@@ -412,14 +412,6 @@ namespace StructuralDesignKitExcel
         }
 
 
-        //public double K90 { get; set; }
-
-        //Shear plane timber
-
-        //Shear plane steel
-
-        //public double WithdrawalStrength { get; set; }
-
         #endregion
 
 

@@ -12,6 +12,10 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using Microsoft.Office.Interop.Excel;
+using System.Windows.Controls;
+using StructuralDesignKitExcel;
+using ExcelDna.Integration.CustomUI;
+using ExcelDna.Integration;
 
 namespace StructuralDesignKitExcel.RibbonActions
 {
@@ -180,6 +184,7 @@ namespace StructuralDesignKitExcel.RibbonActions
             xlApp.Range[baseCell, baseCell.Offset[0, 2]].Merge();
         }
 
+
         public static void TimberConnectionButtonActions(Excel.Application xlApp, string name)
         {
             var baseCell = xlApp.ActiveCell;
@@ -257,7 +262,7 @@ namespace StructuralDesignKitExcel.RibbonActions
                     shearCalculation = new TimberTimberDoubleShear(fastener, timber1, Thick1.Value2, Angle1.Value2, timber2, Thick2.Value2, Angle2.Value2, RopeEffect.Value2);
                     break;
             }
-            
+
 
             //----Results
             activeCell = Kmod.Offset[1, -1]; activeCell.Value2 = "Fh1k";
@@ -288,12 +293,12 @@ namespace StructuralDesignKitExcel.RibbonActions
             foreach (string failureMode in shearCalculation.FailureModes)
             {
                 activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connection.{0}FailureMode({1},{2},{3},{4},{5},{6},{7},{8},\"{9}\")",
-                    name,FastenerTag.Address[false, false], Timber1.Address[false, false], Thick1.Address[false, false], Angle1.Address[false, false],
+                    name, FastenerTag.Address[false, false], Timber1.Address[false, false], Thick1.Address[false, false], Angle1.Address[false, false],
                     Timber2.Address[false, false], Thick2.Address[false, false], Angle2.Address[false, false], RopeEffect.Address[false, false], failureMode);
             }
 
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connection.{0}({1},{2},{3},{4},{5},{6},{7},{8})",
-                    name,FastenerTag.Address[false, false], Timber1.Address[false, false], Thick1.Address[false, false], Angle1.Address[false, false],
+                    name, FastenerTag.Address[false, false], Timber1.Address[false, false], Thick1.Address[false, false], Angle1.Address[false, false],
                     Timber2.Address[false, false], Thick2.Address[false, false], Angle2.Address[false, false], RopeEffect.Address[false, false]);
 
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("={0}*{1}/1.3/1000", activeCell.Offset[-1, 0].Address[false, false], Kmod.Address[false, false]);
@@ -341,7 +346,7 @@ namespace StructuralDesignKitExcel.RibbonActions
                 ((dynamic)activeCell).NumberFormatLocal = "0";
             }
 
-                    ((dynamic)activeCell.Offset[1, 0]).NumberFormatLocal = ExcelHelpers.FormatSeparator(xlApp);
+            ((dynamic)activeCell.Offset[1, 0]).NumberFormatLocal = ExcelHelpers.FormatSeparator(xlApp);
 
             var range = xlApp.Range[baseCell, baseCell.Offset[19 + count, 2]];
             range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
@@ -353,6 +358,62 @@ namespace StructuralDesignKitExcel.RibbonActions
             xlApp.Range[baseCell, baseCell.Offset[0, 2]].Merge();
 
 
+        }
+
+
+        /// <summary>
+        /// Create the template for the effective number of fastener to consider (Neff)
+        /// </summary>
+        /// <param name="xlApp"></param>
+        public static void NeffButtonAction(Excel.Application xlApp)
+        {
+            var baseCell = xlApp.ActiveCell;
+            var activeCell = xlApp.ActiveCell;
+
+
+            //Legend
+            activeCell.Value2 = "Effective number of fastener";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Fastener";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Force angle to the grain";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Number of columns parallel to grain";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "number of rows per column";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "a1 | Distance between columns";
+            activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "Neff";
+
+
+            //Data
+            Range fastenerTagRange = baseCell.Offset[1, 1]; fastenerTagRange.Formula = "=SDK.Utilities.CreateBoltTag(16,400)";
+            Range AngleRange = fastenerTagRange.Offset[1, 0]; AngleRange.Value2 = 0;
+            Range NbColumnRange = AngleRange.Offset[1, 0]; NbColumnRange.Value2 = 4;
+            Range NbRowRange = NbColumnRange.Offset[1, 0]; NbRowRange.Value2 = 2;
+            Range a1Range = NbRowRange.Offset[1, 0]; a1Range.Value2 = 120;
+            Range NeffRange = a1Range.Offset[1, 0]; NeffRange.Formula = string.Format("=(SDK.EC5.Connections.Neff({0},{1},{2},{3}))*{4}",
+                fastenerTagRange.Address[false, false], NbColumnRange.Address[false, false], a1Range.Address[false, false], AngleRange.Address[false, false], NbRowRange.Address[false, false]);
+
+
+            //Units
+            activeCell = baseCell.Offset[1, 2]; activeCell.Value2 = "Degree";
+            activeCell = activeCell.Offset[3, 0]; activeCell.Value2 = "mm";
+
+
+            //Formating
+            baseCell.Font.Bold = true;
+            activeCell = baseCell.Offset[1, 1];
+            for (int i = 0; i < 5; i++)
+            {
+                activeCell.Offset[i, 0].Interior.Color = XlRgbColor.rgbLightYellow;
+            }
+
+            var range = xlApp.Range[baseCell, baseCell.Offset[6, 2]];
+            range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
+            range.Columns.AutoFit();
+            range.HorizontalAlignment = XlHAlign.xlHAlignCenter;
+            xlApp.Range[baseCell, baseCell.Offset[6, 0]].HorizontalAlignment = XlHAlign.xlHAlignLeft;
+
+            baseCell.HorizontalAlignment = XlHAlign.xlHAlignCenter;
+            xlApp.Range[baseCell, baseCell.Offset[0, 2]].Merge();
+
+            NeffRange.NumberFormatLocal = ExcelHelpers.FormatSeparator(xlApp);
         }
     }
 

@@ -754,25 +754,25 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Value2 = "a4c";
 
             //Data
-            Range fastenerType = baseCell.Offset[1, 1];
-            Range Diameter = fastenerType.Offset[1, 0];
-            Range Angle = Diameter.Offset[1, 0];
-            OnButtonPressedGetFastenerTypes(control, fastenerType);
-            Diameter.Value2 = 16;
-            Angle.Value2 = 0;
+            Range fastenerTypeRange = baseCell.Offset[1, 1];
+            Range DiameterRange = fastenerTypeRange.Offset[1, 0];
+            Range AngleRange = DiameterRange.Offset[1, 0];
+            OnButtonPressedGetFastenerTypes(control, fastenerTypeRange);
+            DiameterRange.Value2 = 16;
+            AngleRange.Value2 = 0;
 
-            activeCell = Angle.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a1Min({0},{1},{2})",
-                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+            activeCell = AngleRange.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a1Min({0},{1},{2})",
+                fastenerTypeRange.Address[false, false], DiameterRange.Address[false, false], AngleRange.Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a2Min({0},{1},{2})",
-                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+                fastenerTypeRange.Address[false, false], DiameterRange.Address[false, false], AngleRange.Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a3tMin({0},{1},{2})",
-                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+                fastenerTypeRange.Address[false, false], DiameterRange.Address[false, false], AngleRange.Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a3cMin({0},{1},{2})",
-                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+                fastenerTypeRange.Address[false, false], DiameterRange.Address[false, false], AngleRange.Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a4tMin({0},{1},{2})",
-                 fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+                 fastenerTypeRange.Address[false, false], DiameterRange.Address[false, false], AngleRange.Address[false, false]);
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.EC5.Connections.a4cMin({0},{1},{2})",
-                fastenerType.Address[false, false], Diameter.Address[false, false], Angle.Address[false, false]);
+                fastenerTypeRange.Address[false, false], DiameterRange.Address[false, false], AngleRange.Address[false, false]);
 
             //Units
             activeCell = baseCell.Offset[2, 2]; activeCell.Value2 = "mm";
@@ -825,7 +825,13 @@ namespace StructuralDesignKitExcel
             baseCell.HorizontalAlignment = XlHAlign.xlHAlignCenter;
         }
 
+        public void OnButtonPressedEffectivefasteners(IRibbonControl control)
+        {
+            Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
 
+            ConnectionButtonActions.NeffButtonAction(xlApp);
+        }
 
         #endregion
 
@@ -850,7 +856,7 @@ namespace StructuralDesignKitExcel
         #endregion
 
         #region utilities
-     
+
 
 
         private List<System.Reflection.MethodInfo> GetMethods(List<System.Reflection.MethodInfo> methods, string category)
