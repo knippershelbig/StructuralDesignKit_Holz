@@ -6,13 +6,12 @@ This project is supported by knippershelbig GmbH
 
 ![ezgif-5-639fe7203d](https://user-images.githubusercontent.com/43774443/234279448-ab06318e-1957-4f30-99c6-15ffa39c6005.gif)
 
-<b>Grasshopper</b>
-
-<img src="https://github.com/knippershelbig/StructuralDesignKit_Holz/assets/43774443/805a85d9-88ae-45fc-9b5c-b5441cff6e0d" width="250px">
-<img src="https://user-images.githubusercontent.com/43774443/237311001-bf0790e2-4872-41f2-b823-6a1d5afb88ae.gif" width="400px">
-
-
-
+<b>Grasshopper</b> 
+ 
+<img src="https://github.com/knippershelbig/StructuralDesignKit_Holz/assets/43774443/805a85d9-88ae-45fc-9b5c-b5441cff6e0d" width="250px"><img src="https://github-production-user-asset-6210df.s3.amazonaws.com/43774443/237315167-023fc44b-d953-4578-b2c9-20c9eca56ff2.gif" width="350px">
+ 
+  
+   
 ## Getting started
 The latest Excel connector can be found [here](https://github.com/knippershelbig/StructuralDesignKit_Holz/releases)
 
