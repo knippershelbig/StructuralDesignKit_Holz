@@ -2,7 +2,16 @@
 SDK_H aims at simplifying the daily work of structural engineers working on timber projects. At its core, the SDK_H is a C# library which implements the logic and technical rules from the Eurocodes 5 (DIN EN 1995) and some related utilities. This core can be accessed in any application running on the Microsoft .NET platform. In addition to the core library, the project currently exposes the SDK_H Core into MS Excel and Grasshopper for Rhino.
 This project is supported by knippershelbig GmbH
 
+<b>Excel</b>
+
 ![ezgif-5-639fe7203d](https://user-images.githubusercontent.com/43774443/234279448-ab06318e-1957-4f30-99c6-15ffa39c6005.gif)
+
+<b>Grasshopper</b>
+
+<img src="https://github.com/knippershelbig/StructuralDesignKit_Holz/assets/43774443/805a85d9-88ae-45fc-9b5c-b5441cff6e0d" width="250px">
+<img src="https://user-images.githubusercontent.com/43774443/237311001-bf0790e2-4872-41f2-b823-6a1d5afb88ae.gif" width="400px">
+
+
 
 ## Getting started
 The latest Excel connector can be found [here](https://github.com/knippershelbig/StructuralDesignKit_Holz/releases)
