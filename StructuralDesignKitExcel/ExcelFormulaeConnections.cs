@@ -272,6 +272,45 @@ namespace StructuralDesignKitExcel
 
 
 
+        [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to steel connection with two outer plates in [N];The value is for 2 shear planes",
+            Name = "SDK.EC5.Connection.DoubleOuterSteelPlate",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections_SteelTimber")]
+        public static double DoubleOuterSteelPlate(
+            [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
+            [ExcelArgument(Description = "Steel plate thickness in [mm]")] double steelPlateThickness,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle,
+            [ExcelArgument(Description = "Timber material used in the connection")] string material,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane (t1 to 8.2.3 (3))")] double timberThickness,
+            [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect)
+        {
+            var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
+            var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
+            return new DoubleOuterSteelPlate(fastener, steelPlateThickness, angle, timber, timberThickness, ropeEffect).Capacity;
+        }
+
+        [ExcelFunction(Description = "Return the shear capacity of a chosen failure mode for a timber to steel connection with one outer plate in [N]; The value is for 1 shear plane",
+            Name = "SDK.EC5.Connection.DoubleOuterSteelPlateFailureMode",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections_Utilities")]
+        public static double DoubleOuterSteelPlateFailureMode(
+            [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
+            [ExcelArgument(Description = "Steel plate thickness in [mm]")] double steelPlateThickness,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle,
+            [ExcelArgument(Description = "Timber material used in the connection")] string material,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane (t1) according to 8.2.3 (3))")] double timberThickness,
+            [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect,
+            [ExcelArgument(Description = "Failure mode to consider")] string failureMode)
+        {
+            var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
+            var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
+            var connection = new DoubleOuterSteelPlate(fastener, steelPlateThickness, angle, timber, timberThickness, ropeEffect);
+
+            if (connection.FailureModes.Contains(failureMode)) return connection.Capacities[connection.FailureModes.IndexOf(failureMode)];
+            else return -1.0;
+        }
+
+
 
         /*
          * -------------------------
@@ -325,13 +364,53 @@ namespace StructuralDesignKitExcel
         }
 
 
-        //public double K90 { get; set; }
 
-        //Shear plane timber
+        [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to timber connection in [N]. The value is for 2 shear plane",
+         Name = "SDK.EC5.Connection.TimberTimberDoubleShear",
+         IsHidden = false,
+         Category = "SDK.EC5.Connections_TimberTimber")]
+        public static double TimberTimberDoubleShear(
+         [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
+         [ExcelArgument(Description = "First timber material used in the shear plane")] string timber1,
+         [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber1,
+         [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle1,
+         [ExcelArgument(Description = "Second timber material used in the shear plane")] string timber2,
+         [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber2,
+         [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle2,
+         [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect)
+        {
+            var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
+            var Timber1 = ExcelHelpers.GetTimberMaterialFromTag(timber1);
+            var Timber2 = ExcelHelpers.GetTimberMaterialFromTag(timber2);
 
-        //Shear plane steel
+            return new TimberTimberDoubleShear(fastener, Timber1, ThicknessTimber1, angle1, Timber2, ThicknessTimber2, angle2, ropeEffect).Capacity;
+        }
 
-        //public double WithdrawalStrength { get; set; }
+        [ExcelFunction(Description = "Return the characteristic shear capacity of a timber to timber connection in [N]. The value is for 1 shear plane",
+            Name = "SDK.EC5.Connection.TimberTimberDoubleShearFailureMode",
+            IsHidden = false,
+            Category = "SDK.EC5.Connections_Utilities")]
+        public static double TimberTimberDoubleShearFailureMode(
+            [ExcelArgument(Description = "Tag representing the fastener (i.e Bolt_D10_Fu800)")] string FastenerTag,
+            [ExcelArgument(Description = "First timber material used in the shear plane")] string timber1,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber1,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle1,
+            [ExcelArgument(Description = "Second timber material used in the shear plane")] string timber2,
+            [ExcelArgument(Description = "Timber thickness considered in the shear plane(t1 or t2 according to 8.2.3 (3))")] double ThicknessTimber2,
+            [ExcelArgument(Description = "Load angle toward the timber grain in degree")] double angle2,
+            [ExcelArgument(Description = "Boolean value which defines if the rope effect should be considered")] bool ropeEffect,
+            [ExcelArgument(Description = "Failure mode to consider")] string failureMode)
+        {
+            var fastener = ExcelHelpers.GetFastenerFromTag(FastenerTag);
+            var Timber1 = ExcelHelpers.GetTimberMaterialFromTag(timber1);
+            var Timber2 = ExcelHelpers.GetTimberMaterialFromTag(timber2);
+
+            var connection = new TimberTimberDoubleShear(fastener, Timber1, ThicknessTimber1, angle1, Timber2, ThicknessTimber2, angle2, ropeEffect);
+
+            if (connection.FailureModes.Contains(failureMode)) return connection.Capacities[connection.FailureModes.IndexOf(failureMode)];
+            else return -1.0;
+        }
+
 
         #endregion
 

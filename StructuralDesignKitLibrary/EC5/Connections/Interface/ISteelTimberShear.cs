@@ -55,9 +55,7 @@ namespace StructuralDesignKitLibrary.Connections.Interface
 
 
         /*
-         SteelSingleOuterPlate
-         SteelDoubleOuterPlates
-         SteelSingleInnerplate
+        Remaining to do
          SteelMultipleInnerPlates
         */
     }

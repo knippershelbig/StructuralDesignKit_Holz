@@ -26,7 +26,7 @@
 							<dynamicMenu id="dynamicConnectionUtilities" label="Utilities" getContent="GetMenuContent" tag="SDK.EC5.Connections_Utilities" size="normal"/>
 							<button id ="SpacingsButton" label="Minimum Spacings" size="normal" onAction="OnButtonPressedMinimumSpacings" screentip="Create a table with the minimal spacings"/>
 							<button id ="FastenerTypesButton" label="FastenerType" size="normal" onAction="OnButtonPressedGetFastenerTypes" screentip="Create droplist cell with the available fastener types in the SDK"/>
-							<button id ="NeffButton" label="Neff" size="normal" onAction="OnButtonPressedEffectivefasteners" screentip="Create droplist cell with the available fastener types in the SDK"/>
+							<button id ="NeffButton" label="Neff" size="normal" onAction="OnButtonPressedEffectivefasteners" screentip="Compute the effective number of fastener to consider"/>
 						</group>
 
 						<group id='EC5_Factors' label='EC5 Factors'>
