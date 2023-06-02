@@ -11,9 +11,10 @@ using System.Reflection;
 
 namespace StructuralDesignKitLibrary.RFEM
 {
-    public static class RFEM_Utilities
+    public class RFEM5_Utilities : IRFEM_Utilities_Interface<IModel>
     {
-        public static IModel GetActiveModel()
+
+        public IModel GetActiveModel()
         {
             IModel model = null;
             try
@@ -46,7 +47,7 @@ namespace StructuralDesignKitLibrary.RFEM
             return model;
         }
 
-        public static IModel OpenModel()
+        public IModel OpenModel()
         {
             IModel model = null;
             try
@@ -65,7 +66,7 @@ namespace StructuralDesignKitLibrary.RFEM
             return model;
         }
 
-        public static void CloseRFEMModel(IModel model)
+        public void CloseRFEMModel(IModel model)
         {
             try
             {
@@ -92,7 +93,7 @@ namespace StructuralDesignKitLibrary.RFEM
         /// <param name="model">RFEM Model</param>
         /// <param name="NVC">NaturalVibrationCase index defined in RF-DynamPro</param>
         /// <returns>Returns a list of double representing the modal masses</returns>
-        public static List<double> GetModalMasses(IModel model, int NVC)
+        public List<double> GetModalMasses(IModel model, int NVC)
         {
             var dynPro = model.GetModule("DynamPro") as IDynamModule;
 
@@ -116,7 +117,7 @@ namespace StructuralDesignKitLibrary.RFEM
         /// <param name="model">RFEM Model</param>
         /// <param name="NVC">NaturalVibrationCase index defined in RF-DynamPro</param>
         /// <returns>Returns a list of double representing the natural frequencies calculated in RF-DynamPro</returns>
-        public static List<double> GetNaturalFrequencies(IModel model, int NVC)
+        public List<double> GetNaturalFrequencies(IModel model, int NVC)
         {
             var DynamPro = model.GetModule("DynamPro") as IDynamModule;
 
@@ -143,7 +144,7 @@ namespace StructuralDesignKitLibrary.RFEM
         /// <param name="model">RFEM Model</param>
         /// <param name="NVC">NaturalVibrationCase index defined in RF-DynamPro</param>
         /// <returns></returns>
-        public static List<ModeShape> GetAllStandardizedDisplacementSLOW(IModel model, int NVC)
+        public List<ModeShape> GetAllStandardizedDisplacementSLOW(IModel model, int NVC)
         {
 
             var DynamPro = model.GetModule("DynamPro") as IDynamModule;
@@ -175,7 +176,7 @@ namespace StructuralDesignKitLibrary.RFEM
         /// <param name="model">RFEM Model</param>
         /// <param name="NVC">NaturalVibrationCase index defined in RF-DynamPro</param>
         /// <returns></returns>
-        public static List<ModeShape> GetAllStandardizedDisplacement(IModel model, int NVC)
+        public List<ModeShape> GetAllStandardizedDisplacement(IModel model, int NVC)
         {
 
             var DynamPro = model.GetModule("DynamPro") as IDynamModule;
@@ -217,7 +218,7 @@ namespace StructuralDesignKitLibrary.RFEM
         }
 
 
-        public static void GetDymanicData(IModel model, int NVC)
+        public void GetDymanicData(IModel model, int NVC)
         {
 
             var DynamPro = model.GetModule("DynamPro") as IDynamModule;
@@ -246,15 +247,9 @@ namespace StructuralDesignKitLibrary.RFEM
         /// <param name="model">RFEM Model</param>
         /// <param name="NVC">NaturalVibrationCase index defined in RF-DynamPro</param>
         /// <returns></returns>
-        public static List<FeMeshNode> GetFENodes(IModel model, int NVC)
+        public List<FeMeshNode> GetFENodes(IModel model, int NVC)
         {
-           return model.GetCalculation().GetFeMesh().GetNodes().ToList();
-        }
-
-
-
-
-
-
+            return model.GetCalculation().GetFeMesh().GetNodes().ToList();
+        } 
     }
 }

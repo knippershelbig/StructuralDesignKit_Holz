@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using StructuralDesignKitLibrary;
 using StructuralDesignKitLibrary.RFEM;
 using StructuralDesignKitGrasshopper;
+using Dlubal.RFEM5;
 
 namespace StructuralDesignKitGH
 {
@@ -61,6 +62,8 @@ namespace StructuralDesignKitGH
 
             if (run)
             {
+                var RFEM_Utilities = new RFEM5_Utilities();
+
                 var model = RFEM_Utilities.OpenModel();
 
                 var FEnodes = RFEM_Utilities.GetFENodes(model, 1);
