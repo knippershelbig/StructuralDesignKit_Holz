@@ -6,6 +6,8 @@ using Range = Microsoft.Office.Interop.Excel.Range;
 using StructuralDesignKitLibrary;
 using StructuralDesignKitLibrary.EC5;
 using System.Globalization;
+using System.Reflection;
+using Dlubal.WS.Rfem6.Model;
 
 namespace StructuraldesignKitTesting
 {
@@ -13,12 +15,14 @@ namespace StructuraldesignKitTesting
     {
 
 
-        private static string Path = @"U:\Desktop\tests\Test_CrossSections.xlsx";
+        //private static string Path = @"U:\Desktop\tests\Test_CrossSections.xlsx";
         private static Excel.Application XlApp = new Excel.Application();
+
 
 
         private static Worksheet PopulateTests(string path)
         {
+
             //Read a Excel file, with one tab per check type
             Workbook wb = XlApp.Workbooks.Open(path);
             List<Worksheet> ws = new List<Worksheet>();
@@ -28,40 +32,28 @@ namespace StructuraldesignKitTesting
             }
 
             var tensionWS = ws.Where(p => p.Name == "TensionParallelToGrain").First();
-            
+
             return tensionWS;
         }
 
-        private static void CloseExcslApp()
+        private static void CloseExcelApp()
         {
             XlApp.Workbooks.Close();
             XlApp.Quit();
         }
 
 
-        //public static IEnumerable<object[]> TensionData =>
-        //    new List<object[]>
-        //    {
-        //        new object[]{1, new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL24h),0.6,1.3,1,1, 0.113 },
-        //        new object[]{1, new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL28h),0.6,1.3,1,1, 0.097 },
-        //        new object[]{1, new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL24h),0.8,1.3,1,1, 0.085 },
-        //        new object[]{1, new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL28h),0.8,1.3,1,1, 0.073 },
-        //        new object[]{1, new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL24h),1,1.3,1,1, 0.068},
-        //        new object[]{1, new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL28h),1,1.3,1,1, 0.058 }
-        //    };
-
-
         public static IEnumerable<object[]> GetTensionData()
         {
-            var ws = PopulateTests(Path);
+            var ws = PopulateTests(GetTestDataPath());
 
-            
+
             Range cell = ws.Cells[3, 1];
             while (cell.Value2 != null)
             {
                 int b = (int)cell.Value2;
                 int h = (int)cell.Offset[0, 1].Value2;
-                IMaterialTimber mat = StructuralDesignKitExcel.ExcelHelpers.GetTimberMaterialFromTag(cell.Offset[0,2].Value2);
+                IMaterialTimber mat = StructuralDesignKitExcel.ExcelHelpers.GetTimberMaterialFromTag(cell.Offset[0, 2].Value2);
                 var CS = new StructuralDesignKitLibrary.CrossSections.CrossSectionRectangular(b, h, mat);
                 double stress = CS.ComputeNormalStress(cell.Offset[0, 3].Value2);
                 double kh = EC5_Factors.Kh_Tension(mat.Type, b);
@@ -72,8 +64,24 @@ namespace StructuraldesignKitTesting
 
                 yield return new object[] { stress, mat, kmod, Ym, kh, 1, ratio };
             }
-            CloseExcslApp();
+            CloseExcelApp();
         }
+
+
+
+        /// <summary>
+        /// return the path of the excel file which contains the test data
+        /// </summary>
+        private static string GetTestDataPath()
+        {
+           // String fileName = "..\\TestData\\TestCrossSection.xlsx";
+
+           string fileName = "TestCrossSection.xlsx";
+            string path = Path.Combine(Environment.CurrentDirectory, @"Data\", fileName);
+            return fileName;
+        }
+
+
 
 
 

@@ -42,7 +42,7 @@ namespace StructuralDesignKitLibrary.CrossSections
 
 		//Implement a picture in Excel / GH equivalent to KHL documentation
 
-
+		
 
 		public void ComputeCrossSectionProperties()
 		{

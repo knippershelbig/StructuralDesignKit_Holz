@@ -86,13 +86,15 @@
     <Compile Include="EC5\EC5_CrossSectionCheck.cs" />
     <Compile Include="EC5\EC5_Factors.cs" />
     <Compile Include="EC5\EC5_Utilities.cs" />
+    <Compile Include="Materials\Interfaces\IMaterialTimber.cs" />
     <Compile Include="Materials\MaterialTimberHardwood.cs" />
     <Compile Include="Materials\MaterialTimberGlulam.cs" />
     <Compile Include="Materials\MaterialTimberBaubuche.cs" />
+    <Compile Include="Materials\MaterialCLT.cs" />
     <Compile Include="Materials\MaterialTimberSoftwood.cs" />
     <Compile Include="Materials\MaterialTimberGeneric.cs" />
     <Compile Include="Materials\Interfaces\IMaterial.cs" />
-    <Compile Include="Materials\Interfaces\IMaterialTimber.cs" />
+    <Compile Include="Materials\Interfaces\IMaterialCLT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RFEM\Interface\IRFEM_Utilities_Interface.cs" />
     <Compile Include="RFEM\ModeShape.cs" />

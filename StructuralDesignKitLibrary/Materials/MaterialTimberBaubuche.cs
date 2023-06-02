@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StructuralDesignKitLibrary.EC5;
 using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
+using static StructuralDesignKitLibrary.Materials.MaterialCLT;
 
 namespace StructuralDesignKitLibrary.Materials
 {
@@ -62,43 +63,31 @@ namespace StructuralDesignKitLibrary.Materials
         #region constructor
         public MaterialTimberBaubuche(string name)
         {
-
             if (Enum.GetNames(typeof(MaterialTimberBaubuche.Grades)).Contains(name))
             {
-                Grade = name;
+                Grade = name; //Define name
+
+                //get the Enum based on the string
+                Grades grade;
+                Grades.TryParse(Grade, out grade);
+
+                //define properties
+                DefineProperties(grade);
+
             }
             else throw new ArgumentException(String.Format("The grade {0} is not present in the database, please look at the documentation", name));
 
-
-            Fmyk = MaterialTimberBaubuche.fmyk[Grade];
-            Fmzk = MaterialTimberBaubuche.fmzk[Grade];
-            Ft0k = MaterialTimberBaubuche.ft0k[Grade];
-            Ft90k = MaterialTimberBaubuche.ft90k[Grade];
-            Fc0k = MaterialTimberBaubuche.fc0k[Grade];
-            Fc90k = MaterialTimberBaubuche.fc90k[Grade];
-            Fvk = MaterialTimberBaubuche.fvk[Grade];
-            Frk = MaterialTimberBaubuche.frk[Grade];
-            E0mean = MaterialTimberBaubuche.e0mean[Grade];
-            E90mean = MaterialTimberBaubuche.e90mean[Grade];
-            G0mean = MaterialTimberBaubuche.gmean[Grade];
-            E0_005 = MaterialTimberBaubuche.e0_005[Grade];
-            G0_005 = MaterialTimberBaubuche.g0_005[Grade];
-            RhoMean = MaterialTimberBaubuche.rhoMean[Grade];
-            RhoK = MaterialTimberBaubuche.rhoK[Grade];
-            B0 = MaterialTimberBaubuche.b0;
-            Bn = MaterialTimberBaubuche.bn;
-
-            Density = RhoMean;
-            E = E0mean;
-            G = G0mean;
 
         }
 
         public MaterialTimberBaubuche(Grades name)
         {
+            DefineProperties(name);
+        }
+
+        private void DefineProperties(Grades name)
+        {
             Grade = name.ToString();
-
-
             Fmyk = MaterialTimberBaubuche.fmyk[Grade];
             Fmzk = MaterialTimberBaubuche.fmzk[Grade];
             Ft0k = MaterialTimberBaubuche.ft0k[Grade];
@@ -121,8 +110,9 @@ namespace StructuralDesignKitLibrary.Materials
             Density = 850;
             E = E0mean;
             G = G0mean;
-
         }
+
+
         #endregion
 
         #region Material properties
