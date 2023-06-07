@@ -232,23 +232,25 @@ namespace StructuralDesignKitLibrary.EC5
 
         /// <summary>
         /// The size factor considers the inhomogeneities and other deviations from an ideal orthotropic material
+        /// According to the german annex NCI Zu 3.2(3) -> For components subjected to tensile stresses the section width means the largest section dimension.
         /// </summary>
         /// <param name="timberType"></param>
         /// <param name="b">Rectangular beam width</param>
+        /// <param name="b">Rectangular beam height</param>
         /// <returns></returns>
-        public static double Kh_Tension(TimberType timberType, double b)
+        public static double Kh_Tension(TimberType timberType, double b, double h)
         {
             double kh = 1;
             switch (timberType)
             {
                 case TimberType.Softwood:
-                    kh = Kh_Bending(timberType, b);
+                    kh = Kh_Bending(timberType, Math.Max(b,h));
                     break;
                 case TimberType.Hardwood:
-                    kh = Kh_Bending(timberType, b);
+                    kh = Kh_Bending(timberType, Math.Max(b, h));
                     break;
                 case TimberType.Glulam:
-                    kh = Kh_Bending(timberType, b);
+                    kh = Kh_Bending(timberType, Math.Max(b, h));
                     break;
                 case TimberType.LVL:
                     kh = 1;

@@ -113,10 +113,11 @@ namespace StructuralDesignKitExcel
              Name = "SDK.Factors.Kh_Tension",
              IsHidden = false,
              Category = "SDK.EC5_Factors")]
-        public static double KhTension([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "beam height in [mm]")] double height)
+        public static double KhTension([ExcelArgument(Description = "Timber grade")] string TimberGrade, [ExcelArgument(Description = "beam width in [mm]")] double width,
+                                        [ExcelArgument(Description = "beam width in [mm]")] double height)
         {
             var mat = ExcelHelpers.GetTimberMaterialFromTag(TimberGrade).Type;
-            return EC5_Factors.Kh_Tension(mat, height);
+            return EC5_Factors.Kh_Tension(mat, width, height);
         }
 
 
