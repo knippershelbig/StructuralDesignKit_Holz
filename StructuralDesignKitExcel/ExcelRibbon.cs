@@ -510,7 +510,7 @@ namespace StructuralDesignKitExcel
             xlApp.Range[kczAdr].Formula = String.Format("=SDK.Factors.Kc({0},{1}*1000,{2}*1000,1,{3})", CSAdr, BuckLyAdr, BuckLzAdr, FireAdr);
             xlApp.Range[kcritAdr].Formula = String.Format("=SDK.Factors.Kcrit({0},{1}*1000,{2})", CSAdr, LTBAdr, FireAdr);
             xlApp.Range[kcrAdr].Formula = String.Format("=SDK.Factors.Kcr({0})", MaterialAdr);
-            xlApp.Range[Kh_TensionAdr].Formula = String.Format("=SDK.Factors.Kh_Tension({0},{1})", MaterialAdr, hAdr);
+            xlApp.Range[Kh_TensionAdr].Formula = String.Format("=SDK.Factors.Kh_Tension({0},{1},{2})", MaterialAdr, bAdr, hAdr);
             xlApp.Range[Kh_TensionLVLAdr].Formula = String.Format("=SDK.Factors.Kl_LVL({0},{1}*1000)", MaterialAdr, TensionLengthAdr);
 
 
@@ -547,9 +547,9 @@ namespace StructuralDesignKitExcel
 
             //Value
             activeCell = baseCell.Offset[1, 5]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.TensionParallelToGrain_6.1.2({0},{1},{2},{3},{4},{5},{6})",
-                SigNTenAdr, MaterialAdr, kmodAdr, YmAdr, khzAdr, Kh_TensionAdr, FireAdr);
-
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.CompressionParallelToGrain_6.1.4({0},{1},{2},{3},{4})",
+                SigNTenAdr, MaterialAdr, kmodAdr, YmAdr, Kh_TensionAdr, Kh_TensionLVLAdr, FireAdr);
+			
+			activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.CompressionParallelToGrain_6.1.4({0},{1},{2},{3},{4})",
                 SigNCompAdr, MaterialAdr, kmodAdr, YmAdr, FireAdr);
 
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.Bending_6.1.6({0},{1},{2},{3},{4},{5},{6},{7})",
@@ -558,7 +558,8 @@ namespace StructuralDesignKitExcel
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndTension_6.2.3({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10})",
                 SigMyAdr, SigMzAdr, SigNTenAdr, CSAdr, kmodAdr, YmAdr, khyAdr, khzAdr, Kh_TensionAdr, Kh_TensionLVLAdr, FireAdr);
 
-            activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndCompression_6.2.4({0},{1},{2},{3},{4},{5},{6},{7},{8})",
+
+			activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndCompression_6.2.4({0},{1},{2},{3},{4},{5},{6},{7},{8})",
                 SigMyAdr, SigMzAdr, SigNCompAdr, CSAdr, kmodAdr, YmAdr, khyAdr, khzAdr, FireAdr);
 
             activeCell = activeCell.Offset[1, 0]; activeCell.Formula = string.Format("=SDK.CrossSectionChecks.BendingAndBuckling_6.3.2({0},{1},{2},{3}*1000,{4}*1000,{5},{6},{7},{8},{9},{10})",

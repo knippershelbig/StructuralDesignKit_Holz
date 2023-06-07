@@ -9,13 +9,15 @@ using System.Globalization;
 using System.Reflection;
 using Dlubal.WS.Rfem6.Model;
 using System.IO;
+using System;
+using StructuralDesignKitLibrary.CrossSections.Interfaces;
 
 namespace StructuraldesignKitTesting
 {
     public class EC5CrossSectionTest
     {
 
-        private static string TestFilePath = "C:\\Users\\gc\\source\\repos\\StructuralDesignKit\\StructuraldesignKitTesting\\TestData\\Test_CrossSections.xlsx";
+        private static string TestFilePath = "C:\\Users\\Guillaume Caussarieu\\source\\repos\\StructuralDesignKit_Holz\\StructuraldesignKitTesting\\TestData\\Test_CrossSections.xlsx";
         private static Excel.Application XlApp = new Excel.Application();
 
 
@@ -55,9 +57,25 @@ namespace StructuraldesignKitTesting
             Assert.Equal(expected, actual, 2);
         }
 
+        [Theory]
+        [MemberData(nameof(GetBending_6_1_6Data))]
+        public void Bending_6_1_6Test(double SigMyd, double SigMzd, ICrossSection crossSection, IMaterial material, double Kmod, double Ym, double khy, double khz, double expected)
+		{
+			//Arrange
+			//data generated previsously
+
+			//Act
+			double actual = StructuralDesignKitLibrary.EC5.EC5_CrossSectionCheck.Bending(SigMyd, SigMzd, crossSection, material, Kmod, Ym, khy, khz);
+
+			//Assert
+			//Tolerance is the digit looked at. i.e : 0.0X<- digit compared
+			Assert.Equal(expected, actual, 2);
+		}
 
 
 
+
+		
 
 
 
@@ -115,14 +133,49 @@ namespace StructuraldesignKitTesting
             XlApp.Quit();
         }
 
+		public static IEnumerable<object[]> GetBending_6_1_6Data()
+		{
 
-        #region Utilities
-        /// <summary>
-        /// return a worksheet based on the tab name
-        /// </summary>
-        /// <param name="tabName"></param>
-        /// <returns></returns>
-        private static Worksheet GetDataFromExcelTab(string tabName)
+			Workbook wb = XlApp.Workbooks.Open(TestFilePath);
+
+			var ws = GetDataFromExcelTab("Bending_6.1.6");
+
+			Range cell = ws.Cells[3, 1];
+			while (cell.Value2 != null)
+			{
+				int b = (int)cell.Value2;
+				int h = (int)cell.Offset[0, 1].Value2;
+				IMaterialTimber mat = StructuralDesignKitExcel.ExcelHelpers.GetTimberMaterialFromTag(cell.Offset[0, 2].Value2);
+				var CS = new StructuralDesignKitLibrary.CrossSections.CrossSectionRectangular(b, h, mat);
+				double stressMy = CS.ComputeStressBendingY(cell.Offset[0, 3].Value2);
+				double stressMz = CS.ComputeStressBendingZ(cell.Offset[0, 4].Value2);
+				double kmod = (double)cell.Offset[0, 5].Value2;
+				double Ym = (double)cell.Offset[0, 6].Value2;
+				double ratio = (double)cell.Offset[0, 7].Value2;
+                double khy = EC5_Factors.Kh_Bending(mat.Type, CS.H);
+                double khz = 1;
+				// For verification with RFEM 5, which does not take into account the kh factor for the z axis for Glulam
+				if (mat.Type == EC5_Utilities.TimberType.Softwood || mat.Type == EC5_Utilities.TimberType.Hardwood)
+				{
+                    khz = EC5_Factors.Kh_Bending(mat.Type, CS.B);
+				}
+
+				cell = cell.Offset[1, 0];
+
+				yield return new object[] { stressMy, stressMz,CS, mat, kmod, Ym,khy,khz, ratio };
+			}
+			XlApp.Workbooks.Close();
+			XlApp.Quit();
+		}
+
+
+		#region Utilities
+		/// <summary>
+		/// return a worksheet based on the tab name
+		/// </summary>
+		/// <param name="tabName"></param>
+		/// <returns></returns>
+		private static Worksheet GetDataFromExcelTab(string tabName)
         {
             List<Worksheet> ws = new List<Worksheet>();
 

@@ -533,10 +533,6 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "fire check?")] bool fireDesign = false)
         {
             
-            
-            
-            
-            
             var mat = ExcelHelpers.GetTimberMaterialFromTag(timberGrade);
 
             return EC5_CrossSectionCheck.TensionParallelToGrain(Sig0_t_d, mat, Kmod, Ym, Kh, Kl_LVL, fireDesign);

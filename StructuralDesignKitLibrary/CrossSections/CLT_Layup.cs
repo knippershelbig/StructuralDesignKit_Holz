@@ -12,7 +12,7 @@ namespace StructuralDesignKitLibrary.CrossSections
 	/// </summary>
 	public class CLT_Layup
 	{
-		
+
 		/// <summary>
 		/// List of lamella thicknesses
 		/// </summary>
@@ -53,16 +53,16 @@ namespace StructuralDesignKitLibrary.CrossSections
 		public bool NarrowSideGlued { get; set; }
 
 
-        public CLT_Layup(int lamellaWidth = 150, bool narrowSideGlued = false)
-        {
+		public CLT_Layup(int lamellaWidth = 150, bool narrowSideGlued = false)
+		{
 			Thicknesses = new List<int>();
 			_orientations = new List<int>();
 			Materials = new List<IMaterial>();
 			LamellaWidth = lamellaWidth;
-			NarrowSideGlued	= narrowSideGlued;
-        }
+			NarrowSideGlued = narrowSideGlued;
+		}
 
-		public CLT_Layup(List<int>thicknesses, List<int>orientations, List<IMaterial> materials,int lamellaWidth = 150, bool narrowSideGlued = false)
+		public CLT_Layup(List<int> thicknesses, List<int> orientations, List<IMaterial> materials, int lamellaWidth = 150, bool narrowSideGlued = false)
 		{
 			Thicknesses = thicknesses;
 			_orientations = new List<int>();
