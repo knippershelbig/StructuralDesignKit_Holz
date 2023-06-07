@@ -20,10 +20,9 @@ namespace StructuraldesignKitTesting
         private static string TestFilePath = "C:\\Users\\Guillaume Caussarieu\\source\\repos\\StructuralDesignKit_Holz\\StructuraldesignKitTesting\\TestData\\Test_CrossSections.xlsx";
         private static Excel.Application XlApp = new Excel.Application();
 
+		#region TestFunctions
 
-
-
-        [Theory]
+		[Theory]
         [MemberData(nameof(GetTensionParallelToGrainData))]
         public void TensionParallelToGrainTest(double Sig0_t_d, IMaterial material, double Kmod, double Ym, double Kh, double Kl_LVL, double expected)
         {
@@ -38,8 +37,6 @@ namespace StructuraldesignKitTesting
             //Tolerance is the digit looked at. i.e : 0.0X<- digit compared
             Assert.Equal(expected, actual, 2);
         }
-
-
 
         [Theory]
         [MemberData(nameof(GetCompressionParallelToGrainData))]
@@ -72,14 +69,10 @@ namespace StructuraldesignKitTesting
 			Assert.Equal(expected, actual, 2);
 		}
 
+		#endregion
 
-
-
-		
-
-
-
-        public static IEnumerable<object[]> GetTensionParallelToGrainData()
+		#region Data
+		public static IEnumerable<object[]> GetTensionParallelToGrainData()
         {
 
             Workbook wb = XlApp.Workbooks.Open(TestFilePath);
@@ -105,7 +98,6 @@ namespace StructuraldesignKitTesting
             XlApp.Workbooks.Close();
             XlApp.Quit();
         }
-
 
         public static IEnumerable<object[]> GetCompressionParallelToGrainData()
         {
@@ -167,7 +159,7 @@ namespace StructuraldesignKitTesting
 			XlApp.Workbooks.Close();
 			XlApp.Quit();
 		}
-
+		#endregion
 
 		#region Utilities
 		/// <summary>
