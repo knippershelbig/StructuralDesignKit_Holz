@@ -25,7 +25,7 @@ namespace StructuralDesignKitGH
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            string weighting = "Workshop\r\nCirculationSpace\r\nResidential\r\nOffice\r\n Ward\r\nGeneralLaboratory\r\nConsultingRoom\r\nCriticalWorkingArea\r\nNone";
+            string weighting = "Workshop\r\nCirculationSpace\r\nResidential\r\nOffice\r\nWard\r\nGeneralLaboratory\r\nConsultingRoom\r\nCriticalWorkingArea\r\nNone";
             pManager.AddGenericParameter("data", "data", "RFEM vibration data from the component VibrationData", GH_ParamAccess.item);
             pManager.AddGenericParameter("PaceFrequency", "fp", "Pace frequency, either as single value or as range", GH_ParamAccess.item);
             pManager.AddNumberParameter("Damping ratio", "Xi", "Damping ratio", GH_ParamAccess.item);

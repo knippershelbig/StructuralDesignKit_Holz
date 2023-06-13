@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Add_In\" />
+    <Folder Include="Examples\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="icons\Checks.png">

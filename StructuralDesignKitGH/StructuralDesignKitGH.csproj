@@ -57,6 +57,10 @@
     </None>
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="examples\" />
+  </ItemGroup>
+  
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">
     <StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
     <StartArguments></StartArguments>
@@ -64,7 +68,7 @@
   </PropertyGroup>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="Copy &quot;$(TargetPath)&quot; &quot;C:\Users\Guillaume Caussarieu\AppData\Roaming\Grasshopper\Libraries\KH\StructuralDesignKitGH.gha" />
+    <Exec Command="Copy &quot;$(TargetPath)&quot; &quot;C:\Users\GC\AppData\Roaming\Grasshopper\Libraries\KH\StructuralDesignKitGH.gha" />
   </Target>
 
 </Project>
