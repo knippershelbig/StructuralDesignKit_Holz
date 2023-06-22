@@ -20,9 +20,6 @@
     <Reference Include="Dlubal.RFEM5">
       <HintPath>..\..\..\..\..\Public\Documents\Dlubal\SDK\Reference Assemblies\x64\Dlubal.RFEM5.dll</HintPath>
     </Reference>
-    <Reference Include="StructuralDesignKitLibrary">
-      <HintPath>..\StructuralDesignKitLibrary\bin\Debug\StructuralDesignKitLibrary.dll</HintPath>
-    </Reference>
   </ItemGroup>
 	
 	
@@ -59,6 +56,10 @@
   
   <ItemGroup>
     <Folder Include="examples\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\StructuralDesignKitLibrary\StructuralDesignKitLibrary.csproj" />
   </ItemGroup>
   
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">

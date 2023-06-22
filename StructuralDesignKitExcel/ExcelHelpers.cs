@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Excel;
+﻿using Dlubal.WS.Rfem6.Model;
+using Microsoft.Office.Interop.Excel;
 using StructuralDesignKitLibrary.Connections.Interface;
 using StructuralDesignKitLibrary.CrossSections;
 using StructuralDesignKitLibrary.EC5;
@@ -204,17 +205,39 @@ namespace StructuralDesignKitExcel
         /// <param name="diameter"></param>
         /// <param name="fuk"></param>
         /// <returns></returns>
-        public static IFastener GetFastener(string fastenerType, double diameter, double fuk)
+        public static IFastener GetFastener(string fastenerTypeString, double diameter, double fuk)
         {
+
+
+            EC5_Utilities.FastenerType fastenerType = (EC5_Utilities.FastenerType)Enum.Parse(typeof(EC5_Utilities.FastenerType), fastenerTypeString);
+
+
+
+
+            IFastener fastener = null;
+
+            switch (fastenerType)
+            {
+                case EC5_Utilities.FastenerType.Bolt:
+                    fastener = new StructuralDesignKitLibrary.Connections.Fasteners.FastenerBolt(diameter, fuk);
+                    break;
+                case EC5_Utilities.FastenerType.Dowel:
+                    fastener = new StructuralDesignKitLibrary.Connections.Fasteners.FastenerDowel(diameter, fuk);
+                    break;
+            }
+
+
+            //Method using Reflexion but stoped working....
+            //Previous switch method is a patch..
+
             //Get fasterner types in SDK
-            var test = Assembly.Load("StructuralDesignKitLibrary");
-            var fasteners = Assembly.Load("StructuralDesignKitLibrary").GetTypes().Where(p => p.FullName.StartsWith("StructuralDesignKitLibrary.Connections.Fasteners")).ToList();
 
-            //Get the fastener SDK type requested
-            Type type = fasteners.Where(p => p.Name.ToLower().Contains(fastenerType.ToLower())).First();
+            //var fasteners = Assembly.Load("StructuralDesignKitLibrary").GetTypes().Where(p => p.FullName.StartsWith("StructuralDesignKitLibrary.Connections.Fasteners")).ToList();
+            ////Get the fastener SDK type requested
+            //Type type = fasteners.Where(p => p.Name.ToLower().Contains(fastenerType.ToLower())).First();
 
-            //Create an instance from the particular fastener type to compute the properties
-            IFastener fastener = (IFastener)Activator.CreateInstance(type, diameter, fuk);
+            ////Create an instance from the particular fastener type to compute the properties
+            //IFastener fastener = (IFastener)Activator.CreateInstance(type, diameter, fuk);
 
             return fastener;
         }
