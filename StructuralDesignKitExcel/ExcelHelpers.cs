@@ -207,6 +207,7 @@ namespace StructuralDesignKitExcel
         public static IFastener GetFastener(string fastenerType, double diameter, double fuk)
         {
             //Get fasterner types in SDK
+            var test = Assembly.Load("StructuralDesignKitLibrary");
             var fasteners = Assembly.Load("StructuralDesignKitLibrary").GetTypes().Where(p => p.FullName.StartsWith("StructuralDesignKitLibrary.Connections.Fasteners")).ToList();
 
             //Get the fastener SDK type requested

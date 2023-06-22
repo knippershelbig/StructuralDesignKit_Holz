@@ -40,7 +40,7 @@ namespace StructuralDesignKitLibrary.CrossSections
 		//------------------------------------------------------------------------------------
 
 
-		//Implement a picture in Excel / GH equivalent to KHL documentation
+		//Implement a picture in Excel / GH equivalent to KLH documentation
 
 		
 
