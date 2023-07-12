@@ -207,12 +207,8 @@ namespace StructuralDesignKitExcel
         /// <returns></returns>
         public static IFastener GetFastener(string fastenerTypeString, double diameter, double fuk)
         {
-
-
+            //Transform the fasternerTypeString into Enum
             EC5_Utilities.FastenerType fastenerType = (EC5_Utilities.FastenerType)Enum.Parse(typeof(EC5_Utilities.FastenerType), fastenerTypeString);
-
-
-
 
             IFastener fastener = null;
 

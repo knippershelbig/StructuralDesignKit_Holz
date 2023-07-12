@@ -46,6 +46,9 @@ namespace StructuralDesignKitLibrary.CrossSections
 
 		public void ComputeCrossSectionProperties()
 		{
+
+
+
 			throw new NotImplementedException();
 		}
 

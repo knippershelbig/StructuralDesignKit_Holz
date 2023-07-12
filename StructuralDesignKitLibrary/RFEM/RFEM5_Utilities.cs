@@ -185,6 +185,14 @@ namespace StructuralDesignKitLibrary.RFEM
 
             int nbModeShape = DynamPro.GetData().GetNVCParams(NVC).NumberModeShapes;
             var MeshNodes = model.GetCalculation().GetFeMesh().GetNodes();
+
+            ////remove invalid FE nodes (where id = 0)
+            //List<FeMeshNode> ValidFENodes = new List<FeMeshNode>();
+            //foreach (var node in MeshNodes)
+            //{
+            //    if(node.No!=0) ValidFENodes.Add(node);
+            //}
+
             int nbMeshNode = MeshNodes.Length;
 
             var shapes = dynamicResults.GetAllNVCModeShapes(NVC);
@@ -193,7 +201,7 @@ namespace StructuralDesignKitLibrary.RFEM
 
             for (int i = 0; i < nbMeshNode; i++)
             {
-                ModeShape modeshape = new ModeShape(MeshNodes[i].No);
+                ModeShape modeshape = new ModeShape(shapes[i].Node);
                 modeshape.Modes.Add(shapes[i].ModeShape);
                 modeshape.Ux.Add(shapes[i].StdDisplacementX);
                 modeshape.Uy.Add(shapes[i].StdDisplacementY);
@@ -213,6 +221,10 @@ namespace StructuralDesignKitLibrary.RFEM
                 }
 
             }
+
+
+            List<int> nodesFromShapes = modeShapes.Select(p=>p.NodeID).ToList();
+
 
             return modeShapes;
         }
