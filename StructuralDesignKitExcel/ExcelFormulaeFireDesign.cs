@@ -25,7 +25,7 @@ namespace StructuralDesignKitExcel
             try
             {
                 var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
-                def = EC5_Utilities.ComputeCharringDepthUnprotected(t, timber);
+                def = EC5_Utilities.ComputeCharringDepthUnprotectedBeam(t, timber);
             }
             catch (Exception e)
             {

@@ -157,7 +157,7 @@ namespace StructuralDesignKitLibrary.CrossSections
         public CrossSectionRectangular ComputeReducedCrossSection(int fireDuration, bool top, bool bottom, bool left, bool right)
         {
 
-            double d_ef = EC5.EC5_Utilities.ComputeCharringDepthUnprotected(fireDuration, (IMaterialTimber)this.Material);
+            double d_ef = EC5.EC5_Utilities.ComputeCharringDepthUnprotectedBeam(fireDuration, (IMaterialTimber)this.Material);
             double b = this.B;
             double h = this.H;
             if (left) b -= d_ef;
