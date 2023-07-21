@@ -82,7 +82,7 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="plasterboardthicknesses">List of the thicknesses of plasterboards (max 2); For 2 plasterboards, the first one is the external one</param>
         /// <param name="closedJoint">if true, joints between plasterboards is considered <2mm; if false > 2mm</param>
         /// <returns></returns>
-        public static double ComputeCharringDepthProtectedBeam(int t, IMaterialTimber timber, List<PlasterboardType> plasterboards, List<int> plasterboardthicknesses, bool closedJoint)
+        public static double ComputeCharringDepthProtectedBeam(int t, IMaterialTimber timber, List<PlasterboardType> plasterboards, List<int> plasterboardthicknesses, bool closedJoint, int fastenerLength)
         {
             if (plasterboardthicknesses.Count > 2 || plasterboards.Count > 2) throw new Exception("Standardized protection in the EN 1995-1-2 §3.4.3.3 accounts only for a maximum of 2 boards");
 
@@ -91,8 +91,25 @@ namespace StructuralDesignKitLibrary.EC5
             //tf, Failure time of protection 
             //ta, time limit above which the charring rate gets back to Bn
 
+            double tch = ComputeCombustionStart(plasterboards, plasterboardthicknesses, closedJoint);
+            double tf = ComputePanelFailureTime(tch, plasterboards, plasterboardthicknesses, fastenerLength, closedJoint, timber);
+            double K2 = ComputeK2(plasterboards, plasterboardthicknesses);
+            double Bn = timber.Bn;
+            double ta = ComputeTa(tch, tf, K2, Bn);
 
-            return -1;
+            // t < tch
+            if (t < tch) return 0;
+
+
+            // tch < t < ta
+            else if (t >= tch && t < tf) return K2 * Bn * (t - tch);
+
+            //tf < t < ta
+            else if (t >= tf && t < ta) return K2 * Bn * (t - tch) + K3 * Bn * (t - tf);
+
+            // ta < t
+            else return Bn * (t - ta) + Math.Min(25, Bn * ta);
+
         }
 
         /// <summary>
@@ -137,8 +154,16 @@ namespace StructuralDesignKitLibrary.EC5
             return tch;
         }
 
-        public static double ComputePanelFailureTime(List<PlasterboardType> plasterboards, List<int> plasterboardthicknesses, int fastenerLenght, bool OnJoint, IMaterialTimber timber)
+        public static double ComputePanelFailureTime(double tch, List<PlasterboardType> plasterboards, List<int> plasterboardthicknesses, int fastenerLenght, bool OnJoint, IMaterialTimber timber)
         {
+
+            if (plasterboards.Count > 2 || plasterboards.Count <= 0) throw new Exception("The amount of plasterboard should be 1 or 2");
+            foreach (PlasterboardType plasterboard in plasterboards)
+            {
+                if (plasterboard != PlasterboardType.TypeF && plasterboard != PlasterboardType.TypeA) throw new Exception("Plasterboard type not implemented");
+                if (plasterboard == PlasterboardType.TypeA) return tch;
+            }
+
 
 
             //Max value for panel fasteners failure according to //DIN EN 1995-1-2 §C2.3
@@ -163,14 +188,14 @@ namespace StructuralDesignKitLibrary.EC5
             double kn = 1.5;                //DIN EN 1995-1-2 §C2.1 (1)
 
 
-            double tf_f = (lf - la_min - hp) / (ks * k2 * kn * kj * timber.B0); //DIN EN 1995-1-2 Eq C9
+            double tf_f = tch + (lf - la_min - hp) / (ks * k2 * kn * kj * timber.B0); //DIN EN 1995-1-2 Eq C9
             if (tf_f < 0) throw new Exception("Fasteners are too short - they should at least go 10mm in the uncharred timber");
 
             //-------------------------------------------------------------------------------------------------------------
             //As the current version of the Eurocode 5 does not provide a mean to calculate these value, it was currently
             //chosen to implement the equations provided by the Draft of the new version of the Eurocode 5, even if it is 
             //not yet implemented.
-            //Conservatively, only the value for horizontal time failure have been implemented.
+            //Conservatively, only the value for horizontal time failure have been implemented and only for type F panels
             //The whole process according to this standard will be implemented when the new Eurocode will be enforced ~2025
             //-------------------------------------------------------------------------------------------------------------
 
@@ -206,26 +231,31 @@ namespace StructuralDesignKitLibrary.EC5
 
                 else throw new Exception("Plasterboard type not implemented");
 
-                tf_p *=  1.1;
+                tf_p *= 1.1;
             }
 
 
 
-            return Math.Min(tf_f, tf_p);
+            return (Math.Min(tf_f, tf_p));
 
-
-
-
-
-
-
-
-
+        }
+        //DIN EN 1995-1-2 §3.4.3.2 (2)
+        public static double ComputeK2(List<PlasterboardType> plasterboards, List<int> plasterboardthicknesses)
+        {
+            if (plasterboards.Count > 2 || plasterboards.Count <= 0) throw new Exception("The amount of plasterboard should be 1 or 2");
+            if (plasterboards.Any(p => p != PlasterboardType.TypeF)) return 0;
+            else return 1 - 0.018 * plasterboardthicknesses.Last();         //DIN EN 1995-1-2 Eq 3.7
         }
 
 
+        public static double ComputeTa(double tch, double tf, double k2, double Bn)
+        {
 
+            return Math.Min(2 * tf, (25 - (tf - tch) * k2 * Bn) / (K3 * Bn) + tf);  //DIN EN 1995-1-2 Eq 3.9
 
+        }
+
+        public const int K3 = 2;//DIN EN 1995-1-2 §3.4.3.2 (4)
 
         /// <summary>
         /// Plasterboard type according to EN 520
