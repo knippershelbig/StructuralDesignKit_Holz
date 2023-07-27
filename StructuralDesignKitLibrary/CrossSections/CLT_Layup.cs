@@ -40,7 +40,7 @@ namespace StructuralDesignKitLibrary.CrossSections
 		/// <summary>
 		/// List of the material constituing each lamella
 		/// </summary>
-		public List<IMaterial> Materials { get; set; }
+		public List<IMaterialTimber> Materials { get; set; }
 
 		/// <summary>
 		/// define the with of a single lamella
@@ -57,16 +57,16 @@ namespace StructuralDesignKitLibrary.CrossSections
 		{
 			Thicknesses = new List<int>();
 			_orientations = new List<int>();
-			Materials = new List<IMaterial>();
+			Materials = new List<IMaterialTimber>();
 			LamellaWidth = lamellaWidth;
 			NarrowSideGlued = narrowSideGlued;
 		}
 
-		public CLT_Layup(List<int> thicknesses, List<int> orientations, List<IMaterial> materials, int lamellaWidth = 150, bool narrowSideGlued = false)
+		public CLT_Layup(List<int> thicknesses, List<int> orientations, List<IMaterialTimber> materials, int lamellaWidth = 150, bool narrowSideGlued = false)
 		{
 			Thicknesses = thicknesses;
 			_orientations = new List<int>();
-			Materials = new List<IMaterial>();
+			Materials = new List<IMaterialTimber>();
 			LamellaWidth = lamellaWidth;
 			NarrowSideGlued = narrowSideGlued;
 		}

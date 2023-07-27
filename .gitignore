@@ -365,3 +365,4 @@ FodyWeavers.xsd
 
 #Ignore StructuralDesignKitConsole
 StructuralDesignKitConsole/
+/SDK_Local_Development/SDK_Local_Development.csproj
