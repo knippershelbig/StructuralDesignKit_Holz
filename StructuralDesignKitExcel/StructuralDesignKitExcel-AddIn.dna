@@ -39,6 +39,7 @@
 
 						<group id="SDK_Fire" label="Fire Design">
 							<dynamicMenu id="dynamicFireDesign" label="Fire" getContent="GetMenuContent" tag ="SDK.FireDesign" size="large" image="Fire"/>
+							<button id="firePlasterboardTypesButton" label="Plasterboard types" onAction="ValidateCellWithPlasterboardTypes"></button>
 						</group>
 
 

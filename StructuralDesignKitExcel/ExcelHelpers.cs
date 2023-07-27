@@ -4,10 +4,13 @@ using StructuralDesignKitLibrary.Connections.Interface;
 using StructuralDesignKitLibrary.CrossSections;
 using StructuralDesignKitLibrary.EC5;
 using StructuralDesignKitLibrary.Materials;
+
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using static StructuralDesignKitLibrary.EC5.EC5_Utilities;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace StructuralDesignKitExcel
@@ -267,6 +270,18 @@ namespace StructuralDesignKitExcel
             double fu = Convert.ToDouble(fastener[2].Remove(0, 2));
 
             return GetFastener(type, diameter, fu);
+        }
+
+
+        public static PlasterboardType GetPlaterBoardTypeFromString(string plasterboard)
+        {
+            PlasterboardType Plasterboard = (PlasterboardType)Enum.Parse(typeof(PlasterboardType), plasterboard);
+            return Plasterboard;
+        }
+
+        public static List<string> GetPlasterboardTypes()
+        {
+            return ExcelHelpers.GetStringValuesFromEnum<PlasterboardType>();
         }
 
 

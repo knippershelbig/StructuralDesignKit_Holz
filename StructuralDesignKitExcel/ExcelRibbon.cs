@@ -713,6 +713,15 @@ namespace StructuralDesignKitExcel
         }
 
 
+
+        public void ValidateCellWithPlasterboardTypes(IRibbonControl control)
+        {
+            Excel.Application xlApp = (Excel.Application)ExcelDnaUtil.Application;
+            ExcelHelpers.WorkBookOpen(xlApp); //Ensure a workbook is open
+
+            RibbonActions.FireButtonActions.ValidateCellWithPlasterboardTypes(xlApp);
+        }
+
         #region ConnectionButtons
 
         /// <summary>
