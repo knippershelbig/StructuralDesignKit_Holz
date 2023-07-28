@@ -54,6 +54,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Protection board 2 type  (internal if 2 boards)")] string board2,
             [ExcelArgument(Description = "Protection board 2 thickness [mm] (internal if 2 boards)")] double boardThickness2,
             [ExcelArgument(Description = "Joints between boards < 2mm")] bool closedJoint,
+            [ExcelArgument(Description = "if the protection considered is horizontal -> true, otherwise -> false (vertical)")] bool horizontal,
             [ExcelArgument(Description = "Length of the board fasteners")] int lengthFastener)
 
         {
@@ -79,7 +80,7 @@ namespace StructuralDesignKitExcel
 
 
 
-                def = EC5_Utilities.ComputeCharringDepthProtectedBeam(t, timber, Plasterboards, Thicknesses, closedJoint, lengthFastener);
+                def = EC5_Utilities.ComputeCharringDepthProtectedBeam(t, timber, Plasterboards, Thicknesses, closedJoint,horizontal, lengthFastener);
             }
             catch (Exception e)
             {
@@ -88,6 +89,11 @@ namespace StructuralDesignKitExcel
             }
             return def;
         }
+
+
+
+
+
 
 
         //-------------------------------------------
