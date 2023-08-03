@@ -91,12 +91,16 @@ namespace StructuralDesignKitLibrary.EC5
             //ta, time limit above which the charring rate gets back to Bn
             double d0 = 7.0;
             double tch = ComputeCombustionStart(plasterboards, plasterboardthicknesses, closedJoint);
+
             double tf = ComputePanelFailureTime(tch, plasterboards, plasterboardthicknesses, fastenerLength, horizontal, timber);
 
-            if (tf < tch) tch = tf;
+            //
+            //if (tf < tch) tch = tf;
 
             double K2 = ComputeK2(plasterboards, plasterboardthicknesses);
+
             double Bn = timber.Bn;
+
             double ta = ComputeTa(tch, tf, K2, Bn);
 
             double k0 = ComputeK0(tch, t, true);
@@ -352,7 +356,14 @@ namespace StructuralDesignKitLibrary.EC5
         }
 
 
-        //DIN EN 1995-1-2 §3.4.3.2 (2)
+
+        /// <summary>
+        /// Insulation coefficient according to DIN EN 1995-1-2 §3.4.3.2 (2)
+        /// </summary>
+        /// <param name="plasterboards">List of the type of plasterboards (max 2); For 2 plasterboards, the first one is the external one</param>
+        /// <param name="plasterboardthicknesses">List of the thicknesses of plasterboards (max 2); For 2 plasterboards, the first one is the external one</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static double ComputeK2(List<PlasterboardType> plasterboards, List<double> plasterboardthicknesses)
         {
             if (plasterboards.Count > 2 || plasterboards.Count <= 0) throw new Exception("The amount of plasterboard should be 1 or 2");
@@ -360,7 +371,15 @@ namespace StructuralDesignKitLibrary.EC5
             else return 1 - 0.018 * plasterboardthicknesses.Last();         //DIN EN 1995-1-2 Eq 3.7
         }
 
-
+        /// <summary>
+        /// Compute the time limit above which the charring rate gets back to Bn
+        /// </summary>
+        /// <param name="tch">CombustionStart</param>
+        /// <param name="tf">PanelFailureTime</param>
+        /// <param name="k2"></param>
+        /// <param name="Bn"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static double ComputeTa(double tch, double tf, double k2, double Bn)
 
         {
