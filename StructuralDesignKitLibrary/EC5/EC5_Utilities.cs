@@ -356,7 +356,6 @@ namespace StructuralDesignKitLibrary.EC5
         }
 
 
-
         /// <summary>
         /// Insulation coefficient according to DIN EN 1995-1-2 §3.4.3.2 (2)
         /// </summary>
