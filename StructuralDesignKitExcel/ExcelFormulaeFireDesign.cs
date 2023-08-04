@@ -58,8 +58,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Protection board 2 type  (internal if 2 boards)")] string board2,
             [ExcelArgument(Description = "Protection board 2 thickness [mm] (internal if 2 boards)")] double boardThickness2,
             [ExcelArgument(Description = "Joints between boards < 2mm")] bool closedJoint,
-            [ExcelArgument(Description = "if the protection considered is horizontal -> true, otherwise -> false (vertical)")] bool horizontal,
-            [ExcelArgument(Description = "Length of the board fasteners")] int lengthFastener)
+            [ExcelArgument(Description = "if the protection considered is horizontal -> true, otherwise -> false (vertical)")] bool horizontal)
 
         {
             double def = -1;
@@ -84,7 +83,7 @@ namespace StructuralDesignKitExcel
 
 
 
-                def = EC5_Utilities.ComputeCharringDepthProtectedBeam(t, timber, Plasterboards, Thicknesses, closedJoint, horizontal, lengthFastener);
+                def = EC5_Utilities.ComputeCharringDepthProtectedBeam(t, timber, Plasterboards, Thicknesses, closedJoint, horizontal);
             }
             catch (Exception e)
             {
@@ -145,21 +144,17 @@ namespace StructuralDesignKitExcel
             IsHidden = false,
             Category = "SDK.FireDesign")]
         public static double ComputePanelFailureTime(
-            [ExcelArgument(Description = "Material Tag")] string material,
             [ExcelArgument(Description = "Protection board 1 type (external if 2 boards)")] string board1,
             [ExcelArgument(Description = "Protection board 1 thickness [mm] (external if 2 boards)")] double boardThickness1,
             [ExcelArgument(Description = "Protection board 2 type  (internal if 2 boards)")] string board2,
             [ExcelArgument(Description = "Protection board 2 thickness [mm] (internal if 2 boards)")] double boardThickness2,
             [ExcelArgument(Description = "Joints between boards < 2mm")] bool closedJoint,
-            [ExcelArgument(Description = "if the protection considered is horizontal -> true, otherwise -> false (vertical)")] bool horizontal,
-            [ExcelArgument(Description = "Length of the board fasteners")] int lengthFastener)
+            [ExcelArgument(Description = "if the protection considered is horizontal -> true, otherwise -> false (vertical)")] bool horizontal)
 
         {
-            double tf = -1; 
+            double tf = -1;
             try
             {
-                var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
-
                 List<PlasterboardType> Plasterboards = new List<PlasterboardType>();
                 List<double> Thicknesses = new List<double>();
                 if (board1 != "none" && boardThickness1 != 0)
@@ -174,9 +169,8 @@ namespace StructuralDesignKitExcel
                     Thicknesses.Add(boardThickness2);
                 }
 
-
                 double tch = EC5_Utilities.ComputeCombustionStart(Plasterboards, Thicknesses, closedJoint);
-                tf = EC5_Utilities.ComputePanelFailureTime(tch, Plasterboards, Thicknesses, lengthFastener, horizontal, timber);
+                tf = EC5_Utilities.ComputePanelFailureTime(tch, Plasterboards, Thicknesses, horizontal);
             }
             catch (Exception e)
             {
@@ -185,7 +179,6 @@ namespace StructuralDesignKitExcel
             }
             return tf;
         }
-
 
 
 
@@ -240,8 +233,7 @@ namespace StructuralDesignKitExcel
             [ExcelArgument(Description = "Protection board 2 type  (internal if 2 boards)")] string board2,
             [ExcelArgument(Description = "Protection board 2 thickness [mm] (internal if 2 boards)")] double boardThickness2,
             [ExcelArgument(Description = "Joints between boards < 2mm")] bool closedJoint,
-            [ExcelArgument(Description = "if the protection considered is horizontal -> true, otherwise -> false (vertical)")] bool horizontal,
-            [ExcelArgument(Description = "Length of the board fasteners")] int lengthFastener)
+            [ExcelArgument(Description = "if the protection considered is horizontal -> true, otherwise -> false (vertical)")] bool horizontal)
 
         {
             double ta = -1;
@@ -265,7 +257,7 @@ namespace StructuralDesignKitExcel
 
 
                 double tch = EC5_Utilities.ComputeCombustionStart(Plasterboards, Thicknesses, closedJoint);
-                double tf = EC5_Utilities.ComputePanelFailureTime(tch, Plasterboards, Thicknesses, lengthFastener, horizontal, timber);
+                double tf = EC5_Utilities.ComputePanelFailureTime(tch, Plasterboards, Thicknesses, horizontal);
                 double k2 = EC5_Utilities.ComputeK2(Plasterboards, Thicknesses);
                 ta = EC5_Utilities.ComputeTa(tch, tf, k2, timber.Bn);
 
@@ -280,6 +272,52 @@ namespace StructuralDesignKitExcel
 
 
 
+        [ExcelFunction(Description = "Return the minimum fire protection fastener length in [mm] according to EN 1995-1-2 §3.4.3.4 (4) - Eq 3.16",
+            Name = "SDK.FireDesign.ComputeProtectionMinFastenerLength",
+            IsHidden = false,
+            Category = "SDK.FireDesign")]
+        public static double ComputeProtectionMinFastenerLength(
+            [ExcelArgument(Description = "fastener diameter in [mm]")] double d,
+            [ExcelArgument(Description = "Fire duration in minutes")] int t,
+            [ExcelArgument(Description = "Material Tag")] string material,
+            [ExcelArgument(Description = "Protection board 1 type (external if 2 boards)")] string board1,
+            [ExcelArgument(Description = "Protection board 1 thickness [mm] (external if 2 boards)")] double boardThickness1,
+            [ExcelArgument(Description = "Protection board 2 type  (internal if 2 boards)")] string board2,
+            [ExcelArgument(Description = "Protection board 2 thickness [mm] (internal if 2 boards)")] double boardThickness2,
+            [ExcelArgument(Description = "Joints between boards < 2mm")] bool closedJoint,
+            [ExcelArgument(Description = "if the protection considered is horizontal -> true, otherwise -> false (vertical)")] bool horizontal)
+        {
+            double lmin = -1;
+
+            try
+            {
+                var timber = ExcelHelpers.GetTimberMaterialFromTag(material);
+
+                List<PlasterboardType> Plasterboards = new List<PlasterboardType>();
+                List<double> Thicknesses = new List<double>();
+                if (board1 != "none" && boardThickness1 != 0)
+                {
+                    Plasterboards.Add(ExcelHelpers.GetPlaterBoardTypeFromString(board1));
+                    Thicknesses.Add(boardThickness1);
+                }
+
+                if (boardThickness2 != 0 && board2 != "none")
+                {
+                    Plasterboards.Add(ExcelHelpers.GetPlaterBoardTypeFromString(board1));
+                    Thicknesses.Add(boardThickness2);
+                }
+
+                lmin = EC5_Utilities.ComputeProtectionMinFastenerLength(d, t, timber, Plasterboards, Thicknesses, closedJoint, horizontal);
+            }
+            catch (Exception e)
+            {
+
+                MessageBox.Show(e.Message);
+            }
+            return lmin;
+        }
+
+    
 
         //-------------------------------------------
         //Reduced cross section

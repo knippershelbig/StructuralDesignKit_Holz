@@ -52,7 +52,12 @@ namespace StructuralDesignKitLibrary.EC5
         }
 
         #region FireDesign
-        //Charring calculation for beams
+        /// <summary>
+        /// Return the effective charring depth of an exposed timber linear member (beam, column, ...). Result is in [mm] per exposed face
+        /// </summary>
+        /// <param name="t">exposed duration</param>
+        /// <param name="timber">Timber member material</param>
+        /// <returns></returns>
         public static double ComputeCharringDepthUnprotectedBeam(int t, IMaterialTimber timber)
         {
             //No strength layer according to DIN EN 1995-1-2 §4.2.2
@@ -72,7 +77,7 @@ namespace StructuralDesignKitLibrary.EC5
         }
 
         /// <summary>
-        /// Return the charring depth in mm of a protected beam. Result is per exposed face
+        /// Return the effective charring depth of a protected timber linear member (beam, column, ...). Result is in [mm] per exposed face
         /// </summary>
         /// <param name="t">exposed duration</param>
         /// <param name="timber">Timber member material</param>
@@ -81,21 +86,15 @@ namespace StructuralDesignKitLibrary.EC5
         /// <param name="closedJoint">if true, joints between plasterboards is considered <2mm; if false > 2mm</param>
         /// <param name="horizontal">Boolean value to represent if the protection is horizontal or vertical</param>
         /// <returns></returns>
-        public static double ComputeCharringDepthProtectedBeam(int t, IMaterialTimber timber, List<PlasterboardType> plasterboards, List<double> plasterboardthicknesses, bool closedJoint, bool horizontal, int fastenerLength)
+        public static double ComputeCharringDepthProtectedBeam(int t, IMaterialTimber timber, List<PlasterboardType> plasterboards, List<double> plasterboardthicknesses, bool closedJoint, bool horizontal)
         {
             if (plasterboardthicknesses.Count > 2 || plasterboards.Count > 2) throw new Exception("Standardized protection in the EN 1995-1-2 §3.4.3.3 accounts only for a maximum of 2 boards");
 
-            //Bn, Design notional charring rate under standard fire exposure 
-            //tch, start of charring
-            //tf, Failure time of protection 
-            //ta, time limit above which the charring rate gets back to Bn
             double d0 = 7.0;
+
             double tch = ComputeCombustionStart(plasterboards, plasterboardthicknesses, closedJoint);
 
-            double tf = ComputePanelFailureTime(tch, plasterboards, plasterboardthicknesses, fastenerLength, horizontal, timber);
-
-            //
-            //if (tf < tch) tch = tf;
+            double tf = ComputePanelFailureTime(tch, plasterboards, plasterboardthicknesses, horizontal);
 
             double K2 = ComputeK2(plasterboards, plasterboardthicknesses);
 
@@ -104,6 +103,12 @@ namespace StructuralDesignKitLibrary.EC5
             double ta = ComputeTa(tch, tf, K2, Bn);
 
             double k0 = ComputeK0(tch, t, true);
+
+
+            //Due to the implementation of different sources for the failure time of the protection (ÖNORM, Draft EN-1995-2 [2020])
+            //The calculation of the protection failure time can be shorter than the combustion start.
+            //In this case, we set tch = tf
+            if (tf < tch) tch = tf;
 
             // t < tch
             if (t < tch) return 0;
@@ -181,180 +186,131 @@ namespace StructuralDesignKitLibrary.EC5
 
 
         /// <summary>
-        /// Compute the Panel Failure Time according to the Austrian approach
+        /// Compute the Panel Failure Time according to both the ÖNORM and the Draft EN 1995-1-2:2020 (E) to provide a safer design while 
+        /// waiting for the implementation of the new version of the Eurocode 5. Variations from the ÖNORM apply for horizontal plasterboards type A/H
         /// </summary>
         /// <param name="tch"></param>
         /// <param name="plasterboards"></param>
         /// <param name="plasterboardthicknesses"></param>
-        /// <param name="fastenerLenght"></param>
         /// <param name="horizontal">Boolean value to represent if the protection is horizontal or vertical</param>
-        /// <param name="timber"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static double ComputePanelFailureTime(double tch, List<PlasterboardType> plasterboards, List<double> plasterboardthicknesses, int fastenerLenght, bool horizontal, IMaterialTimber timber)
+        public static double ComputePanelFailureTime(double tch, List<PlasterboardType> plasterboards, List<double> plasterboardthicknesses, bool horizontal)
+        {
+            //--------------------------------------------------------------------------------------------------------------------------------
+            //NOTES ON THE CALCULATION OF THE PANEL FAILURE TIME
+            //--------------------------------------------------------------------------------------------------------------------------------
+            //As the current version of the Eurocode 5 does not provide a mean to calculate tf, the Austrian approach based on the 
+            //results from the Holzforschung Austria[Teibinger und Matzinger 2010] is implemented.
+            //However, the ÖNORM calculation provides inconsistent results on horizontal surfaces where the plasterboards type A perform better than
+            //the plasterboards type F.
+            //To take this shortcoming into account, the panel failure time according to the draft of the new EN 1995-1-2:2020 (E) is considered for
+            //the calculation of horizontal plasterboard type A/H
+            //--------------------------------------------------------------------------------------------------------------------------------
+
+            //Sanity checks
+            if (plasterboards.Count > 2 || plasterboards.Count <= 0) throw new Exception("The amount of plasterboard should be 1 or 2");
+            if (!plasterboards.Contains(PlasterboardType.TypeF) && !plasterboards.Contains(PlasterboardType.TypeA)) throw new Exception("The amount of plasterboard should be 1 or 2");
+
+
+            //tf for plasterboards type A/H
+            if (plasterboards.Contains(PlasterboardType.TypeA))
+            {
+                if (plasterboards.Count == 1 && horizontal)
+                {
+                    double hp = plasterboardthicknesses.Sum();
+
+                    return (2.1 * hp - 9) * 1.1; //EN 1995-1-2:2020 (E) Table 5.4
+                }
+
+                else if (plasterboards.Count == 2 && horizontal)
+                {
+                    double hp = plasterboardthicknesses.Sum();
+
+                    return (1.7 * hp - 13) * 1.1; //EN 1995-1-2:2020 (E) Table 5.4
+                }
+
+                else return tch; //EN 1995-1-2 §3.4.3.4 (3)
+            }
+
+            //tf for plasterboards type F according to  Holzforschung Austria[Teibinger und Matzinger 2010]
+            else
+            {
+                double hp;
+                double tf_p = 0;
+
+                if (plasterboards.Count == 1)
+                {
+                    hp = plasterboardthicknesses[0];
+                }
+                else
+                {
+                    hp = plasterboardthicknesses[0] + plasterboardthicknesses[1] * 0.8;
+                }
+
+                if (horizontal) tf_p = 1.4 * hp + 6;
+
+                else tf_p = 2.2 * hp + 4;
+
+                return tf_p;
+            }
+        }
+
+
+
+        /// <summary>
+        /// Return the minimum fire protection fastener length in [mm] according to EN 1995-1-2 §3.4.3.4 (4) - Eq 3.16
+        /// </summary>
+        /// <param name="d">Fastener diameter in [mm]</param>
+        /// <param name="t">exposed duration</param>
+        /// <param name="timber">Timber member material</param>
+        /// <param name="plasterboards">List of the type of plasterboards (max 2); For 2 plasterboards, the first one is the external one</param>
+        /// <param name="plasterboardthicknesses">List of the thicknesses of plasterboards (max 2); For 2 plasterboards, the first one is the external one</param>
+        /// <param name="closedJoint">if true, joints between plasterboards is considered <2mm; if false > 2mm</param>
+        /// <param name="horizontal">Boolean value to represent if the protection is horizontal or vertical</param>
+        /// <returns></returns>
+        public static double ComputeProtectionMinFastenerLength(double d, int t, IMaterialTimber timber, List<PlasterboardType> plasterboards, List<double> plasterboardthicknesses, bool closedJoint, bool horizontal)
         {
             if (plasterboards.Count > 2 || plasterboards.Count <= 0) throw new Exception("The amount of plasterboard should be 1 or 2");
             if (!plasterboards.Contains(PlasterboardType.TypeF) && !plasterboards.Contains(PlasterboardType.TypeA)) throw new Exception("The amount of plasterboard should be 1 or 2");
 
 
-            //If the plasterboards are not type F, tf = tch
-            if (plasterboards.Contains(PlasterboardType.TypeA)) return tch;
+            //Compute charring depth at tf
+
+            double dchar;
+            //Bn, Design notional charring rate under standard fire exposure 
+            //tch, start of charring
+            //tf, Failure time of protection 
+            //ta, time limit above which the charring rate gets back to Bn
+            double d0 = 7.0;
+            double tch = ComputeCombustionStart(plasterboards, plasterboardthicknesses, closedJoint);
+            double tf = ComputePanelFailureTime(tch, plasterboards, plasterboardthicknesses, horizontal);
+            double K2 = ComputeK2(plasterboards, plasterboardthicknesses);
+            double Bn = timber.Bn;
+            double k0 = ComputeK0(tch, t, true);
 
 
-            //---------------------------------------------
-            //Max value for panel fasteners failure according to //DIN EN 1995-1-2 §C2.3
-            //---------------------------------------------
+            //Due to the implementation of different sources for the failure time of the protection (ÖNORM, Draft EN-1995-2 [2020])
+            //The calculation of the protection failure time can be shorter than the combustion start.
+            //In this case, we set tch = tf
+            if (tf < tch) tch = tf;
+
+            // t < tch
+            if (t < tch) dchar = 0;
+
+            // tch <= t <= ta
+            else if (t >= tch && t <= tf) dchar =  K2 * Bn * (t - tch) + k0 * d0;
+
+            else dchar = K2 * Bn * (tf - tch) + k0 * d0;
 
 
-            int lf = fastenerLenght;
-            int la_min = 10;
             double hp = plasterboardthicknesses.Sum();
-            double ks = 1.1; // DIN EN 1995-1-2 table C1 - Value taken for a minimal cross section of 60mm; Higher value might apply in case of timberframe wall (38 & 45mm); Unlikely for structural element
-            double k2 = 0;
-            double kj = 0;
 
-            //We can consider that there will always be a joint, so onJoint = true
-            bool OnJoint = true;
-            if (OnJoint)
-            {
-                k2 = 0.86 - 0.0037 * hp;    //DIN EN 1995-1-2 Eq C4
-                kj = 1.15;                  //DIM EN 1995-1-2 Eq C11
-            }
-            else //No plasterboard joint over the considered area - implemented but not used
-            {
-                k2 = 1.05 - 0.0073 * hp;    //DIN EN 1995-1-2 Eq C3
-                kj = 1;                     //DIM EN 1995-1-2 Eq C10
-            }
-
-
-            double kn = 1.5;                //DIN EN 1995-1-2 §C2.1 (1)
-
-            double tf_f = tch + (lf - la_min - hp) / (ks * k2 * kn * kj * timber.B0); //DIN EN 1995-1-2 Eq C9
-
-            if (tf_f < 0) throw new Exception("Fasteners are too short - they should at least go 10mm in the uncharred timber");
-
-
-
-
-            //--------------------------------------------------------------------------------------------------------------------------------
-            //As the current version of the Eurocode 5 does not provide a mean to calculate these value, the Austrian approach based on the 
-            //results from the Holzforschung Austria [Teibinger und Matzinger 2010] is implemented
-            //--------------------------------------------------------------------------------------------------------------------------------
-
-            double tf_p = 0;
-
-            if (plasterboards.Count == 1)
-            {
-                hp = plasterboardthicknesses[0];
-            }
-            else
-            {
-                hp = plasterboardthicknesses[0] + plasterboardthicknesses[1] * 0.8;
-            }
-
-
-            if (horizontal) tf_p = 1.4 * hp + 6;
-            else tf_p = 2.2 * hp + 4;
-
-            //making sure failure time of the panel is not lower than start of charring time 
-            //This can happen with the austrian approach and this lead to panel type A performing better than panel type F.
-            //To our opinion, this should not be the case, hence the decision to put a lower threshold to the panel failure time
-            if (tf_p < tch) tf_p = tch;
-
-            return (Math.Min(tf_f, tf_p));
+            //The minimal length is considered as the panels thickness + the maximum of
+            // - 6x fastener diameter
+            // - The carbonised timber (when the protection fails) + 10mm according to EN 1995-1-2 §3.4.3.4 (4) - Eq 3.16
+            return Math.Max(d * 6 + hp, dchar + 10 + hp);
         }
-
-
-        public static double ComputePanelFailureTimeDepreciated(double tch, List<PlasterboardType> plasterboards, List<double> plasterboardthicknesses, int fastenerLenght, bool OnJoint, IMaterialTimber timber)
-        {
-
-            if (plasterboards.Count > 2 || plasterboards.Count <= 0) throw new Exception("The amount of plasterboard should be 1 or 2");
-            foreach (PlasterboardType plasterboard in plasterboards)
-            {
-                if (plasterboard != PlasterboardType.TypeF && plasterboard != PlasterboardType.TypeA) throw new Exception("Plasterboard type not implemented");
-                if (plasterboard == PlasterboardType.TypeA) return tch;
-            }
-
-
-
-            //Max value for panel fasteners failure according to //DIN EN 1995-1-2 §C2.3
-            int lf = fastenerLenght;
-            int la_min = 10;
-            double hp = plasterboardthicknesses.Sum();
-            double ks = 1.1; // DIN EN 1995-1-2 table C1 - Value taken for a minimal cross section of 60mm; Higher value might apply in case of timberframe wall (38 & 45mm); Unlikely for structural element
-            double k2 = 0;
-            double kj = 0;
-
-            //We can consider that there will always be a joint, so onJoint = true
-            OnJoint = true;
-            if (OnJoint)
-            {
-                k2 = 0.86 - 0.0037 * hp;    //DIN EN 1995-1-2 Eq C4
-                kj = 1.15;                  //DIM EN 1995-1-2 Eq C11
-            }
-            else //No plasterboard joint over the considered area
-            {
-                k2 = 1.05 - 0.0073 * hp;    //DIN EN 1995-1-2 Eq C3
-                kj = 1;                     //DIM EN 1995-1-2 Eq C10
-            }
-
-
-
-            double kn = 1.5;                //DIN EN 1995-1-2 §C2.1 (1)
-
-
-            double tf_f = tch + (lf - la_min - hp) / (ks * k2 * kn * kj * timber.B0); //DIN EN 1995-1-2 Eq C9
-
-            if (tf_f < 0) throw new Exception("Fasteners are too short - they should at least go 10mm in the uncharred timber");
-
-            //-------------------------------------------------------------------------------------------------------------
-            //As the current version of the Eurocode 5 does not provide a mean to calculate these value, it was currently
-            //chosen to implement the equations provided by the Draft of the new version of the Eurocode 5, even if it is 
-            //not yet implemented.
-            //Conservatively, only the value for horizontal time failure have been implemented and only for type F panels
-            //The whole process according to this standard will be implemented when the new Eurocode will be enforced ~2025
-            //-------------------------------------------------------------------------------------------------------------
-
-
-            double tf_p = 0;
-
-            //Max value for panel failure according to //EN 1995-1-2:2020 (E) Draft 2021  - §5.4.2.3 - Table 5.4
-            if (plasterboards.Count == 1)
-            {
-                //verify conformity with standard
-
-                if (plasterboardthicknesses[0] > 18 || plasterboardthicknesses[0] < 9) throw new Exception("Single plasterboard thickness needs to be comprised between 9 and 18mm");
-
-
-                if (plasterboards[0] == PlasterboardType.TypeF) tf_p = 1.3 * hp + 9;
-                else if (plasterboards[0] == PlasterboardType.TypeA) tf_p = 2.1 * hp - 9;
-                else throw new Exception("Plasterboard type not implemented");
-
-                if (tf_p < tch) tf_p = tch; //making sure failure time of the panel is not lower than start of charring time | To ensure compatibility between Draft of the new EC5 and current EC5
-
-            }
-            else
-            {
-                //verify conformity with standard
-                double thick = plasterboardthicknesses.Sum();
-                if (thick > 36 || thick < 24) throw new Exception("the overall plasterboards thickness needs to be comprised between 24 and 36mm");
-
-
-                if (plasterboards[0] == PlasterboardType.TypeF) tf_p = 1.5 * hp + 15;
-                else if (plasterboards[0] == PlasterboardType.TypeA) tf_p = 1.7 * hp - 13;
-
-                else throw new Exception("Plasterboard type not implemented");
-
-                tf_p *= 1.1;
-                if (tf_p < tch) tf_p = tch;//making sure failure time of the panel is not lower than start of charring time | To ensure compatibility between Draft of the new EC5 and current EC5
-            }
-
-
-
-            return (Math.Min(tf_f, tf_p));
-
-        }
-
 
         /// <summary>
         /// Insulation coefficient according to DIN EN 1995-1-2 §3.4.3.2 (2)
@@ -380,18 +336,22 @@ namespace StructuralDesignKitLibrary.EC5
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public static double ComputeTa(double tch, double tf, double k2, double Bn)
-
         {
+            //Due to the implementation of different sources for the failure time of the protection (ÖNORM, Draft EN-1995-2 [2020])
+            //The calculation of the protection failure time can be shorter than the combustion start.
+            //In this case, we set tch = tf
+            if (tf < tch) tch = tf;
+
+
             double ta = 0;
             if (tch == tf)
             {
                 ta = Math.Min(2 * tf, 25 / (K3 * Bn) + tf);//DIN EN 1995-1-2 Eq 3.8
             }
-            else if (tch < tf)
+            else
             {
                 ta = (25 - (tf - tch) * k2 * Bn) / (K3 * Bn) + tf;  //DIN EN 1995-1-2 Eq 3.9
             }
-            else throw new Exception("Case not covered");
 
             return ta;
         }
