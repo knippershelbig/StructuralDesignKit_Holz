@@ -263,7 +263,10 @@ namespace StructuralDesignKitLibrary.Connections.Fasteners
             else
             {
                 double nef_0 = Math.Min(n, Math.Pow(n, 0.9) * Math.Pow(a1 / (13 * Diameter), 0.25));
-                return SDKUtilities.LinearInterpolation(angle, 0, nef_0, 90, n);
+
+                int angleFirstQuadrant = SDKUtilities.ComputeAngleToFirstQuadrant(angle);
+
+                return SDKUtilities.LinearInterpolation(Convert.ToDouble(angleFirstQuadrant), 0, nef_0, 90, n);
             }
         }
 
