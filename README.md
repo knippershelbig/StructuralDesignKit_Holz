@@ -6,7 +6,9 @@ This project is supported by knippershelbig GmbH
 
 ![ezgif-5-639fe7203d](https://user-images.githubusercontent.com/43774443/234279448-ab06318e-1957-4f30-99c6-15ffa39c6005.gif)
 
-![image](https://github.com/knippershelbig/StructuralDesignKit_Holz/assets/43774443/e60b50f1-2f45-4e55-b699-7cf90e80f941)
+<img src="https://github.com/knippershelbig/StructuralDesignKit_Holz/assets/43774443/bfb4be47-db09-4012-8506-a06b4648feed" width="700px">
+
+
 
 <b>Grasshopper</b> 
  
