@@ -392,7 +392,7 @@ namespace StructuralDesignKitExcel.RibbonActions
 
 
             //Units
-            activeCell = baseCell.Offset[1, 2]; activeCell.Value2 = "Degree";
+            activeCell = baseCell.Offset[2, 2]; activeCell.Value2 = "Degree";
             activeCell = activeCell.Offset[3, 0]; activeCell.Value2 = "mm";
 
 
