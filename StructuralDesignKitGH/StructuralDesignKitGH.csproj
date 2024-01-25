@@ -9,7 +9,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.2.54" />
+    <PackageReference Include="Dlubal.RFEMWebServiceLibrary" Version="6.4.13" />
     <PackageReference Include="Grasshopper" Version="7.30.23163.13001" IncludeAssets="compile;build" />
   </ItemGroup>
   

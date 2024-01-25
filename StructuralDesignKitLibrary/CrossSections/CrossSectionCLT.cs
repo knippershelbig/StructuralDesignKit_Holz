@@ -1,4 +1,5 @@
 ﻿using Dlubal.RFEM5;
+using Dlubal.WS.Rfem6.Model;
 using StructuralDesignKitLibrary.CrossSections.Interfaces;
 using StructuralDesignKitLibrary.Materials;
 using System;
@@ -10,339 +11,297 @@ using System.Threading.Tasks;
 
 namespace StructuralDesignKitLibrary.CrossSections
 {
-	public class CrossSectionCLT
-	{
-		public int ID { get; set; }
-		public string Name { get; set; }
-		public string Description { get; set; }
-		public int Thickness { get; set; }
-		public int NbOfLayers { get; set; }
-
-		/// <summary>
-		/// List of lamella thicknesses
-		/// </summary>
-		public List<int> LamellaThicknesses { get; set; }
-
-		/// <summary>
-		/// List of lamella orientation (0° or 90°)
-		/// </summary>
-		private List<int> _orientations;
-
-		public List<int> LamellaOrientations
-		{
-			get { return _orientations; }
-			set
-			{
-				//Verify if the lamella orientation is properly defined
-				foreach (int angle in value)
-				{
-					if (angle != 0 && angle != 90) throw new Exception("The CLT lamella angle can only be 0° or 90°");
-				}
-				_orientations = value;
-			}
-		}
-
-		/// <summary>
-		/// List of the material constituing each lamella
-		/// </summary>
-		public List<IMaterialTimber> LamellaMaterials { get; set; }
-
-		/// <summary>
-		/// Position of the lamella center of gravity from the CS upper edge
-		/// </summary>
-		public List<double> LamellaDistanceFromTopFibre { get; set; }
-
-		/// <summary>
-		/// Distance from the center of gravity of a layer to overall center of gravity
-		/// </summary>
-		public List<double> LamellaDistanceToCDG { get; set; }
-
-		/// <summary>
-		/// define the with of a single lamella
-		/// </summary>
-		public int LamellaWidth { get; set; }
-
-		/// <summary>
-		/// define if the narrow side of the lamella is glued
-		/// </summary>
-		public bool NarrowSideGlued { get; set; }
-
-		//Reference E modulus in the X axis to determine the geometrical properties
-		private double EcX { get; set; }
-		private double EcY { get; set; }
-
-        private int FirstLayer0{ get; set; }
-        private int FirstLayer90{ get; set; }
-        private int LastLayer0{ get; set; }
-        private int LastLayer90{ get; set; }
-
-
-		public double CenterOfGravityXX { get; set; }
-		public double CenterOfGravityYY { get; set; }
-
-        public double ZuXX{ get; set; }
-        public double ZoXX{ get; set; }
-        public double ZuYY{ get; set; }
-        public double ZoYY{ get; set; }
-		
-		public double AreaX { get; set; }
-		public double AreaY { get; set; }
-		public double MomentOfInertiaXX { get; set; }
-		public double MomentOfInertiaYY { get; set; }
-		/// <summary>
-		/// Section Module 0°
-		/// </summary>
-		public double WXX { get; set; }
-
-		/// <summary>
-		/// Section Module 90°
-		/// </summary>
-		public double WYY { get; set; }
-
-
-		public double TorsionalInertia { get; set; }
-		public double SectionModulus_XX { get; set; }
-		public double SectionModulus_YY { get; set; }
-		public double TorsionalModulus { get; set; }
-		public double NxCompressionChar { get; set; }
-		public double NxTensionChar { get; set; }
-		public double NyCompressionChar { get; set; }
-		public double NyTensionChar { get; set; }
-		public double NxyChar { get; set; }
-		public double MxChar { get; set; }
-		public double MxyChar { get; set; }
-		public double VxChar { get; set; }
-		public double VyChar { get; set; }
+    /// <summary>
+    /// Class defining a CLT Cross-section
+    /// A cross section differs from a layup. The layup represents the "physical" assembly of boards
+    /// while whe cross section provides the mechanical properties, either in X (0°) or Y (90°)
+    /// 
+    /// the cross section can be equivalent to its parent layup or it can be a part of it
+    /// 
+    /// A layup two cross sections 
+    /// The different notations and approaches are taken from 
+    /// - "2018 Wallner-Novak M., CLT structural design I proHOLZ -  ISBN 978-3-902926-03-6"
+    /// - "2018 Wallner-Novak M., CLT structural design II proHOLZ -  ISBN 978-3-902320-96-4"
+    /// </summary>
+    public class CrossSectionCLT
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public double Thickness { get; set; }
+        public int NbOfLayers { get; set; }
+
+        /// <summary>
+        /// List of lamella thicknesses
+        /// </summary>
+        public List<double> LamellaThicknesses { get; set; }
+
+        /// <summary>
+        /// List of lamella orientation (0° or 90°)
+        /// </summary>
+
+        public List<int> LamellaOrientations { get; set; }
+
+        /// <summary>
+        /// List of the material constituing each lamella
+        /// </summary>
+        public List<IMaterialTimber> LamellaMaterials { get; set; }
+
+        /// <summary>
+        /// Position of the lamella center of gravity from the CS upper edge
+        /// </summary>
+        public List<double> LamellaCoGDistanceFromTopFibre { get; set; }
 
-		//------------------------------------------------------------------------------------
-		//Define EIx EIy, GAx, GAy, ExEquivalent, EyEquivalent to be defined as orthotropic material in Karamba for instance 
-		//with the constant stiffness representing the overall thickness of the CLT plate
-		//------------------------------------------------------------------------------------
+        /// <summary>
+        /// Distance from the center of gravity of a layer toward the overall center of gravity
+        /// </summary>
+        public List<double> LamellaDistanceToCDG { get; set; }
+
+
+        //Reference E modulus 
+        private double ERef { get; set; }
+
+
+
+        //Center of gravity in both main direction ; in mm from the top
+        public double CenterOfGravity { get; set; }
 
 
+        /// <summary>
+        /// Distance of the bottom edge to the overall center of gravity - X direction
+        /// </summary>
+        public double Zu { get; set; }
 
-		public CrossSectionCLT(List<int> thicknesses, List<int> orientations, List<IMaterialTimber> materials, int lamellaWidth = 150, bool narrowSideGlued = false)
-		{
-			LamellaThicknesses = thicknesses;
-			LamellaOrientations = orientations;
-			LamellaMaterials = materials;
-			LamellaWidth = lamellaWidth;
-			NarrowSideGlued = narrowSideGlued;
-			LamellaDistanceFromTopFibre = new List<double>();
-			LamellaDistanceToCDG = new List<double>();
-			NbOfLayers = LamellaMaterials.Count;
-			ComputeCrossSectionProperties();
-		}
+        /// <summary>
+        /// Distance of the top edge to the overall center of gravity - X direction
+        /// </summary>
+        public double Zo { get; set; }
 
+        /// <summary>
+        /// Active area in the considered direction in mm²
+        /// </summary>
+        public double Area { get; set; }
 
+        /// <summary>
+        /// Moment of inertia in mm4
+        /// </summary>
+        public double MomentOfInertia { get; set; }
 
+        /// <summary>
+        /// Section Module (net) in mm³
+        /// </summary>
+        public double W0_Net { get; set; }
 
-		//Implement a picture in Excel / GH equivalent to KLH documentation
+        /// <summary>
+        /// Static Moment for rolling shear
+        /// </summary>
+        public double Sr0Net { get; set; }
+
+
+        /// <summary>
+        /// Static Moment for  shear
+        /// </summary>
+        public double S0Net { get; set; }
+
+        public double TorsionalInertia { get; set; }
+        public double TorsionalModulus { get; set; }
+        public double NCompressionChar { get; set; }
+        public double NTensionChar { get; set; }
+        public double NxyChar { get; set; }
+        public double MChar { get; set; }
+        public double MxyChar { get; set; }
+        public double VChar { get; set; }
+
 
 
-		public void ComputeCrossSectionProperties()
-		{
-			//Checks and preparatory methods
-			CheckLayupValidity();
-			DefineReferenceElasticityModuls();
-			Thickness = LamellaThicknesses.Sum();
-			FirstLayer0 = LamellaOrientations.IndexOf(0);
-			FirstLayer90 = LamellaOrientations.IndexOf(90);
-			LastLayer0 = LamellaOrientations.LastIndexOf(0);
-			LastLayer90 = LamellaOrientations.LastIndexOf(90);
-
-			ComputeCenterOfGravities();
-			ComputeNetAreas();
-			ComputeInertia();
-
-
-		}
-
-		/// <summary>
-		/// Verify that the layup has at least one layer in X and one layer in Y to qualify as CLT and that the geometric
-		/// properties can be computed without errors
-		/// </summary>
-		private void CheckLayupValidity()
-		{
-
-			//Check layers orientation
-			bool layer0 = false;
-			bool layer90 = false;
-
-			for (int i = 0; i < NbOfLayers; i++)
-			{
-				if (LamellaOrientations[i] == 0) layer0 = true;
-				if (LamellaOrientations[i] == 90) layer90 = true;
-				if (layer0 && layer90) break;
-			}
-
-			if (!layer0 || !layer90) throw new Exception("The CLT layup does not have at least one layer at 0° X and one layer at 90°");
-
-			//Check consistancy in layer input
-			if (LamellaMaterials.Count != LamellaOrientations.Count || LamellaMaterials.Count != LamellaThicknesses.Count)
-			{
-				throw new Exception("The input data is not consistent between the number of Materials, thicknesses and orientations provided");
-			}
-
-		}
-
-		private void DefineReferenceElasticityModuls()
-		{
-			//The reference moduli of elasticity are taken as the first layer in either 0° or 90°
-			int i = LamellaOrientations.FindIndex(p => p == 0);
-			int j = LamellaOrientations.FindIndex(p => p == 90);
-			EcX = LamellaMaterials[i].E0mean;
-			EcY = LamellaMaterials[j].E0mean;
-
-		}
-
-		private void ComputeCenterOfGravities()
-		{
-			double distToCOG = 0;
-
-			double nominatorXX = 0;
-			double denominatorXX = 0;
-			double nominatorYY = 0;
-			double denominatorYY = 0;
+        //------------------------------------------------------------------------------------
+        //Define EIx EIy, GAx, GAy, ExEquivalent, EyEquivalent to be defined as orthotropic material in Karamba for instance 
+        //with the constant stiffness representing the overall thickness of the CLT plate
+        //------------------------------------------------------------------------------------
 
 
-			for (int i = FirstLayer0; i < LastLayer0; i++)
-			{
 
-			}
+        public CrossSectionCLT(List<double> thicknesses, List<int> orientations, List<IMaterialTimber> materials, int lamellaWidth = 150, bool narrowSideGlued = false)
+        {
+            LamellaThicknesses = thicknesses;
+            LamellaOrientations = orientations;
+            LamellaMaterials = materials;
+            LamellaCoGDistanceFromTopFibre = new List<double>();
+            LamellaDistanceToCDG = new List<double>();
+            NbOfLayers = LamellaMaterials.Count;
+            ComputeCrossSectionProperties();
+        }
 
-			for (int i = FirstLayer90; i < LastLayer90; i++)
-			{
 
-			}
+        //Implement a picture in Excel / GH equivalent to KLH documentation
 
 
-			for (int i = 0; i < NbOfLayers; i++)
-			{
-				double oi = distToCOG + LamellaThicknesses[i] / 2;
-				LamellaDistanceFromTopFibre.Add(oi);
+        public void ComputeCrossSectionProperties()
+        {
+            //Define the top lamella as the reference material
+            ERef = LamellaMaterials[0].E0mean;
+            Thickness = LamellaThicknesses.Sum();
 
-				if (LamellaOrientations[i] == 0)
-				{
-					nominatorXX += LamellaMaterials[i].E0mean / EcX * LamellaThicknesses[i] * oi;
-					denominatorXX += LamellaMaterials[i].E0mean / EcX * LamellaThicknesses[i];
-				}
-				else
-				{
-					nominatorYY += LamellaMaterials[i].E0mean / EcY * LamellaThicknesses[i] * oi;
-					denominatorYY += LamellaMaterials[i].E0mean / EcY * LamellaThicknesses[i];
-				}
-				distToCOG += LamellaThicknesses[i];
+            ComputeCenterOfGravity();
+            ComputeNetAreas();
+            ComputeInertia();
+            ComputeSectionModulus();
+            ComputeStaticMoment();
+        }
 
-			}
 
-			CenterOfGravityXX = nominatorXX / denominatorXX;
-			CenterOfGravityYY = nominatorYY / denominatorYY;
 
-			for (int i = 0; i < NbOfLayers; i++)
-			{
-				if (LamellaOrientations[i] == 0)
-				{
-					LamellaDistanceToCDG.Add(LamellaDistanceFromTopFibre[i] - CenterOfGravityXX);
-				}
-				else
-				{
-					LamellaDistanceToCDG.Add(LamellaDistanceFromTopFibre[i] - CenterOfGravityYY);
-				}
-			}
-		}
+        private void ComputeCenterOfGravity()
+        {
+            double distToCOG = 0;
+
+            double nominator = 0;
+            double denominator = 0;
+
+            for (int i = 0; i < NbOfLayers; i++)
+            {
+                //Position of the center of gravity of the individual layers from the element's upper edge
+                double oi = distToCOG + LamellaThicknesses[i] / 2;
+
+                LamellaCoGDistanceFromTopFibre.Add(oi);
+
+                if (LamellaOrientations[i] == 0)
+                {
+                    nominator += LamellaMaterials[i].E0mean / ERef * LamellaThicknesses[i] * oi;
+                    denominator += LamellaMaterials[i].E0mean / ERef * LamellaThicknesses[i];
+                }
 
-		private void ComputeNetAreas()
-		{
-			for (int i = 0; i < NbOfLayers; i++)
-			{
-				if (LamellaOrientations[i] == 0)
-				{
-					AreaX += LamellaMaterials[i].E0mean / EcX * 1000 * LamellaThicknesses[i];
-				}
-				else
-				{
-					AreaY += LamellaMaterials[i].E0mean / EcY * 1000 * LamellaThicknesses[i];
-				}
+                distToCOG += LamellaThicknesses[i];
+            }
 
-			}
-		}
+            CenterOfGravity = nominator / denominator;
 
-		private void ComputeInertia()
-		{
-			for (int i = 0; i < NbOfLayers; i++)
-			{
-				//XX
-				if (LamellaOrientations[i] == 0)
-				{
-					MomentOfInertiaXX += LamellaMaterials[i].E0mean / EcX * 1000 * Math.Pow(LamellaThicknesses[i], 3) / 12;
-					MomentOfInertiaXX += LamellaMaterials[i].E0mean / EcX * 1000 * LamellaThicknesses[i] * Math.Pow(LamellaDistanceToCDG[i], 2);
-				}
+
+            //Compute the distance of the center of gravity of the individual layers from the Layup CoG
+            for (int i = 0; i < NbOfLayers; i++)
+            {
+                LamellaDistanceToCDG.Add(LamellaCoGDistanceFromTopFibre[i] - CenterOfGravity);
+            }
 
-				//YY
-				else
-				{
-					MomentOfInertiaYY += LamellaMaterials[i].E0mean / EcY * 1000 * Math.Pow(LamellaThicknesses[i], 3) / 12;
-					MomentOfInertiaYY += LamellaMaterials[i].E0mean / EcY * 1000 * LamellaThicknesses[i] * Math.Pow(LamellaDistanceToCDG[i], 2);
-				}
-			}
 
+            //Compute the distance of the top and bottom edge toward the center of gravity
+            Zo = Math.Abs(LamellaDistanceToCDG.First()) + LamellaThicknesses.First() / 2;
+            Zu = Math.Abs(LamellaDistanceToCDG.Last()) + LamellaThicknesses.Last() / 2;
+        }
+
+        /// <summary>
+        /// Compute the net area in both directions
+        /// </summary>
+        private void ComputeNetAreas()
+        {
+            for (int i = 0; i < NbOfLayers; i++)
+            {
+                if (LamellaOrientations[i] == 0)
+                {
+                    Area += LamellaMaterials[i].E0mean / ERef * 1000 * LamellaThicknesses[i];
+                }
+            }
+        }
+
 
-			//Section Modulus
-			//XX
-
-
-			//YY
-
-
-
-
-		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		public List<double> ComputeNormalStress(double NormalForce)
-		{
-			throw new NotImplementedException();
-		}
-
-		public List<double> ComputeShearStressX(double ShearForceY)
-		{
-			throw new NotImplementedException();
-		}
-
-		public List<double> ComputeShearStressY(double ShearForceZ)
-		{
-			throw new NotImplementedException();
-		}
-
-		public List<double> ComputeStressBendingX(double BendingMomentY)
-		{
-			throw new NotImplementedException();
-		}
-
-		public List<double> ComputeStressBendingY(double BendingMomentZ)
-		{
-			throw new NotImplementedException();
-		}
-
-		public List<double> ComputeTorsionStress(double TorsionMoment)
-		{
-			throw new NotImplementedException();
-		}
-
-
-	}
+        private void ComputeInertia()
+        {
+            for (int i = 0; i < NbOfLayers; i++)
+            {
+                if (LamellaOrientations[i] == 0)
+                {
+                    MomentOfInertia += LamellaMaterials[i].E0mean / ERef * 1000 * Math.Pow(LamellaThicknesses[i], 3) / 12;
+                    MomentOfInertia += LamellaMaterials[i].E0mean / ERef * 1000 * LamellaThicknesses[i] * Math.Pow(LamellaDistanceToCDG[i], 2);
+                }
+            }
+        }
+
+
+
+
+        private void ComputeStaticMoment()
+        {
+            //define longitudinal layer closest to the position of the center of gravity
+            int lamellaIndex = 0;
+            bool CoGinLayer = false;
+            for (int i = 0; i < LamellaDistanceToCDG.Count; i++)
+            {
+                if (LamellaOrientations[i] == 0)
+                {
+                    if (Math.Abs(LamellaDistanceToCDG[i]) < Math.Abs(LamellaDistanceToCDG[lamellaIndex])) lamellaIndex = i;
+                }
+            }
+
+
+            for (int i = 0; i < lamellaIndex + 1; i++)
+            {
+                if (LamellaOrientations[i] == 0)
+                {
+                    Sr0Net += ERef / LamellaMaterials[i].E0mean * 1000 * LamellaThicknesses[i] * Math.Abs(LamellaDistanceToCDG[i]);
+                }
+            }
+
+            //define if Center of gravity is situated in the closest longitudinal layer 
+            if (LamellaDistanceToCDG[lamellaIndex] < LamellaThicknesses[lamellaIndex] / 2) CoGinLayer = true;
+
+            //if the center of gravity is located in the affected region
+            if (CoGinLayer)
+            {
+                for (int i = 0; i < lamellaIndex + 1; i++)
+                {
+                    if (LamellaOrientations[i] == 0)
+                    {
+                        S0Net += ERef / LamellaMaterials[i].E0mean * 1000 * LamellaThicknesses[i] * LamellaDistanceToCDG[i] + 1000 * (Math.Pow(LamellaThicknesses[lamellaIndex] / 2 - LamellaDistanceToCDG[lamellaIndex], 2) / 2);
+                    }
+                }
+          
+            }
+
+            //if the center of gravity is not situated in the closest longitudinal layer
+            else
+            {
+                S0Net = Sr0Net;
+            }
+
+
+        }
+
+
+        private void ComputeSectionModulus()
+        {
+            W0_Net = MomentOfInertia / Math.Max(Math.Abs(Zu), Math.Abs(Zo));
+        }
+
+        public List<double> ComputeNormalStress(double NormalForce)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<double> ComputeShearStressX(double ShearForceY)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<double> ComputeShearStressY(double ShearForceZ)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<double> ComputeStressBendingX(double BendingMomentY)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<double> ComputeStressBendingY(double BendingMomentZ)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<double> ComputeTorsionStress(double TorsionMoment)
+        {
+            throw new NotImplementedException();
+        }
+
+
+    }
 }
