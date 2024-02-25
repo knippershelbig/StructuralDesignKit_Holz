@@ -298,6 +298,20 @@ namespace StructuralDesignKitLibrary.CrossSections
 			}
 
 
+
+			//List<List<double>> S0net
+
+			////Compute static moment per layer
+			//for (int i = 0; i < LamellaDistanceToCDG.Count; i++)
+			//{
+			//	if (LamellaOrientations[i] == 0)
+			//	{
+			//		if (Math.Abs(LamellaDistanceToCDG[i]) < Math.Abs(LamellaDistanceToCDG[lamellaIndex])) lamellaIndex = i;
+			//	}
+			//}
+
+
+
 		}
 
 
@@ -355,7 +369,11 @@ namespace StructuralDesignKitLibrary.CrossSections
 
 		public void ComputeShearStress(double ShearForceZ)
 		{
-			throw new NotImplementedException();
+
+
+
+
+
 		}
 
 

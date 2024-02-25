@@ -16,8 +16,8 @@ namespace SDK_Local_Development
 
 			//List<double> thicknesses = new List<double>() { 40, 20, 20, 20, 40 };
 			//List<int> orientations = new List<int>() { 0, 90, 0, 90, 0 };
-			List<double> thicknesses = new List<double>() { 40,40,40,40,40 };
-			List<int> orientations = new List<int>() { 0, 90, 0, 90, 0 };
+			List<double> thicknesses = new List<double>() { 40,40,40,40,40,40 };
+			List<int> orientations = new List<int>() { 0, 90, 0,0, 90, 0 };
 			MaterialTimberSoftwood c24 = new MaterialTimberSoftwood(MaterialTimberSoftwood.Grades.C24);
 			MaterialTimberGlulam Glulam = new MaterialTimberGlulam(MaterialTimberGlulam.Grades.GL24h);
 			MaterialTimberGeneric t1 = new MaterialTimberGeneric(new MaterialTimberSoftwood(MaterialTimberSoftwood.Grades.C24), new List<string>() { "E0mean" }, new List<object>() { 11000 }, "toto");
