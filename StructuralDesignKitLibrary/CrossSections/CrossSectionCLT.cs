@@ -1,5 +1,4 @@
-﻿using Dlubal.RFEM5;
-using Dlubal.WS.Rfem6.Model;
+﻿
 using StructuralDesignKitLibrary.CrossSections.Interfaces;
 using StructuralDesignKitLibrary.Materials;
 using System;
@@ -142,7 +141,7 @@ namespace StructuralDesignKitLibrary.CrossSections
             ERef = LamellaMaterials[0].E0mean;
             Thickness = LamellaThicknesses.Sum();
 
-            ComputeCenterOfGravity();
+            CenterOfGravity = ComputeCenterOfGravity(this);
             ComputeNetAreas();
             ComputeInertia();
             ComputeSectionModulus();
@@ -151,42 +150,44 @@ namespace StructuralDesignKitLibrary.CrossSections
 
 
 
-        private void ComputeCenterOfGravity()
+        private double ComputeCenterOfGravity( CrossSectionCLT CS)
         {
             double distToCOG = 0;
 
             double nominator = 0;
             double denominator = 0;
 
-            for (int i = 0; i < NbOfLayers; i++)
+            for (int i = 0; i < CS.NbOfLayers; i++)
             {
                 //Position of the center of gravity of the individual layers from the element's upper edge
-                double oi = distToCOG + LamellaThicknesses[i] / 2;
+                double oi = distToCOG + CS.LamellaThicknesses[i] / 2;
 
-                LamellaCoGDistanceFromTopFibre.Add(oi);
+                CS.LamellaCoGDistanceFromTopFibre.Add(oi);
 
-                if (LamellaOrientations[i] == 0)
+                if (CS.LamellaOrientations[i] == 0)
                 {
-                    nominator += LamellaMaterials[i].E0mean / ERef * LamellaThicknesses[i] * oi;
-                    denominator += LamellaMaterials[i].E0mean / ERef * LamellaThicknesses[i];
+                    nominator += CS.LamellaMaterials[i].E0mean / CS.ERef * CS.LamellaThicknesses[i] * oi;
+                    denominator += CS.LamellaMaterials[i].E0mean / CS.ERef * CS.LamellaThicknesses[i];
                 }
 
-                distToCOG += LamellaThicknesses[i];
+                distToCOG += CS.LamellaThicknesses[i];
             }
 
-            CenterOfGravity = nominator / denominator;
+             CS.CenterOfGravity =  nominator / denominator;
 
 
             //Compute the distance of the center of gravity of the individual layers from the Layup CoG
-            for (int i = 0; i < NbOfLayers; i++)
+            for (int i = 0; i < CS.NbOfLayers; i++)
             {
-                LamellaDistanceToCDG.Add(LamellaCoGDistanceFromTopFibre[i] - CenterOfGravity);
+                CS.LamellaDistanceToCDG.Add(CS.LamellaCoGDistanceFromTopFibre[i] - CS.CenterOfGravity);
             }
 
 
             //Compute the distance of the top and bottom edge toward the center of gravity
-            Zo = Math.Abs(LamellaDistanceToCDG.First()) + LamellaThicknesses.First() / 2;
-            Zu = Math.Abs(LamellaDistanceToCDG.Last()) + LamellaThicknesses.Last() / 2;
+            CS.Zo = Math.Abs(CS.LamellaDistanceToCDG.First()) + CS.LamellaThicknesses.First() / 2;
+            CS.Zu = Math.Abs(CS.LamellaDistanceToCDG.Last()) + CS.LamellaThicknesses.Last() / 2;
+
+            return CS.CenterOfGravity;
         }
 
         /// <summary>
@@ -215,7 +216,6 @@ namespace StructuralDesignKitLibrary.CrossSections
                 }
             }
         }
-
 
 
 
@@ -264,6 +264,17 @@ namespace StructuralDesignKitLibrary.CrossSections
             }
 
 
+        }
+
+
+        //Compute the different static moments as follow
+        //3 values per lamella up (top / middle / bottom) unless the CoG is in the lamella. Then a 4rth value is added
+        //The calculation is done from top to CoG and then from Bottom to COG
+        //The values are then sorted from top to bottom, per lamella
+        private List<List<double>> ComputeStaticMomentPerLamella()
+        {
+
+            return new List<List<double>>();
         }
 
 

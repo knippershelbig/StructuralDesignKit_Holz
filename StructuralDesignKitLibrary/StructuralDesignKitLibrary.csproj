@@ -35,13 +35,13 @@
     <Reference Include="Dlubal.DynamPro, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ad96acf4bd703704, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\..\..\..\..\Public\Documents\Dlubal\SDK\Reference Assemblies\x64\Dlubal.DynamPro.dll</HintPath>
+      <HintPath>U:\Desktop\Temp dev data\Dlubal.DynamPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Dlubal.RFEM5, Version=5.7.0.0, Culture=neutral, PublicKeyToken=f22b2f92593d105e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\..\..\..\..\Public\Documents\Dlubal\SDK\Reference Assemblies\x64\Dlubal.RFEM5.dll</HintPath>
+      <HintPath>U:\Desktop\Temp dev data\Dlubal.RFEM5.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RFEMWebServiceLibrary, Version=6.4.13.0, Culture=neutral, processorArchitecture=MSIL">
