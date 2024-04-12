@@ -92,38 +92,42 @@ namespace StructuralDesignKitLibrary.CrossSections
             LastLayer90 = LamellaOrientations.LastIndexOf(90);
 
 
-            List<double> lamellaThickness = new List<double>();
-            List<int> orientations = new List<int>();
-            List<IMaterialTimber> materials = new List<IMaterialTimber>();
+            List<double> lamellaThicknessX = new List<double>();
+            List<int> orientationsX = new List<int>();
+            List<IMaterialTimber> materialsX = new List<IMaterialTimber>();
 
-            for (int i = FirstLayer0; i < LastLayer0 + 1; i++)
+			List<double> lamellaThicknessY = new List<double>();
+			List<int> orientationsY = new List<int>();
+			List<IMaterialTimber> materialsY = new List<IMaterialTimber>();
+
+			for (int i = FirstLayer0; i < LastLayer0 + 1; i++)
             {
-                lamellaThickness.Add(Thicknesses[i]);
-                orientations.Add(LamellaOrientations[i]);
-                materials.Add(Materials[i]);
+                lamellaThicknessX.Add(Thicknesses[i]);
+                orientationsX.Add(LamellaOrientations[i]);
+                materialsX.Add(Materials[i]);
             }
 
-            CS_X = new CrossSectionCLT(lamellaThickness, orientations, materials, LamellaWidth, NarrowSideGlued);
+            CS_X = new CrossSectionCLT(lamellaThicknessX, orientationsX, materialsX, LamellaWidth, NarrowSideGlued);
 
-            lamellaThickness.Clear();
-            orientations.Clear();
-            materials.Clear();
+            //lamellaThickness.Clear();
+            //orientations.Clear();
+            //materials.Clear();
 
             for (int i = FirstLayer90; i < LastLayer90 + 1; i++)
             {
-                lamellaThickness.Add(Thicknesses[i]);
+                lamellaThicknessY.Add(Thicknesses[i]);
                 if (LamellaOrientations[i] == 0)
                 {
-                    orientations.Add(90);
+                    orientationsY.Add(90);
                 }
                 else
                 {
-                    orientations.Add(0);
+                    orientationsY.Add(0);
                 }
-                materials.Add(Materials[i]);
+                materialsY.Add(Materials[i]);
             }
 
-            CS_Y = new CrossSectionCLT(lamellaThickness, orientations, materials, LamellaWidth, NarrowSideGlued);
+            CS_Y = new CrossSectionCLT(lamellaThicknessY, orientationsY, materialsY, LamellaWidth, NarrowSideGlued);
         }
 
         /// <summary>

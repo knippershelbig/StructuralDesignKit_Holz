@@ -109,6 +109,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "C:\Users\gc\AppData\Roaming\Grasshopper\Libraries\KH\StructuralDesignKitLibrary.dll</PostBuildEvent>
+    <PostBuildEvent>Copy "$(TargetPath)" "C:\Users\Guillaume Caussarieu\AppData\Roaming\Grasshopper\Libraries\KH\StructuralDesignKitLibrary.dll</PostBuildEvent>
   </PropertyGroup>
 </Project>
