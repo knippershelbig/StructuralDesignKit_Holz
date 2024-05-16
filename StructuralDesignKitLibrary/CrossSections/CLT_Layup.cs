@@ -48,7 +48,7 @@ namespace StructuralDesignKitLibrary.CrossSections
         /// <summary>
         /// List of the material constituing each lamella
         /// </summary>
-        public List<IMaterialTimber> Materials { get; set; }
+        public List<MaterialCLT> Materials { get; set; }
 
         /// <summary>
         /// define the with of a single lamella
@@ -68,7 +68,7 @@ namespace StructuralDesignKitLibrary.CrossSections
         private int LastLayer90 { get; set; }
 
 
-        public CLT_Layup(List<double> thicknesses, List<int> orientations, List<IMaterialTimber> materials, int lamellaWidth = 150, bool narrowSideGlued = false)
+        public CLT_Layup(List<double> thicknesses, List<int> orientations, List<MaterialCLT> materials, int lamellaWidth = 150, bool narrowSideGlued = false)
         {
             Thicknesses = thicknesses;
             LamellaOrientations = orientations;
@@ -94,11 +94,11 @@ namespace StructuralDesignKitLibrary.CrossSections
 
             List<double> lamellaThicknessX = new List<double>();
             List<int> orientationsX = new List<int>();
-            List<IMaterialTimber> materialsX = new List<IMaterialTimber>();
+            List<MaterialCLT> materialsX = new List<MaterialCLT>();
 
 			List<double> lamellaThicknessY = new List<double>();
 			List<int> orientationsY = new List<int>();
-			List<IMaterialTimber> materialsY = new List<IMaterialTimber>();
+			List<MaterialCLT> materialsY = new List<MaterialCLT>();
 
 			for (int i = FirstLayer0; i < LastLayer0 + 1; i++)
             {

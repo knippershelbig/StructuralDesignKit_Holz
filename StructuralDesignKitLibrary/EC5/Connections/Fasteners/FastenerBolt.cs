@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace StructuralDesignKitLibrary.Connections.Fasteners
 {
     /// <summary>
-    /// Dowel fastener according to EN 1995-1-1 §8.6
+    /// Bolt fastener according to EN 1995-1-1 §8.5
     /// </summary>
     public class FastenerBolt : IFastener
     {

@@ -17,7 +17,7 @@ namespace StructuraldesignKitTesting
     public class EC5CrossSectionTest
     {
 
-        private static string TestFilePath = "C:\\Users\\Guillaume Caussarieu\\source\\repos\\StructuralDesignKit_Holz\\StructuraldesignKitTesting\\TestData\\Test_CrossSections.xlsx";
+        private static string TestFilePath = "C:\\Users\\gc\\source\\repos\\StructuralDesignKit\\StructuraldesignKitTesting\\TestData\\Test_CrossSections.xlsx";
         private static Excel.Application XlApp = new Excel.Application();
 
 		#region TestFunctions
