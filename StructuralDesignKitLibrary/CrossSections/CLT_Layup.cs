@@ -80,6 +80,8 @@ namespace StructuralDesignKitLibrary.CrossSections
             Thickness = Thicknesses.Sum();
 
             ComputeCrossSections();
+            CS_X.ComputeCapacities();
+            CS_Y.ComputeCapacities();
 
         }
 

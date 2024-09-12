@@ -100,15 +100,9 @@ namespace StructuralDesignKitLibrary.CrossSections
         public double W0_Net { get; set; }
 
         /// <summary>
-        /// Static Moment for rolling shear
-        /// </summary>
-        public double Sr0Net { get; set; }
-
-
-        /// <summary>
         /// Static Moment for  shear
         /// </summary>
-        public double S0Net { get; set; }
+        public List<List<double>> S0Net { get; set; }
 
 
         /// <summary>
@@ -165,9 +159,10 @@ namespace StructuralDesignKitLibrary.CrossSections
             LamellaMaterials = materials;
             LamellaCoGDistanceFromTopFibre = new List<double>();
             LamellaDistanceToCDG = new List<double>();
+            S0Net = new List<List<double>>();
             NbOfLayers = LamellaMaterials.Count;
+
             ComputeCrossSectionProperties();
-            ComputeCapacities();
         }
 
 
@@ -179,11 +174,9 @@ namespace StructuralDesignKitLibrary.CrossSections
             //Define the top lamella as the reference material
             ERef = LamellaMaterials[0].E0mean;
             Thickness = LamellaThicknesses.Sum();
-
             CenterOfGravity = ComputeCLTCenterOfGravity(this);
             ComputeNetAreas();
             ComputeInertia();
-            ComputeStaticMoment();
             ComputeAEeff();
         }
 
@@ -256,50 +249,6 @@ namespace StructuralDesignKitLibrary.CrossSections
         }
 
 
-        private void ComputeStaticMoment()
-        {
-            //define longitudinal layer closest to the position of the center of gravity
-            int lamellaIndex = 0;
-            bool CoGinLayer = false;
-            for (int i = 0; i < LamellaDistanceToCDG.Count; i++)
-            {
-                if (LamellaOrientations[i] == 0)
-                {
-                    if (Math.Abs(LamellaDistanceToCDG[i]) < Math.Abs(LamellaDistanceToCDG[lamellaIndex])) lamellaIndex = i;
-                }
-            }
-
-
-            for (int i = 0; i < lamellaIndex + 1; i++)
-            {
-                if (LamellaOrientations[i] == 0)
-                {
-                    Sr0Net += ERef / LamellaMaterials[i].E0mean * 1000 * LamellaThicknesses[i] * Math.Abs(LamellaDistanceToCDG[i]);
-                }
-            }
-
-            //define if Center of gravity is situated in the closest longitudinal layer 
-            if (LamellaDistanceToCDG[lamellaIndex] < LamellaThicknesses[lamellaIndex] / 2) CoGinLayer = true;
-
-            //if the center of gravity is located in the affected region
-            if (CoGinLayer)
-            {
-                for (int i = 0; i < lamellaIndex + 1; i++)
-                {
-                    if (LamellaOrientations[i] == 0)
-                    {
-                        S0Net += ERef / LamellaMaterials[i].E0mean * 1000 * LamellaThicknesses[i] * LamellaDistanceToCDG[i] + 1000 * (Math.Pow(LamellaThicknesses[lamellaIndex] / 2 - LamellaDistanceToCDG[lamellaIndex], 2) / 2);
-                    }
-                }
-
-            }
-
-            //if the center of gravity is not situated in the closest longitudinal layer
-            else
-            {
-                S0Net = Sr0Net;
-            }
-        }
 
         //Compute the different static moments (first moment of area) as follow
         //3 values per lamella up (top / middle / bottom) unless the CoG is in the lamella. Then a 4rth value is added
@@ -347,10 +296,11 @@ namespace StructuralDesignKitLibrary.CrossSections
 
 
             //Following lamellas if oriented in the same direction (0°) as a CLT layup cannot be generated with only 0° layer.
-            while (LamellaOrientations[i] == 0)
+            while (i < LamellaOrientations.Count && LamellaOrientations[i] == 0)
             {
                 List<double> S = new List<double>();
 
+                //Top of considered layer - same value as bottom of the previous layer
                 S.Add(Q[i - 1][2]);
 
                 List<double> PreviousLamellaTck = new List<double>();
@@ -368,7 +318,7 @@ namespace StructuralDesignKitLibrary.CrossSections
 
                 Y1 = ComputeCenterOfGravityFromMultipleLayers(PreviousLamellaTck, PreviousLamellaE);
                 Y = this.CenterOfGravity - Y1;
-                Ai = (PreviousLamellaTck.Sum() + LamellaThicknesses[i] / 2) * 1000; ;
+                Ai = (PreviousLamellaTck.Sum()) * 1000; ;
                 S.Add(Y * Ai);
 
                 //bottom
@@ -377,7 +327,7 @@ namespace StructuralDesignKitLibrary.CrossSections
 
                 Y1 = ComputeCenterOfGravityFromMultipleLayers(PreviousLamellaTck, PreviousLamellaE);
                 Y = this.CenterOfGravity - Y1;
-                Ai = (PreviousLamellaTck.Sum() + LamellaThicknesses[i]) * 1000; ;
+                Ai = (PreviousLamellaTck.Sum()) * 1000; ;
                 S.Add(Y * Ai);
 
                 Q.Add(S);
@@ -405,7 +355,7 @@ namespace StructuralDesignKitLibrary.CrossSections
                         List<int> orientationTemp = new List<int>();
 
                         //Create new CS based on the thickness from top
-                        for (int l = 0; l < j ; l++)
+                        for (int l = 0; l < j; l++)
                         {
                             thickTemp.Add(LamellaThicknesses[l]);
                             matTemp.Add(LamellaMaterials[l]);
@@ -625,20 +575,39 @@ namespace StructuralDesignKitLibrary.CrossSections
         /// </summary>
         private void ComputeShearCapacity()
         {
-            if (!MaterialConsistenty()) throw new Exception("This method is not implemented with lamella made of different materials");
-            VChar = MomentOfInertia / Sr0Net * LamellaMaterials[0].Frk;
+            S0Net = ComputeStaticMomentPerLamella();
+
+            List<double> V = new List<double>();
+            VChar = 0;
+
+            for (int i = 0; i < LamellaOrientations.Count; i++)
+            {
+                if (LamellaOrientations[i] == 0)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+
+                        V.Add(LamellaMaterials[i].Fvk * MomentOfInertia / S0Net[i][j]);
+
+                    }
+                }
+
+                else
+                {
+                    V.Add(LamellaMaterials[i].Frk * MomentOfInertia / S0Net[i][0]);
+                }
+            }
 
 
-
-
+            VChar = V.Min();
         }
 
-        private void ComputeCapacities()
+        public void ComputeCapacities()
         {
             ComputeCompressionCapacity();
             ComputeTensionCapacity();
             ComputeBendingCapacity();
-            //ComputeShearCapacity();
+            ComputeShearCapacity();
         }
 
         /// <summary>
